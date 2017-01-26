@@ -11,8 +11,14 @@ document.addEventListener('DOMContentLoaded', function() {
   var checkPageButton = document.getElementById('checkPage');
   checkPageButton.addEventListener('click', function() {
 	chrome.tabs.query({active : true}, function(tab) {
-	  var tld = controller.tldparser(tab);
-	  console.log(tld);
+	  var checkBox = document.getElementById('fillForm');
+	  if (checkBox.checked) {
+	    var tld = controller.tldparser(tab);
+	    console.log(tld);
+	  }
+	  else {
+		console.log('blank form');  
+	  };
 	});
   }, false);
 }, false);

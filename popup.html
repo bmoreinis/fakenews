@@ -3,8 +3,16 @@
   <head>
     <title>Fake News Analyzer</title>
     <script src="popup.js"></script>
+	<link rel="stylesheet" href="styles.css">
   </head>
   <body>
-   <input type="button" id="checkPage" value="Check Page" />
+    <div class="container">
+    <p>Toggle the switch to pre-fill your form</p>
+    <label class="switch">
+      <input type="checkbox" id="fillForm"/>
+      <div class="slider round"></div>
+    </label>
+    <input type="button" id="checkPage" value="Check Page" />
+	</div>
   </body>
 </html>
