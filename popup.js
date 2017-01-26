@@ -14,11 +14,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	  var checkBox = document.getElementById('fillForm');
 	  if (checkBox.checked) {
 	    var tld = controller.tldparser(tab);
-	    console.log(tld);
+		document.getElementById('myForm').style.display = 'block';
+		document.getElementById('tld').value = tld;
 	  }
 	  else {
-		console.log('blank form');  
+		document.getElementById('myForm').style.display = 'block'; 
 	  };
+	  var submitButton = document.getElementById('submit');
+	  submitButton.addEventListener('click', function() {
+		  alert("authenticating and submitting data to the server...");
+	  }, false);
 	});
   }, false);
 }, false);
