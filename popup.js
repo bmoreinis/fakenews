@@ -13,7 +13,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	chrome.tabs.query({active : true}, function(tab) {
 	  var checkBox = document.getElementById('fillForm');
 	  if (checkBox.checked) {
+		function doStuffWithDom(domContent) {
+			console.log('I received the following DOM content:\n' + domContent);
+		}
+		chrome.tabs.sendMessage(tab[0].id, {text: 'report_back'}, doStuffWithDom);
 	    var tld = controller.tldparser(tab);
+		var links = controller.linkFinder(tab);
 		document.getElementById('myForm').style.display = 'block';
 		document.getElementById('tld').value = tld;
 	  }
@@ -59,6 +64,10 @@ var controller = (function(){
 	//insert fxn here
   };
   
+  function setDOMInfo(array) {
+	  console.log(array.links);
+  };
+  
   // does something like http://smallseotools.com/backlink-checker/
   function backlinkCounter () {
 	//insert fxn here
@@ -66,7 +75,8 @@ var controller = (function(){
   
   //return public methods
   return {
-	tldparser : tldparser
+	tldparser : tldparser,
+	linkFinder : linkFinder
   };
   
 })();
