@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
 //Only query for DOM content once and only if the user wants pre-filled form, to do operations on it 
 		function doStuffWithDom(domContent) {
 			document.getElementById('tld').value = domContent.topLevelDomain;
+			document.getElementById('modifiedDate').value = domContent.modifiedDate;
+			document.getElementById('allLinks').value = domContent.allLinks;
 		};
 //Send message for callback to our content script getting DOM content
 		chrome.tabs.sendMessage(tab[0].id, {text: 'report_back'}, doStuffWithDom);
