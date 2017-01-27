@@ -11,18 +11,20 @@ document.addEventListener('DOMContentLoaded', function() {
   var checkPageButton = document.getElementById('checkPage');
   checkPageButton.addEventListener('click', function() {
 	chrome.tabs.query({active : true}, function(tab) {
+//Check if user wants form pre-filled
 	  var checkBox = document.getElementById('fillForm');
 	  if (checkBox.checked) {
+//Only query for DOM content once and only if the user wants pre-filled form, to do operations on it 
 		function doStuffWithDom(domContent) {
-			console.log('I received the following DOM content:\n' + domContent);
-		}
+			document.getElementById('tld').value = domContent.topLevelDomain;
+		};
+//Send message for callback to our content script getting DOM content
 		chrome.tabs.sendMessage(tab[0].id, {text: 'report_back'}, doStuffWithDom);
-	    var tld = controller.tldparser(tab);
-		var links = controller.linkFinder(tab);
+//Display filled-in form
 		document.getElementById('myForm').style.display = 'block';
-		document.getElementById('tld').value = tld;
 	  }
 	  else {
+//Display blank form
 		document.getElementById('myForm').style.display = 'block'; 
 	  };
 	  var submitButton = document.getElementById('submit');
@@ -32,51 +34,3 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
   }, false);
 }, false);
-
-//flow controller revealing module - contains various page parsing methods
-var controller = (function(){
-	
-  // extract tld from url of active tab
-  function tldparser(tab) {
-	var cutTrail = tab[0].url.split( '/' );
-	var items = cutTrail[2].split( '.' );
-	if (items.length === 3) {
-		var topLevelDomain = items[2];
-	}
-	else {
-		var topLevelDomain = items[1];
-	};
-	return topLevelDomain;
-  };
-  
-  // search document.body for ABOUT US or similar in menu lists
-  function aboutFinder (tab) {
-	//insert fxn here
-  };
-  
-  // search document.body for posted date above or below body
-  function dateFinder (tab) {
-	//insert fxn here
-  };
-  
-  // lists all links within body of page
-  function linkFinder (tab) {
-	//insert fxn here
-  };
-  
-  function setDOMInfo(array) {
-	  console.log(array.links);
-  };
-  
-  // does something like http://smallseotools.com/backlink-checker/
-  function backlinkCounter () {
-	//insert fxn here
-  }
-  
-  //return public methods
-  return {
-	tldparser : tldparser,
-	linkFinder : linkFinder
-  };
-  
-})();

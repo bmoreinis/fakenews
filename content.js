@@ -2,8 +2,61 @@
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     // If the received message has the expected format...
     if (msg.text === 'report_back') {
+		var topLevelDomain = controller.tldparser();
+		var allLinks = controller.linkFinder();
         // Call the specified callback, passing
         // the web-page's DOM content as argument
-        sendResponse(document.all[0].outerHTML);
+        sendResponse({
+			topLevelDomain : topLevelDomain,
+			allLinks : allLinks
+		});
     }
 });
+
+//flow controller revealing module - contains various page parsing methods
+var controller = (function(){
+	
+  // extract tld from url of active tab
+  function tldparser() {
+	var path = window.location.host.split('.');
+	if (path.length == 3) {
+		var tld = path[2]
+	}
+	else {
+		var tld = path[1]
+	};
+	return tld;
+  };
+  
+  // search document.body for ABOUT US or similar in menu lists
+  function aboutFinder () {
+	//insert fxn here
+  };
+  
+  // search document.body for posted date above or below body
+  function dateFinder () {
+	//insert fxn here
+  };
+  
+  // lists all links within body of page
+  function linkFinder () {
+	var array = [];
+	var links = document.getElementsByTagName("a");
+	for(var i=0, max=links.length; i<max; i++) {
+		array.push(links[i].href);
+	};
+	return array;
+  };
+  
+  // does something like http://smallseotools.com/backlink-checker/
+  function backlinkCounter () {
+	//insert fxn here
+  }
+  
+  //return public methods
+  return {
+	tldparser : tldparser,
+	linkFinder : linkFinder
+  };
+  
+})();
