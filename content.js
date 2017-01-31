@@ -1,5 +1,5 @@
 // Listen for messages
-chrome.runtime.onMessage.addListener(function (msg, sendResponse) {
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
 		
