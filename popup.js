@@ -11,57 +11,17 @@ document.addEventListener('DOMContentLoaded', function() {
   var checkPageButton = document.getElementById('checkPage');
   checkPageButton.addEventListener('click', function() {
 	chrome.tabs.query({active : true}, function(tab) {
+//Check if user wants form pre-filled
 	  var checkBox = document.getElementById('fillForm');
 	  if (checkBox.checked) {
-	    var tld = controller.tldparser(tab);
-	    console.log(tld);
+//Send message for callback to our content script getting DOM content
+		chrome.tabs.sendMessage(tab[0].id, {text: 'build_form_filled'}, null);
 	  }
 	  else {
-		console.log('blank form');  
+//Display blank form
+		chrome.tabs.sendMessage(tab[0].id, {text: 'build_form_blank'}, null);
 	  };
+	  //}, false);
 	});
   }, false);
 }, false);
-
-//flow controller revealing module - contains various page parsing methods
-var controller = (function(){
-	
-  // extract tld from url of active tab
-  function tldparser(tab) {
-	var cutTrail = tab[0].url.split( '/' );
-	var items = cutTrail[2].split( '.' );
-	if (items.length === 3) {
-		var topLevelDomain = items[2];
-	}
-	else {
-		var topLevelDomain = items[1];
-	};
-	return topLevelDomain;
-  };
-  
-  // search document.body for ABOUT US or similar in menu lists
-  function aboutFinder (tab) {
-	//insert fxn here
-  };
-  
-  // search document.body for posted date above or below body
-  function dateFinder (tab) {
-	//insert fxn here
-  };
-  
-  // lists all links within body of page
-  function linkFinder (tab) {
-	//insert fxn here
-  };
-  
-  // does something like http://smallseotools.com/backlink-checker/
-  function backlinkCounter () {
-	//insert fxn here
-  }
-  
-  //return public methods
-  return {
-	tldparser : tldparser
-  };
-  
-})();
