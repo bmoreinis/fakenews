@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 			["username","Email Address as User Name","","f"],
 			["tld","Top Level Domain", "","f"],
 			["modifiedDate","Modified Date(s)", "","f"],
-			["allLinks","Page Links", "","v"]
+			["allLinks","Page Links", "","f"]
 			];
 		//Build the form
 		makeForm(formFields);
