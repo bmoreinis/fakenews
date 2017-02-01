@@ -2,15 +2,16 @@
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
-		
+
 		var topLevelDomain = controller.tldparser();
 		var allLinks = controller.linkFinder();
 		var modifiedDate = controller.dateFinder();
 		var formFields = [
-			["username","Email Address as User Name",""],
-			["tld","Top Level Domain", topLevelDomain],
-			["modifiedDate","Modified Date(s)", modifiedDate],
-			["allLinks","Page Links", allLinks]
+        //f = fixed rows; v = variable rows
+			["username","Email Address as User Name","","f"],
+			["tld","Top Level Domain", topLevelDomain, "f"],
+			["modifiedDate","Modified Date(s)", modifiedDate,"f"],
+			["allLinks","Page Links", allLinks,"v"]
 			];
 		//Build the form
 		makeForm(formFields);
@@ -24,10 +25,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     }
 	else if (msg.text === 'build_form_blank') {
 		var formFields = [
-			["username","Email Address as User Name",""],
-			["tld","Top Level Domain", ""],
-			["modifiedDate","Modified Date(s)", ""],
-			["allLinks","Page Links", ""]
+			["username","Email Address as User Name","","f"],
+			["tld","Top Level Domain", "","f"],
+			["modifiedDate","Modified Date(s)", "","f"],
+			["allLinks","Page Links", "","v"]
 			];
 		//Build the form
 		makeForm(formFields);
@@ -36,7 +37,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
 //flow controller revealing module - contains various page parsing methods
 var controller = (function(){
-	
+
   // extract tld from url of active tab
   function tldparser() {
 	var myPath = window.location.host.split('.');
@@ -52,7 +53,7 @@ var controller = (function(){
   function aboutFinder () {
 	//insert fxn here
   };
-  
+
   // search document.body for posted date above or below body
   function dateFinder () {
 	var modifiedDate = new Date(document.lastModified);
@@ -74,7 +75,7 @@ var controller = (function(){
 		};
 	};
   };
-  
+
   // lists all links within body of page
   function linkFinder () {
 	var array = [];
@@ -88,19 +89,19 @@ var controller = (function(){
 	}
 	return array;
   };
-  
+
   // does something like http://smallseotools.com/backlink-checker/
   function backlinkCounter () {
 	//insert fxn here
   }
-  
+
   //return public methods
   return {
 	tldparser : tldparser,
 	linkFinder : linkFinder,
 	dateFinder : dateFinder
   };
-  
+
 })();
 
 function makeForm(fields) {
@@ -109,19 +110,44 @@ function makeForm(fields) {
 	formDiv.setAttribute('id', "FakeNewsForm");
     var formName = document.createElement("form");
     formName.setAttribute('method',"post");
-    formName.setAttribute('action',"submit.php"); 
-        for(var i = 0; i < fields.length; i++){
-            var labelElement = document.createElement("label");
-            labelElement.setAttribute("for", fields[i][0]);
-            var labelText = document.createTextNode(fields[i][1]+": ");
-            labelElement.appendChild(labelText);
-            formName.appendChild(labelElement);
-            var inputElement = document.createElement("input"); //input element, text
-            inputElement.setAttribute('type',"text");
-            inputElement.setAttribute("id",fields[i][0]);
-			inputElement.value = fields[i][2];
-            formName.appendChild(inputElement);
+    formName.setAttribute('action',"submit.php");
+    for(var i = 0; i < fields.length; i++){
+        var labelElement = document.createElement("label");
+        labelElement.setAttribute("for", fields[i][0]);
+        var labelText = document.createTextNode(fields[i][1]+": ");
+        labelElement.appendChild(labelText);
+        formName.appendChild(labelElement);
+        if (fields[i][3] == "v") {
+			if (fields[i][2].length > 0) {
+				var listNode = document.createElement("OL");
+				listNode.setAttribute("id", fields[i][0]);
+				var itemsArray = fields[i][2];
+				for(var x = 0; x < itemsArray.length; x++){
+					var listItem = document.createElement("LI"); // Create a <li> node
+					var listText = document.createTextNode(itemsArray[x]);// Create a text node
+					listItem.appendChild(listText);
+					listNode.appendChild(listItem);
+				}
+				formName.appendChild(listNode);
+			}
+			else {
+				var listNode = document.createElement("UL");
+				listNode.setAttribute("id", fields[i][0]);
+				var listItem = document.createElement("LI");
+				var listText = document.createTextNode('No items were found');
+				listItem.appendChild(listText);
+				listNode.appendChild(listItem);
+				formName.appendChild(listNode);
+			};
         }
+        else {
+        var inputElement = document.createElement("input"); //input element, text
+        inputElement.setAttribute('type',"text");
+        inputElement.setAttribute("id",fields[i][0]);
+        inputElement.value = fields[i][2];
+        formName.appendChild(inputElement);
+        }
+    }
     var submitElement = document.createElement("input"); //input element, Submit button
     submitElement.setAttribute('type',"button");
     submitElement.setAttribute('value',"Submit Data");
