@@ -60,7 +60,9 @@ var controller = (function(){
 	var today = new Date();
     //Check for dynamically created page
 	if (String(modifiedDate) !== String(today)) {
-		return modifiedDate;
+		splitDate = String(modifiedDate).split(' ');
+		returnDate = splitDate[0]+' '+splitDate[1]+' '+splitDate[2]+' '+splitDate[3];
+		return returnDate;
 	}
 	//If modifiedDate doesn't work, search page for updated, posted, revised, modified + date
 	else {
