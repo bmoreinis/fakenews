@@ -1,12 +1,11 @@
 #FakeNewsForm {
 	position: fixed;
 	padding: 15px;
-    top: 2em;
-	top: 20px;
-	left: 2em;
-	left: 20px;
-	width: 30em;
-	width: 300px;
+    top: 0em;
+	top: 0px;
+	width: 100%;
+	height: 50%;
+	overflow: scroll;
 	background-color: #f1f8fe;
 	border-radius: 10px;
 	z-index: 10001;
