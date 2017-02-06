@@ -106,6 +106,11 @@ var controller = (function(){
 
 })();
 
+function cancelForm() {
+	var element = document.getElementById("FakeNewsForm");
+	element.parentNode.removeChild(element);
+};
+
 function makeForm(fields) {
     // Create Form Object
 	var formDiv = document.createElement("div");
@@ -153,8 +158,16 @@ function makeForm(fields) {
     var submitElement = document.createElement("input"); //input element, Submit button
     submitElement.setAttribute('type',"button");
     submitElement.setAttribute('value',"Submit Data");
-	submitElement.setAttribute('id','Submit');
+	submitElement.setAttribute('id',"submit");
     formName.appendChild(submitElement);
+	
+	var cancelElement = document.createElement("input");
+	cancelElement.setAttribute('type',"button");
+	cancelElement.setAttribute('value',"Cancel");
+	cancelElement.setAttribute('id','cancel');
+	cancelElement.addEventListener('click', cancelForm, false);
+    formName.appendChild(cancelElement);
+	
 	formDiv.appendChild(formName);
 	if (document.getElementById('FakeNewsForm')) {
 		document.getElementById('FakeNewsForm').replaceWith(formDiv);
