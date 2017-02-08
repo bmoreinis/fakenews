@@ -5,6 +5,15 @@ body
     height:50%;
 }
 
+.movedown {
+    padding-top:40%;
+    color: #303030;
+    font-family: 'Open Sans', Tahoma, Arial;
+    font-size: 16px;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
 #FakeNewsForm {
     position    : fixed;
     top         : 0;
@@ -13,36 +22,39 @@ body
     height      : 400px;
     padding: 15px;
     width: 100%;
-    background-color: #f1f8fe;
     border-radius: 10px;
     z-index: 10001;
+    background-color:transparent;
 }
 
 
 #FakeNewsForm form {
     overflow-y: scroll;
+    background-color: #85e8f7;
     position: absolute;
     bottom:0;
-    width:90%;
+    width:92%;
     left:10px
     right:0;
-    top:0;
+    top:20px;
     z-index: 10001;
+    padding-top:20px!important;
 }
 
 
 #FakeNewsForm label {
 	display: block;
 	color:#000;
+    margin-left:20px;
 }
 
 
-ol li {
+#FakeNewsForm ol li {
 	color:#000;
 }
 
-button, input {
-    margin: 5px 5px 5px 0;
+#FakeNewsForm button, #FakeNewsForm input {
+    margin: 5px 5px 5px 20px;
     padding: 0.6em 1em;
     font-family: 'Montserrat', Tahoma, Arial;
     font-size: 15px;
@@ -55,20 +67,20 @@ button, input {
     transition: all 0.2s ease;
     line-height: normal;
 }
-button#submit, input#submit, button#cancel, input#cancel{
+#FakeNewsForm #submit, #FakeNewsForm #cancel {
     font-weight:bold;
 }
 
-button#submit:hover, input#submit:hover, button#cancel:hover, input#cancel:hover {
+#FakeNewsForm button#submit:hover, #FakeNewsForm input#submit:hover, #FakeNewsForm button#cancel:hover, #FakeNewsForm input#cancel:hover {
 	color:yellow;
 }
 
-button#submit, input#submit {
+#FakeNewsForm button#submit, #FakeNewsForm input#submit {
     color: #fff;
     background: #ee4444;
     font-weight:bold;
 }
-body, select, textarea {
+#FakeNewsForm select, #FakeNewsForm textarea {
     color: #303030;
     font-family: 'Open Sans', Tahoma, Arial;
     font-size: 16px;

@@ -112,6 +112,9 @@ function cancelForm() {
 };
 
 function makeForm(fields) {
+	// Move Body Down
+	var script = document.createElement("script");
+    document.getElementsByTagName("BODY")[0].style.marginTop="420px";
     // Create Form Object
 	var formDiv = document.createElement("div");
 	formDiv.setAttribute('id', "FakeNewsForm");
