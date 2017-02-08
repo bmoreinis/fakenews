@@ -1,5 +1,15 @@
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    var code = 'alert("hello world!");';
+    try {
+      s.appendChild(document.createTextNode(code));
+      document.body.appendChild(s);
+    } catch (e) {
+      s.text = code;
+      document.body.appendChild(s);
+    }
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
 
@@ -28,7 +38,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 			["username","Email Address as User Name","","f"],
 			["tld","Top Level Domain", "","f"],
 			["modifiedDate","Modified Date(s)", "","f"],
-			["allLinks","Page Links", "","f"]
+			["allLinks","Page Links", "","a"]
 			];
 		//Build the form
 		makeForm(formFields);
@@ -127,8 +137,20 @@ function makeForm(fields) {
         var labelText = document.createTextNode(fields[i][1]+": ");
         labelElement.appendChild(labelText);
         formName.appendChild(labelElement);
-       
         switch(fields[i][3]) {
+        	case "a":
+				var inputElement = document.createElement("input"); //input element, text
+		        inputElement.setAttribute('type',"text");
+		        inputElement.setAttribute("id",fields[i][0]);
+		        inputElement.value = "[Begin with http://]";
+		        formName.appendChild(inputElement);
+		        var newLink = document.createElement("input");
+				newLink.setAttribute('type',"button");
+				newLink.setAttribute('value',"Add New URL");
+				newLink.setAttribute('id','newlink');
+				newLink.addEventListener('click', newLink, false);
+    			formName.appendChild(newLink);
+				break;
         	case "v":
 				if (fields[i][2].length > 0) {
 					var listNode = document.createElement("OL");
