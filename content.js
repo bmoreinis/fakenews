@@ -1,15 +1,5 @@
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    var code = 'alert("hello world!");';
-    try {
-      s.appendChild(document.createTextNode(code));
-      document.body.appendChild(s);
-    } catch (e) {
-      s.text = code;
-      document.body.appendChild(s);
-    }
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
 
@@ -117,8 +107,17 @@ var controller = (function(){
 })();
 
 function cancelForm() {
-	var element = document.getElementById("FakeNewsForm");
-	element.parentNode.removeChild(element);
+	var formElement = document.getElementById("FakeNewsForm");
+	formElement.parentNode.removeChild(formElement);
+};
+
+function addLink() {
+	var divElement = document.getElementById('blankLinks');
+	var newElement = document.createElement('input');
+	newElement.setAttribute('type','text');
+	newElement.setAttribute('style','width:500px;');
+	newElement.value = "[Begin with http://]";
+	divElement.appendChild(newElement);
 };
 
 function makeForm(fields) {
@@ -139,17 +138,20 @@ function makeForm(fields) {
         formName.appendChild(labelElement);
         switch(fields[i][3]) {
         	case "a":
+				var divElement = document.createElement("div");
+				divElement.setAttribute('id','blankLinks');
 				var inputElement = document.createElement("input"); //input element, text
 		        inputElement.setAttribute('type',"text");
 		        inputElement.setAttribute("id",fields[i][0]);
 		        inputElement.value = "[Begin with http://]";
-		        formName.appendChild(inputElement);
+		        divElement.appendChild(inputElement);
 		        var newLink = document.createElement("input");
 				newLink.setAttribute('type',"button");
 				newLink.setAttribute('value',"Add New URL");
 				newLink.setAttribute('id','newlink');
-				newLink.addEventListener('click', newLink, false);
-    			formName.appendChild(newLink);
+				newLink.addEventListener('click', addLink, false);
+    			divElement.appendChild(newLink);
+				formName.appendChild(divElement);
 				break;
         	case "v":
 				if (fields[i][2].length > 0) {
