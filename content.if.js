@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 			["username","Email Address as User Name","","f"],
 			["tld","Top Level Domain", topLevelDomain, "f"],
 			["modifiedDate","Modified Date(s)", modifiedDate,"f"],
-			["allLinks","Page Links", allLinks,"vl"]
+			["allLinks","Page Links", allLinks,"v"]
 			];
 		//Build the form
 		makeForm(formFields);
@@ -127,66 +127,36 @@ function makeForm(fields) {
         var labelText = document.createTextNode(fields[i][1]+": ");
         labelElement.appendChild(labelText);
         formName.appendChild(labelElement);
-       
-        switch(fields[i][3]) {
-        	case "v":
-				if (fields[i][2].length > 0) {
-					var listNode = document.createElement("OL");
-					listNode.setAttribute("id", fields[i][0]);
-					var itemsArray = fields[i][2];
-					for(var x = 0; x < itemsArray.length; x++){
-						var listItem = document.createElement("LI"); // Create a <li> node
-						var listText = document.createTextNode(itemsArray[x]);// Create a text node
-						listItem.appendChild(listText);
-						listNode.appendChild(listItem);
-					}
-					formName.appendChild(listNode);
-				}
-				else {
-					var listNode = document.createElement("UL");
-					listNode.setAttribute("id", fields[i][0]);
-					var listItem = document.createElement("LI");
-					var listText = document.createTextNode('No items were found');
+        if (fields[i][3] == "v") {
+			if (fields[i][2].length > 0) {
+				var listNode = document.createElement("OL");
+				listNode.setAttribute("id", fields[i][0]);
+				var itemsArray = fields[i][2];
+				for(var x = 0; x < itemsArray.length; x++){
+					var listItem = document.createElement("LI"); // Create a <li> node
+					var listText = document.createTextNode(itemsArray[x]);// Create a text node
 					listItem.appendChild(listText);
 					listNode.appendChild(listItem);
-					formName.appendChild(listNode);
 				}
-				break;
-			case "vl":
-				if (fields[i][2].length > 0) {
-					var listNode = document.createElement("OL");
-					listNode.setAttribute("id", fields[i][0]);
-					var itemsArray = fields[i][2];
-					for(var x = 0; x < itemsArray.length; x++){
-						var listItem = document.createElement("LI"); // Create a <li> node
-						var itemLink = document.createElement('a')
-						var linkText = document.createTextNode(itemsArray[x]);// Create a text node
-						itemLink.appendChild(linkText);
-						itemLink.href = itemsArray[x];
-						itemLink.setAttribute('target', '_blank');
-						listItem.appendChild(itemLink);
-						listNode.appendChild(listItem);
-					}
-					formName.appendChild(listNode);
-				}
-				else {
-					var listNode = document.createElement("UL");
-					listNode.setAttribute("id", fields[i][0]);
-					var listItem = document.createElement("LI");
-					var listText = document.createTextNode('No items were found');
-					listItem.appendChild(listText);
-					listNode.appendChild(listItem);
-					formName.appendChild(listNode);
-				}
-				break;
-        	case "f":
-		        var inputElement = document.createElement("input"); //input element, text
-		        inputElement.setAttribute('type',"text");
-		        inputElement.setAttribute("id",fields[i][0]);
-		        inputElement.value = fields[i][2];
-		        formName.appendChild(inputElement);
-		    	break;
-		}
+				formName.appendChild(listNode);
+			}
+			else {
+				var listNode = document.createElement("UL");
+				listNode.setAttribute("id", fields[i][0]);
+				var listItem = document.createElement("LI");
+				var listText = document.createTextNode('No items were found');
+				listItem.appendChild(listText);
+				listNode.appendChild(listItem);
+				formName.appendChild(listNode);
+			};
+        }
+        else {
+        var inputElement = document.createElement("input"); //input element, text
+        inputElement.setAttribute('type',"text");
+        inputElement.setAttribute("id",fields[i][0]);
+        inputElement.value = fields[i][2];
+        formName.appendChild(inputElement);
+        }
     }
     var submitElement = document.createElement("input"); //input element, Submit button
     submitElement.setAttribute('type',"button");
