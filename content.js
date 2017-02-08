@@ -1,5 +1,16 @@
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+	// playing with how to add a script to the page so it can be called from a form button
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    var code = 'alert("hello world!");';
+    try {
+      s.appendChild(document.createTextNode(code));
+      document.body.appendChild(s);
+    } catch (e) {
+      s.text = code;
+      document.body.appendChild(s);
+    }
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
 		var topLevelDomain = controller.tldparser();
