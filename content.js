@@ -1,16 +1,5 @@
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-	// playing with how to add a script to the page so it can be called from a form button
-    var s = document.createElement('script');
-    s.type = 'text/javascript';
-    var code = 'alert("hello world!");';
-    try {
-      s.appendChild(document.createTextNode(code));
-      document.body.appendChild(s);
-    } catch (e) {
-      s.text = code;
-      document.body.appendChild(s);
-    }
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
 		var topLevelDomain = controller.tldparser();
@@ -18,19 +7,19 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 		var modifiedDate = controller.dateFinder();
 		var formFields = [
         //f = fixed rows; v = variable rows
-			["username","Email Address as User Name","","f"],
-			["tld","Top Level Domain", topLevelDomain, "f"],
-			["modifiedDate","Modified Date(s)", modifiedDate,"f"],
-			["allLinks","Page Links", allLinks,"vl"]
-			];
+                ["username","Email Address as User Name","","f"],
+                ["tld","Top Level Domain", topLevelDomain, "f"],
+                ["modifiedDate","Modified Date(s)", modifiedDate,"f"],
+                ["allLinks","Page Links", allLinks,"vl"]
+                ];
 		//Build the form
 		makeForm(formFields);
         // Call the specified callback, passing
         // the web-page's DOM content as argument
         sendResponse({
-			topLevelDomain : topLevelDomain,
-			allLinks : allLinks,
-			modifiedDate : modifiedDate
+                topLevelDomain : topLevelDomain,
+                allLinks : allLinks,
+                modifiedDate : modifiedDate
 		});
     }
 	else if (msg.text === 'build_form_blank') {
@@ -148,21 +137,21 @@ function makeForm(fields) {
         formName.appendChild(labelElement);
         switch(fields[i][3]) {
         	case "a":
-				var divElement = document.createElement("div");
-				divElement.setAttribute('id','blankLinks');
-				var inputElement = document.createElement("input"); //input element, text
-		        inputElement.setAttribute('type',"text");
-		        inputElement.setAttribute("id",fields[i][0]);
-		        inputElement.value = "[Begin with http://]";
-		        divElement.appendChild(inputElement);
+                        var divElement = document.createElement("div");
+                            divElement.setAttribute('id','blankLinks');
+                        var inputElement = document.createElement("input"); //input element, text
+                            inputElement.setAttribute('type',"text");
+                            inputElement.setAttribute("id",fields[i][0]);
+                            inputElement.value = "[Begin with http://]";
+                            divElement.appendChild(inputElement);
 		        var newLink = document.createElement("input");
-				newLink.setAttribute('type',"button");
-				newLink.setAttribute('value',"Add New URL");
-				newLink.setAttribute('id','newlink');
-				newLink.addEventListener('click', addLink, false);
-    			divElement.appendChild(newLink);
-				formName.appendChild(divElement);
-				break;
+                            newLink.setAttribute('type',"button");
+                            newLink.setAttribute('value',"Add New URL");
+                            newLink.setAttribute('id','newlink');
+                            newLink.addEventListener('click', addLink, false);
+                            divElement.appendChild(newLink);
+                            formName.appendChild(divElement);
+                        break;
         	case "v":
 				if (fields[i][2].length > 0) {
 					var listNode = document.createElement("OL");
