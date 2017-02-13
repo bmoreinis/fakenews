@@ -113,8 +113,8 @@ function cancelForm() {
 function addLink() {
 	var divElement = document.getElementById('blankLinks');
 	var newElement = document.createElement('input');
+    newElement.setAttribute('class','emptyField');
 	newElement.setAttribute('type','text');
-	newElement.setAttribute('style','width:500px;');
 	newElement.value = "[Begin with http://]";
 	divElement.appendChild(newElement);
 };
@@ -137,21 +137,22 @@ function makeForm(fields) {
         formName.appendChild(labelElement);
         switch(fields[i][3]) {
         	case "a":
-                        var divElement = document.createElement("div");
-                            divElement.setAttribute('id','blankLinks');
-                        var inputElement = document.createElement("input"); //input element, text
-                            inputElement.setAttribute('type',"text");
-                            inputElement.setAttribute("id",fields[i][0]);
-                            inputElement.value = "[Begin with http://]";
-                            divElement.appendChild(inputElement);
-		        var newLink = document.createElement("input");
-                            newLink.setAttribute('type',"button");
-                            newLink.setAttribute('value',"Add New URL");
-                            newLink.setAttribute('id','newlink');
-                            newLink.addEventListener('click', addLink, false);
-                            divElement.appendChild(newLink);
-                            formName.appendChild(divElement);
-                        break;
+                    var divElement = document.createElement("div");
+                        divElement.setAttribute('id','blankLinks');
+                    var newLink = document.createElement("input");
+                        newLink.setAttribute('type',"button");
+                        newLink.setAttribute('value',"Add New URL");
+                        newLink.setAttribute('class','newField');
+                        newLink.addEventListener('click', addLink, false);
+                        divElement.appendChild(newLink);
+                        formName.appendChild(divElement);
+                    var inputElement = document.createElement("input"); //input element, text
+                        inputElement.setAttribute('type',"text");
+                        inputElement.setAttribute("id",fields[i][0]);
+                        inputElement.setAttribute('class','emptyField');
+                        inputElement.value = "[Begin with http://]";
+                        divElement.appendChild(inputElement);
+                    break;
         	case "v":
 				if (fields[i][2].length > 0) {
 					var listNode = document.createElement("OL");
@@ -216,14 +217,14 @@ function makeForm(fields) {
     submitElement.setAttribute('value',"Submit Data");
 	submitElement.setAttribute('id',"submit");
     formName.appendChild(submitElement);
-	
+
 	var cancelElement = document.createElement("input");
 	cancelElement.setAttribute('type',"button");
 	cancelElement.setAttribute('value',"Cancel");
 	cancelElement.setAttribute('id','cancel');
 	cancelElement.addEventListener('click', cancelForm, false);
     formName.appendChild(cancelElement);
-	
+
 	formDiv.appendChild(formName);
 	if (document.getElementById('FakeNewsForm')) {
 		document.getElementById('FakeNewsForm').replaceWith(formDiv);

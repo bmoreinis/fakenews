@@ -5,6 +5,10 @@ body
     height:50%;
 }
 
+#blankLinks input, input#submit, input#cancel {
+    float:left;
+    clear:left;
+}
 .movedown {
     padding-top:40%;
     color: #303030;
@@ -98,6 +102,9 @@ body
     line-height: 1.75;
 }
 
-input#allLinks {
-    width:500px;
+div#blankLinks input.emptyField {
+    width:600px;
+}
+
+div#blankLinks input.newField {
 }
