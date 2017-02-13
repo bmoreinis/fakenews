@@ -108,6 +108,7 @@ var controller = (function(){
 function cancelForm() {
 	var formElement = document.getElementById("FakeNewsForm");
 	formElement.parentNode.removeChild(formElement);
+	document.getElementsByTagName("BODY")[0].style.marginTop="0px";
 };
 
 function addLink() {
@@ -121,7 +122,6 @@ function addLink() {
 
 function makeForm(fields) {
 	// Move Body Down
-	var script = document.createElement("script");
     document.getElementsByTagName("BODY")[0].style.marginTop="420px";
     // Create Form Object
 	var formDiv = document.createElement("div");
