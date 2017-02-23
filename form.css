@@ -19,12 +19,12 @@ body
 }
 
 #FakeNewsForm {
-    position    : fixed;
-    top         : 0;
-    left       : 0;
-    z-index     : 200;
-    height      : 400px;
-    padding: 15px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    height: 400px;
+    padding:15px;
     width: 100%;
     border-radius: 10px;
     z-index: 10001;
@@ -49,8 +49,8 @@ body
     color:blue;
 }
 #FakeNewsForm label {
-	display: block;
-	color:#000;
+    display: block;
+    color:#000;
     margin-left:20px;
 }
 
@@ -61,6 +61,7 @@ body
 
 #FakeNewsForm button, #FakeNewsForm input {
     margin: 5px 5px 5px 20px;
+    width:400px;
     padding: 0.6em 1em;
     font-family: 'Montserrat', Tahoma, Arial;
     font-size: 15px;
@@ -86,7 +87,7 @@ body
 }
 
 #FakeNewsForm button#submit:hover, #FakeNewsForm input#submit:hover, #FakeNewsForm button#cancel:hover, #FakeNewsForm input#cancel:hover {
-	color:yellow;
+    color:yellow;
 }
 
 #FakeNewsForm button#submit, #FakeNewsForm input#submit {
