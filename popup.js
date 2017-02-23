@@ -11,25 +11,25 @@ document.addEventListener('DOMContentLoaded', function() {
   var checkPageButton = document.getElementById('checkPage');
   checkPageButton.addEventListener('click', function() {
 	chrome.tabs.query({active : true}, function(tab) {
-//Check if user wants form pre-filled
+        //Check if user wants form pre-filled
 	  var checkBox = document.getElementById('fillForm');
 	  if (checkBox.checked) {
-		var req = new XMLHttpRequest();
-		function sendFilled() {
-			var whois = req.responseText;
-			console.log(whois);
-			chrome.tabs.sendMessage(tab[0].id, {text:'build_form_filled', whois: whois}, null);
-		};
-		var url = new URL(tab[0].url)
-        var domain = url.hostname
-		console.log(tab[0].url);
-        req.open("GET","http://api.bulkwhoisapi.com/whoisAPI.php?domain="+domain+"&token=usemeforfree");
-        req.onload = sendFilled;
-        req.send(null);
+            var req = new XMLHttpRequest();
+            function sendFilled() {
+                var whois = req.responseText;
+                console.log(whois);
+                chrome.tabs.sendMessage(tab[0].id, {text:'build_form_filled', whois: whois}, null);
+            };
+            var url = new URL(tab[0].url);
+            var domain = url.hostname;
+            console.log(tab[0].url);
+            req.open("GET","http://api.bulkwhoisapi.com/whoisAPI.php?domain="+domain+"&token=usemeforfree");
+            req.onload = sendFilled;
+            req.send(null);
 	  }
 	  else {
-//Display blank form
-		chrome.tabs.sendMessage(tab[0].id, {text: 'build_form_blank'}, null);
+            //Display blank form
+            chrome.tabs.sendMessage(tab[0].id, {text: 'build_form_blank'}, null);
 	  };
 	  //}, false);
 	});
