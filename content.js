@@ -2,6 +2,8 @@
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
+		var whoIsObj = JSON.parse(msg.whois).formatted_data;
+		var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
 		var topLevelDomain = controller.tldparser();
 		var allLinks = controller.linkFinder();
 		var modifiedDate = controller.dateFinder();
@@ -10,7 +12,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
                 ["username","Email Address as User Name","","f"],
                 ["tld","Top Level Domain", topLevelDomain, "f"],
                 ["modifiedDate","Modified Date(s)", modifiedDate,"f"],
-                ["allLinks","Page Links", allLinks,"vl"]
+                ["allLinks","Page Links", allLinks,"vl"],
+				["whois", "WHOIS Lookup", whoIsArr, "v"]
                 ];
 		//Build the form
 		makeForm(formFields);
