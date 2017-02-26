@@ -1,5 +1,23 @@
+function sendToServer(obj) {
+    console.log(obj);
+
+    fetch('http://app.fakenewsfitness.org', {
+        method: 'POST',
+        body: JSON.stringify(obj)
+    })
+    .then(function(res) {
+        if (!res.ok) {
+            console.log("request failed: " + res.status + " " + res.statusText);
+        }
+    })
+    .catch(function(err) {
+        console.log(err);
+    })
+}
+
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+    console.log("onMessage", msg);
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
         var whoIsObj = JSON.parse(msg.whois).formatted_data;
@@ -26,7 +44,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             topLevelDomain : topLevelDomain,
             allLinks : allLinks,
             modifiedDate : modifiedDate
-            });
+        });
     }
     else if (msg.text === 'build_form_blank') {
         var formFields = [
@@ -43,7 +61,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
 //flow controller revealing module - contains various page parsing methods
 var controller = (function(){
-    
+
   // get domain from active tab
    function domainFinder() {
 	var myPath = window.location.host.split('.');
@@ -146,8 +164,6 @@ function makeForm(fields) {
 	var formDiv = document.createElement("div");
 	formDiv.setAttribute('id', "FakeNewsForm");
     var formName = document.createElement("form");
-    formName.setAttribute('method',"post");
-    formName.setAttribute('action',"submit.php");
     for(var i = 0; i < fields.length; i++){
         var labelElement = document.createElement("label");
         labelElement.setAttribute("for", fields[i][0]);
@@ -235,6 +251,13 @@ function makeForm(fields) {
     submitElement.setAttribute('type',"button");
     submitElement.setAttribute('value',"Submit Data");
 	submitElement.setAttribute('id',"submit");
+
+    submitElement.addEventListener("click", function() {
+        sendToServer({
+            /* use Jquery with a form serialization library */
+            username: document.getElementById("username").value
+        })
+    }, false)
     formName.appendChild(submitElement);
 
 	var cancelElement = document.createElement("input");
