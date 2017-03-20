@@ -117,13 +117,13 @@ var controller = (function(){
   function linkFinder () {
 	var array = [];
 	var paragraphs = document.getElementsByTagName("p");
-	for(var i=0, max=paragraphs.length; i<max; i++) {
-		for(var x=0, max=paragraphs[i].children.length; x<max; x++) {
-			if (paragraphs[i].children[x].tagName == "A") {
-				array.push(paragraphs[i].children[x].href);
+		for(var i=0, max=paragraphs.length; i<max; i++) {
+			for(var x=0, Xmax=paragraphs[i].children.length; x<Xmax; x++) {
+				if (paragraphs[i].children[x].tagName == "A") {
+					array.push(paragraphs[i].children[x].href)
+				}
 			}
 		}
-	}
 	return array;
   };
 
