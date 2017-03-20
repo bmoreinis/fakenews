@@ -17,7 +17,7 @@ function sendToServer(obj) {
 
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    console.log("onMessage", msg);
+	
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
         var whoIsObj = JSON.parse(msg.whois).formatted_data;
@@ -35,8 +35,13 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             ["allLinks","Page Links", allLinks,"vl"],
             ["whois", "WHOIS Lookup", whoIsArr, "v"]
             ];
+		var critThinksFields = [
+			["Critical Question #1 ID", "Critical Question #1 Label"],
+			["Critical Question #2 ID", "Critical Question #2 Label"],
+			["Critical Question #3 ID", "Critical Question #3 Label"]
+		];
         //Build the form
-        makeForm(formFields);
+        makeForm(formFields, critThinksFields);
         // Call the specified callback, passing
         // the web-page's DOM content as argument
         sendResponse({
@@ -54,8 +59,13 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             ["modifiedDate","Modified Date(s)", "","f"],
             ["allLinks","Page Links", "","a"]
             ];
+		var critThinksFields = [
+			["Critical Question #1 ID", "Critical Question #1 Label"],
+			["Critical Question #2 ID", "Critical Question #2 Label"],
+			["Critical Question #3 ID", "Critical Question #3 Label"]
+		];
         //Build the form
-        makeForm(formFields);
+        makeForm(formFields, critThinksFields);
     }
 });
 
@@ -142,6 +152,7 @@ var controller = (function(){
 
 })();
 
+//cancel button - now that we have multiple pages could/should be made generic
 function cancelForm() {
 	var formElement = document.getElementById("FakeNewsForm");
 	formElement.parentNode.removeChild(formElement);
@@ -157,10 +168,10 @@ function addLink() {
 	divElement.appendChild(newElement);
 };
 
-function makeForm(fields) {
+function makeForm(fields, critFields) {
 	// Move Body Down
     document.getElementsByTagName("BODY")[0].style.marginTop="420px";
-    // Create Form Object
+    // Create Form Object Page 1
 	var formDiv = document.createElement("div");
 	formDiv.setAttribute('id', "FakeNewsForm");
     var formName = document.createElement("form");
@@ -247,11 +258,21 @@ function makeForm(fields) {
 		    	break;
 		}
     }
+	//could maybe should be made generic for multiple pages
+	var pagerElement = document.createElement("input"); //input element, pager
+    pagerElement.setAttribute('type',"button");
+    pagerElement.setAttribute('value',"Go to Page 2");
+	pagerElement.setAttribute('id',"pageTwo");
+    pagerElement.addEventListener("click", function() {
+		formName.style.display = 'none';
+		ctForm.style.display = 'block';
+	}, false);
+    formName.appendChild(pagerElement);
+	
     var submitElement = document.createElement("input"); //input element, Submit button
     submitElement.setAttribute('type',"button");
     submitElement.setAttribute('value',"Submit Data");
 	submitElement.setAttribute('id',"submit");
-
     submitElement.addEventListener("click", function() {
         sendToServer({
             /* use Jquery with a form serialization library */
@@ -260,14 +281,58 @@ function makeForm(fields) {
     }, false)
     formName.appendChild(submitElement);
 
-	var cancelElement = document.createElement("input");
+	var cancelElement = document.createElement("input"); //input element, cancel
 	cancelElement.setAttribute('type',"button");
-	cancelElement.setAttribute('value',"Cancel");
+	cancelElement.setAttribute('value',"Cancel (You will lose your work)");
 	cancelElement.setAttribute('id','cancel');
 	cancelElement.addEventListener('click', cancelForm, false);
     formName.appendChild(cancelElement);
-
 	formDiv.appendChild(formName);
+	
+	//Create Page 2 Critical Thinking, and hide it
+    var ctForm = document.createElement("form");
+	ctForm.setAttribute('id', "FakeNewsPageTwo")
+	ctForm.setAttribute('style','display:none');
+	for(var c = 0; c < critFields.length; c++){
+		var labelElement = document.createElement("label");
+		labelElement.setAttribute("for", critFields[c][0]);
+		var labelText = document.createTextNode(critFields[c][1]+": ");
+		labelElement.appendChild(labelText);
+		ctForm.appendChild(labelElement);
+		var inputElement = document.createElement("textarea"); //input element, textarea
+		inputElement.setAttribute('rows', 4);
+		inputElement.setAttribute('cols', 50);
+		inputElement.setAttribute("id", critFields[c][0]);
+		ctForm.appendChild(inputElement);
+	}
+	var pageBackElement = document.createElement("input"); //input element, page back to 1
+    pageBackElement.setAttribute('type',"button");
+    pageBackElement.setAttribute('value',"Go to Page 1");
+	pageBackElement.setAttribute('id',"pageOne");
+    pageBackElement.addEventListener("click", function() {
+		ctForm.style.display = 'none';
+		formName.style.display = 'block';
+	}, false);
+    ctForm.appendChild(pageBackElement);
+	var submitAllElement = document.createElement("input"); //input element, Submit All button
+    submitAllElement.setAttribute('type',"button");
+    submitAllElement.setAttribute('value',"Submit All Data");
+	submitAllElement.setAttribute('id',"submitAll");
+    submitAllElement.addEventListener("click", function() {
+        sendToServer({
+            /* use Jquery with a form serialization library */
+            username: document.getElementById("username").value
+        })
+    }, false)
+    ctForm.appendChild(submitAllElement);
+	var cancelAllElement = document.createElement("input"); //input element, cancel
+	cancelAllElement.setAttribute('type',"button");
+	cancelAllElement.setAttribute('value',"Cancel (You will lose your work)");
+	cancelAllElement.setAttribute('id','cancelAll');
+	cancelAllElement.addEventListener('click', cancelForm, false);
+    ctForm.appendChild(cancelAllElement);
+	formDiv.appendChild(ctForm);
+	
 	if (document.getElementById('FakeNewsForm')) {
 		document.getElementById('FakeNewsForm').replaceWith(formDiv);
 	}
