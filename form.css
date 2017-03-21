@@ -74,23 +74,23 @@ body
     transition: all 0.2s ease;
     line-height: normal;
 }
-#FakeNewsForm #submit {
+#FakeNewsForm #submit, #FakeNewsForm #submitAll, #FakeNewsForm #pageOne, #FakeNewsForm #pageTwo {
     clear:all;
     display:block;
 }
-#FakeNewsForm #cancel {
+#FakeNewsForm #cancel, #FakeNewsForm #cancelAll {
     display:inline;
 }
 
-#FakeNewsForm #submit, #FakeNewsForm #cancel {
+#FakeNewsForm #submit, #FakeNewsForm #cancel, #FakeNewsForm #submitAll, #FakeNewsForm #cancelAll {
     font-weight:bold;
 }
 
-#FakeNewsForm button#submit:hover, #FakeNewsForm input#submit:hover, #FakeNewsForm button#cancel:hover, #FakeNewsForm input#cancel:hover {
+#FakeNewsForm #submit:hover, #FakeNewsForm #submitAll:hover, #FakeNewsForm #cancel:hover, #FakeNewsForm #cancelAll:hover {
     color:yellow;
 }
 
-#FakeNewsForm button#submit, #FakeNewsForm input#submit {
+#FakeNewsForm #submit, #FakeNewsForm #cancel, #FakeNewsForm #submitAll, #FakeNewsForm #cancelAll {
     color: #fff;
     background: #ee4444;
     font-weight:bold;
