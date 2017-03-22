@@ -21,7 +21,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
         var whoIsObj = JSON.parse(msg.whois).formatted_data;
-        var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
+		if (whoIsObj.RegistrantName == undefined) {
+			var whoIsArr = ['There was a problem with the WHOIS lookup'];
+		} else {
+			var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
+		};
         var myDomain = controller.domainFinder();
         var topLevelDomain = controller.tldParser();
         var allLinks = controller.linkFinder();
@@ -32,7 +36,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             ["username","Email Address as User Name","","f"],
             ["dn","Domain Name",myDomain,"f"],
             ["tld","Top Level Domain", topLevelDomain, "f"],
-			["url","Page URL", thisURL, "f"],
+			["url","Page URL", thisURL[0], "f"],
+			["params","URL Parameters", thisURL[1], "f"],
             ["modifiedDate","Modified Date(s)", modifiedDate,"f"],
             ["allLinks","Page Links", allLinks,"vl"],
             ["whois", "WHOIS Lookup", whoIsArr, "v"]
@@ -78,7 +83,10 @@ var controller = (function(){
   // get domain from active tab
    function getURL() {
      var href = window.location.href.split('?');
-     return href[0];	 
+	 if (href[1] == undefined) {
+		 href[1] = 'No parameters';
+	 }
+     return href;
    };
    
    function domainFinder() {
