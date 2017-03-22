@@ -26,11 +26,13 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         var topLevelDomain = controller.tldParser();
         var allLinks = controller.linkFinder();
         var modifiedDate = controller.dateFinder();
+		var thisURL = controller.getURL();
         var formFields = [
         //f = fixed rows; v = variable rows
             ["username","Email Address as User Name","","f"],
             ["dn","Domain Name",myDomain,"f"],
             ["tld","Top Level Domain", topLevelDomain, "f"],
+			["url","Page URL", thisURL, "f"],
             ["modifiedDate","Modified Date(s)", modifiedDate,"f"],
             ["allLinks","Page Links", allLinks,"vl"],
             ["whois", "WHOIS Lookup", whoIsArr, "v"]
@@ -56,6 +58,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             ["username","Email Address as User Name","","f"],
             ["dn","Domain Name", "","f"],
             ["tld","Top Level Domain", "","f"],
+			["url","Page URL","","f"],
             ["modifiedDate","Modified Date(s)", "","f"],
             ["allLinks","Page Links", "","a"]
             ];
@@ -73,6 +76,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 var controller = (function(){
 
   // get domain from active tab
+   function getURL() {
+     var href = window.location.href.split('?');
+     return href[0];	 
+   };
+   
    function domainFinder() {
 	var myPath = window.location.host.split('.');
 	if (myPath.length === 3) {
@@ -144,8 +152,9 @@ var controller = (function(){
 
   //return public methods
   return {
+	getURL : getURL,
 	domainFinder : domainFinder,
-        tldParser : tldParser,
+    tldParser : tldParser,
 	linkFinder : linkFinder,
 	dateFinder : dateFinder
   };
