@@ -20,55 +20,24 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
-        var whoIsObj = JSON.parse(msg.whois).formatted_data;
-        var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
-        var myDomain = controller.domainFinder();
-        var topLevelDomain = controller.tldParser();
-        var allLinks = controller.linkFinder();
-        var modifiedDate = controller.dateFinder();
-		var thisURL = controller.getURL();
+        var thisURL = controller.getURL();
         var formFields = [
         //f = fixed rows; v = variable rows
             ["username","Email Address as User Name","","f"],
-            ["dn","Domain Name",myDomain,"f"],
-            ["tld","Top Level Domain", topLevelDomain, "f"],
-			["url","Page URL", thisURL, "f"],
-            ["modifiedDate","Modified Date(s)", modifiedDate,"f"],
-            ["allLinks","Page Links", allLinks,"vl"],
-            ["whois", "WHOIS Lookup", whoIsArr, "v"]
+            ["url","Page URL", thisURL, "f"]
             ];
-		var critThinksFields = [
-			["Critical Question #1 ID", "Critical Question #1 Label"],
-			["Critical Question #2 ID", "Critical Question #2 Label"],
-			["Critical Question #3 ID", "Critical Question #3 Label"]
-		];
         //Build the form
-        makeForm(formFields, critThinksFields);
+        makeForm(formFields);
         // Call the specified callback, passing
         // the web-page's DOM content as argument
-        sendResponse({
-            myDomain : myDomain,
-            topLevelDomain : topLevelDomain,
-            allLinks : allLinks,
-            modifiedDate : modifiedDate
-        });
     }
     else if (msg.text === 'build_form_blank') {
         var formFields = [
             ["username","Email Address as User Name","","f"],
-            ["dn","Domain Name", "","f"],
-            ["tld","Top Level Domain", "","f"],
-			["url","Page URL","","f"],
-            ["modifiedDate","Modified Date(s)", "","f"],
-            ["allLinks","Page Links", "","a"]
+            ["url","Page URL","","f"]
             ];
-		var critThinksFields = [
-			["Critical Question #1 ID", "Critical Question #1 Label"],
-			["Critical Question #2 ID", "Critical Question #2 Label"],
-			["Critical Question #3 ID", "Critical Question #3 Label"]
-		];
         //Build the form
-        makeForm(formFields, critThinksFields);
+        makeForm(formFields);
     }
 });
 
@@ -267,25 +236,15 @@ function makeForm(fields, critFields) {
 		    	break;
 		}
     }
-	//could maybe should be made generic for multiple pages
-	var pagerElement = document.createElement("input"); //input element, pager
-    pagerElement.setAttribute('type',"button");
-    pagerElement.setAttribute('value',"Go to Page 2");
-	pagerElement.setAttribute('id',"pageTwo");
-    pagerElement.addEventListener("click", function() {
-		formName.style.display = 'none';
-		ctForm.style.display = 'block';
-	}, false);
-    formName.appendChild(pagerElement);
 	
     var submitElement = document.createElement("input"); //input element, Submit button
     submitElement.setAttribute('type',"button");
     submitElement.setAttribute('value',"Submit Data");
-	submitElement.setAttribute('id',"submit");
+    submitElement.setAttribute('id',"submit");
     submitElement.addEventListener("click", function() {
         sendToServer({
-            /* use Jquery with a form serialization library */
-            username: document.getElementById("username").value
+        /* use Jquery with a form serialization library */
+        username: document.getElementById("username").value
         })
     }, false)
     formName.appendChild(submitElement);
@@ -295,57 +254,27 @@ function makeForm(fields, critFields) {
 	cancelElement.setAttribute('value',"Cancel (You will lose your work)");
 	cancelElement.setAttribute('id','cancel');
 	cancelElement.addEventListener('click', cancelForm, false);
-    formName.appendChild(cancelElement);
+        formName.appendChild(cancelElement);
 	formDiv.appendChild(formName);
 	
-	//Create Page 2 Critical Thinking, and hide it
-    var ctForm = document.createElement("form");
-	ctForm.setAttribute('id', "FakeNewsPageTwo")
-	ctForm.setAttribute('style','display:none');
-	for(var c = 0; c < critFields.length; c++){
-		var labelElement = document.createElement("label");
-		labelElement.setAttribute("for", critFields[c][0]);
-		var labelText = document.createTextNode(critFields[c][1]+": ");
-		labelElement.appendChild(labelText);
-		ctForm.appendChild(labelElement);
-		var inputElement = document.createElement("textarea"); //input element, textarea
-		inputElement.setAttribute('rows', 4);
-		inputElement.setAttribute('cols', 50);
-		inputElement.setAttribute("id", critFields[c][0]);
-		ctForm.appendChild(inputElement);
-	}
-	var pageBackElement = document.createElement("input"); //input element, page back to 1
-    pageBackElement.setAttribute('type',"button");
-    pageBackElement.setAttribute('value',"Go to Page 1");
-	pageBackElement.setAttribute('id',"pageOne");
-    pageBackElement.addEventListener("click", function() {
-		ctForm.style.display = 'none';
-		formName.style.display = 'block';
-	}, false);
-    ctForm.appendChild(pageBackElement);
+
 	var submitAllElement = document.createElement("input"); //input element, Submit All button
-    submitAllElement.setAttribute('type',"button");
-    submitAllElement.setAttribute('value',"Submit All Data");
+        submitAllElement.setAttribute('type',"button");
+        submitAllElement.setAttribute('value',"Submit All Data");
 	submitAllElement.setAttribute('id',"submitAll");
-    submitAllElement.addEventListener("click", function() {
+        submitAllElement.addEventListener("click", function() {
         sendToServer({
-            /* use Jquery with a form serialization library */
+        /* use Jquery with a form serialization library */
             username: document.getElementById("username").value
         })
     }, false)
-    ctForm.appendChild(submitAllElement);
-	var cancelAllElement = document.createElement("input"); //input element, cancel
-	cancelAllElement.setAttribute('type',"button");
-	cancelAllElement.setAttribute('value',"Cancel (You will lose your work)");
-	cancelAllElement.setAttribute('id','cancelAll');
-	cancelAllElement.addEventListener('click', cancelForm, false);
-    ctForm.appendChild(cancelAllElement);
-	formDiv.appendChild(ctForm);
+    
+  
 	
-	if (document.getElementById('FakeNewsForm')) {
-		document.getElementById('FakeNewsForm').replaceWith(formDiv);
-	}
-	else {
-    document.getElementsByTagName('body')[0].appendChild(formDiv);
-	};
+    if (document.getElementById('FakeNewsForm')) {
+        document.getElementById('FakeNewsForm').replaceWith(formDiv);
+    }
+    else {
+        document.getElementsByTagName('body')[0].appendChild(formDiv);
+    };
 };
