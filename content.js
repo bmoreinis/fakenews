@@ -31,6 +31,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         // Call the specified callback, passing
         // the web-page's DOM content as argument
     }
+
     else if (msg.text === 'build_form_blank') {
         var formFields = [
             ["username","Email Address as User Name","","f"],
@@ -57,20 +58,6 @@ var controller = (function(){
 })();
 
 //cancel button - now that we have multiple pages could/should be made generic
-function cancelForm() {
-	var formElement = document.getElementById("FakeNewsForm");
-	formElement.parentNode.removeChild(formElement);
-	document.getElementsByTagName("BODY")[0].style.marginTop="0px";
-};
-
-function addLink() {
-	var divElement = document.getElementById('blankLinks');
-	var newElement = document.createElement('input');
-        newElement.setAttribute('class','emptyField');
-	newElement.setAttribute('type','text');
-	newElement.value = "[Begin with http://]";
-	divElement.appendChild(newElement);
-};
 
 function makeForm(fields) {
     // Move Body Down
@@ -79,21 +66,23 @@ function makeForm(fields) {
     // Create Form Object Page 1
 	var formDiv = document.createElement("div");
 	formDiv.setAttribute('id', "FakeNewsForm");
-    	var formName = document.createElement("form");
+    var formName = document.createElement("form");
 
     // Create Input Elements	
-    	for(var i = 0; i < fields.length; i++){
+	for(var i = 0; i < fields.length; i++){
+		// Create Label
 		var labelElement = document.createElement("label");
 		labelElement.setAttribute("for", fields[i][0]);
 		var labelText = document.createTextNode(fields[i][1]+": ");
 		labelElement.appendChild(labelText);
 		formName.appendChild(labelElement);
+		// Create Input
 		var inputElement = document.createElement("input"); //input element, text
 		inputElement.setAttribute('type',"text");
 		inputElement.setAttribute("id",fields[i][0]);
 		inputElement.value = fields[i][2];
 		formName.appendChild(inputElement);
-    	}
+    }
 	
      // Create Submit Element	
 	var submitElement = document.createElement("input"); //input element, Submit button
@@ -107,6 +96,8 @@ function makeForm(fields) {
 		})
 		}, false)
 	formName.appendChild(submitElement);
+	formDiv.appendChild(formName);
+	
 	if (document.getElementById('FakeNewsForm')) {
 		document.getElementById('FakeNewsForm').replaceWith(formDiv);
 		}
