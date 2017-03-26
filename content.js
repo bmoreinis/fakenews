@@ -32,15 +32,21 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         var modifiedDate = controller.dateFinder();
 		var thisURL = controller.getURL();
         var formFields = [
-        //f = fixed rows; v = variable rows
-            ["username","Email Address as User Name","","f"],
-            ["dn","Domain Name",myDomain,"f"],
-            ["tld","Top Level Domain", topLevelDomain, "f"],
-			["url","Page URL", thisURL[0], "f"],
-			["params","URL Parameters", thisURL[1], "f"],
-            ["modifiedDate","Modified Date(s)", modifiedDate,"f"],
-            ["allLinks","Page Links", allLinks,"vl"],
-            ["whois", "WHOIS Lookup", whoIsArr, "v"]
+        /*f = fixed rows; v = variable rows, parameters to create FN form
+		* array[0] => field id
+		* array[1] => field label
+		* array[2] => field value
+		* array[3] => field generation type (f, v, vl, a)
+		* array[4] => boolean required
+		*/
+            ["username","Email Address as User Name","","f",1],
+            ["dn","Domain Name",myDomain,"f",1],
+            ["tld","Top Level Domain", topLevelDomain, "f",0],
+			["url","Page URL", thisURL[0], "f",0],
+			["params","URL Parameters", thisURL[1], "f",0],
+            ["modifiedDate","Modified Date(s)", modifiedDate,"f",0],
+            ["allLinks","Page Links", allLinks,"vl",0],
+            ["whois", "WHOIS Lookup", whoIsArr, "v",0]
             ];
 		var critThinksFields = [
 			["Critical Question #1 ID", "Critical Question #1 Label"],
@@ -53,12 +59,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     }
     else if (msg.text === 'build_form_blank') {
         var formFields = [
-            ["username","Email Address as User Name","","f"],
-            ["dn","Domain Name", "","f"],
-            ["tld","Top Level Domain", "","f"],
-			["url","Page URL","","f"],
-            ["modifiedDate","Modified Date(s)", "","f"],
-            ["allLinks","Page Links", "","a"]
+            ["username","Email Address as User Name","","f",1],
+            ["dn","Domain Name", "","f",1],
+            ["tld","Top Level Domain", "","f",0],
+			["url","Page URL","","f",0],
+            ["modifiedDate","Modified Date(s)", "","f",0],
+            ["allLinks","Page Links", "","a",0]
             ];
 		var critThinksFields = [
 			["Critical Question #1 ID", "Critical Question #1 Label"],
@@ -178,6 +184,18 @@ function addLink() {
 	divElement.appendChild(newElement);
 };
 
+function checkRequired () {
+	var FNrequired = document.getElementsByClassName("FNrequired");
+		var reqmax = FNrequired.length;
+		for (var r = 0; r<reqmax; r++) {
+			if (FNrequired[r].value == "") {
+				return false;
+			} else {
+				return true;
+			}
+		}
+};
+
 function makeForm(fields, critFields) {
 	// Move Body Down
     document.getElementsByTagName("BODY")[0].style.marginTop="420px";
@@ -188,7 +206,11 @@ function makeForm(fields, critFields) {
     for(var i = 0; i < fields.length; i++){
         var labelElement = document.createElement("label");
         labelElement.setAttribute("for", fields[i][0]);
-        var labelText = document.createTextNode(fields[i][1]+": ");
+		if (fields[i][4] == 0) {
+			var labelText = document.createTextNode(fields[i][1]+": ");
+		} else {
+			var labelText = document.createTextNode(fields[i][1]+"* : ");
+		}
         labelElement.appendChild(labelText);
         formName.appendChild(labelElement);
         switch(fields[i][3]) {
@@ -207,6 +229,10 @@ function makeForm(fields, critFields) {
                         inputElement.setAttribute("id",fields[i][0]);
                         inputElement.setAttribute('class','emptyField');
                         inputElement.value = "[Begin with http://]";
+						if (fields[i][4] == 1) {
+							inputElement.setAttribute("required","");
+							inputElement.setAttribute("class", "FNrequired")
+						}
                         divElement.appendChild(inputElement);
                     break;
         	case "v":
@@ -264,6 +290,10 @@ function makeForm(fields, critFields) {
 		        inputElement.setAttribute('type',"text");
 		        inputElement.setAttribute("id",fields[i][0]);
 		        inputElement.value = fields[i][2];
+				if (fields[i][4] == 1) {
+					inputElement.setAttribute("required","");
+					inputElement.setAttribute("class", "FNrequired")
+				}
 		        formName.appendChild(inputElement);
 		    	break;
 		}
@@ -272,10 +302,16 @@ function makeForm(fields, critFields) {
 	var pagerElement = document.createElement("input"); //input element, pager
     pagerElement.setAttribute('type',"button");
     pagerElement.setAttribute('value',"Go to Page 2");
-	pagerElement.setAttribute('id',"pageTwo");
+	pagerElement.setAttribute('id',"submit");
     pagerElement.addEventListener("click", function() {
-		formName.style.display = 'none';
-		ctForm.style.display = 'block';
+		var check = checkRequired();
+		console.log(check);
+		if (check == true) {
+			formName.style.display = 'hidden';
+			ctForm.style.display = 'block';
+		} else {
+			alert ('Please fill out required fields');
+		};
 	}, false);
     formName.appendChild(pagerElement);
 	
@@ -284,10 +320,15 @@ function makeForm(fields, critFields) {
     submitElement.setAttribute('value',"Submit Data");
 	submitElement.setAttribute('id',"submit");
     submitElement.addEventListener("click", function() {
+		var check = checkRequired();
+		if (check == true) {
         sendToServer({
             /* use Jquery with a form serialization library */
             username: document.getElementById("username").value
         })
+		} else {
+			alert ('Please fill out required fields');
+		}
     }, false)
     formName.appendChild(submitElement);
 
