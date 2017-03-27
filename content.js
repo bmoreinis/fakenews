@@ -4,7 +4,7 @@ function sendToServer(obj) {
     fetch('http://app.fakenewsfitness.org', {
         method: 'POST',
         body: JSON.stringify(obj)
-    })zrf
+    })
     .then(function(res) {
         if (!res.ok) {
             console.log("request failed: " + res.status + " " + res.statusText);
@@ -43,7 +43,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 		*/
             ["username","Email Address as User Name","","f",1],
 			["url","Page URL", thisURL[0], "f",0],
-			["pageTitle","Page Title (<title>)", title, "f",0],
+			["pageTitle","Page Title ( <title> )", title, "f",0],
 			["pageArticle","Article Title (First <H1>)", article, "f",0],
             ["dn","Domain Name",myDomain,"f",1],
             ["tld","Top Level Domain", topLevelDomain, "f",0],
