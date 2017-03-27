@@ -31,6 +31,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         var allLinks = controller.linkFinder();
         var modifiedDate = controller.dateFinder();
 		var thisURL = controller.getURL();
+		var title = controller.getTitle();
+		var article = controller.getArticle();
         var formFields = [
         /*f = fixed rows; v = variable rows, parameters to create FN form
 		* array[0] => field id
@@ -40,9 +42,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 		* array[4] => boolean required
 		*/
             ["username","Email Address as User Name","","f",1],
+			["url","Page URL", thisURL[0], "f",0],
+			["pageTitle","Page Title (First <title>)", title, "f",0],
+			["pageArticle","Article Title (First <H1>)", article, "f",0],
             ["dn","Domain Name",myDomain,"f",1],
             ["tld","Top Level Domain", topLevelDomain, "f",0],
-			["url","Page URL", thisURL[0], "f",0],
 			["params","URL Parameters", thisURL[1], "f",0],
             ["modifiedDate","Modified Date(s)", modifiedDate,"f",0],
             ["allLinks","Page Links", allLinks,"vl",0],
@@ -60,9 +64,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     else if (msg.text === 'build_form_blank') {
         var formFields = [
             ["username","Email Address as User Name","","f",1],
+			["url","Page URL","","f",0],
+			["pageTitle","Page Title (First <title>)", "", "f",0],
+			["pageArticle","Article Title (First <H1>)", "", "f",0],
             ["dn","Domain Name", "","f",1],
             ["tld","Top Level Domain", "","f",0],
-			["url","Page URL","","f",0],
             ["modifiedDate","Modified Date(s)", "","f",0],
             ["allLinks","Page Links", "","a",0]
             ];
@@ -109,6 +115,28 @@ var controller = (function(){
 	};
   };
 
+  function getTitle () {
+	  var title = document.getElementsByTagName("title");
+	  console.log(title);
+	  if (title.length == 0) {
+		  return "No title tags found";
+	  } else {
+		  var treturn = title[0].innerText;
+		  return treturn;
+	  }
+  }
+  
+  function getArticle () {
+	  var article = document.getElementsByTagName("h1")
+	  console.log(article);
+	  if (article.length == 0) {
+		  return "No h1 tags found";
+	  } else {
+		  var areturn = article[0].innerText;
+		  return areturn;
+	  }
+  }
+  
   // search document.body for ABOUT US or similar in menu lists
   function aboutFinder () {
 	//insert fxn here
@@ -163,7 +191,9 @@ var controller = (function(){
 	domainFinder : domainFinder,
     tldParser : tldParser,
 	linkFinder : linkFinder,
-	dateFinder : dateFinder
+	dateFinder : dateFinder,
+	getTitle : getTitle,
+	getArticle : getArticle
   };
 
 })();
