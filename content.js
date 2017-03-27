@@ -64,9 +64,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     else if (msg.text === 'build_form_blank') {
         var formFields = [
             ["username","Email Address as User Name","","f",1],
+			["url","Page URL","","f",0],
+			["pageTitle","Page Title (First <title>)", "", "f",0],
+			["pageArticle","Article Title (First <H1>)", "", "f",0],
             ["dn","Domain Name", "","f",1],
             ["tld","Top Level Domain", "","f",0],
-			["url","Page URL","","f",0],
             ["modifiedDate","Modified Date(s)", "","f",0],
             ["allLinks","Page Links", "","a",0]
             ];
