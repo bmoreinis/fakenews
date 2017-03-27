@@ -116,13 +116,25 @@ var controller = (function(){
   };
 
   function getTitle () {
-	  var title = document.getElementsByTagName("title")[0].innerText;
-	  return title;
+	  var title = document.getElementsByTagName("title");
+	  console.log(title);
+	  if (title.length == 0) {
+		  return "No title tags found";
+	  } else {
+		  var treturn = title[0].innerText;
+		  return treturn;
+	  }
   }
   
   function getArticle () {
-	  var article = document.getElementsByTagName("h1")[0].innerText;
-	  return article;
+	  var article = document.getElementsByTagName("h1")
+	  console.log(article);
+	  if (article.length == 0) {
+		  return "No h1 tags found";
+	  } else {
+		  var areturn = article[0].innerText;
+		  return areturn;
+	  }
   }
   
   // search document.body for ABOUT US or similar in menu lists
