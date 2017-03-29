@@ -1,18 +1,76 @@
+//Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
 function sendToServer(obj) {
-    console.log(obj);
+  var promiseToken = new Promise(function(resolve, reject) {
+  var getToken = new XMLHttpRequest();
+		  var turl = "http://www.fakenewsfitness.org/restws/session/token";
+		  getToken.onload = function () {
+			  var tStatus = getToken.status;
+			  var tData = getToken.responseText;
+			  console.log(tData);
+			    if (tStatus == 200) {
+				resolve(tData);
+				}
+				else {
+				reject(Error("This email is not logged into fakenewsfitness.org"));
+				}
+		  }
+		  getToken.open("GET", turl, true);
+		  getToken.setRequestHeader("Accept", "application/json");
+		  getToken.send(null);
+});
 
-    fetch('http://app.fakenewsfitness.org', {
-        method: 'POST',
-        body: JSON.stringify(obj)
-    })
-    .then(function(res) {
-        if (!res.ok) {
-            console.log("request failed: " + res.status + " " + res.statusText);
-        }
-    })
-    .catch(function(err) {
-        console.log(err);
-    })
+promiseToken.then(function(result) {
+  var promiseUser = new Promise(function(resolve, reject) {
+  var getUser = new XMLHttpRequest();
+	  var uurl = "http://www.fakenewsfitness.org/user.json?mail="+obj.username;
+	  getUser.onload = function () {
+		  var uStatus = getUser.status;
+		  console.log(getUser.response)
+		  var uData = JSON.parse(getUser.response);
+		  console.log(uData);
+		  // Check for an email that isn't a user before confirming promise fulfilled
+		  if (uData.list[0] == undefined) {
+			  alert("Email not related to valid FakeNewsFitness user");
+		  } else {
+		    if (uStatus == 200) {
+		    resolve(uData.list[0].uid);
+			    }
+		    else {
+            reject(Error("Something went wrong retrieving user information"));
+		    }
+		  }
+	  }
+	  getUser.open("GET", uurl, true);
+	  getUser.setRequestHeader("Accept", "application/json");
+	  sessionToken = result;
+	  getUser.setRequestHeader("X-CSRF-Token", sessionToken);
+	  getUser.send(null);
+  });
+  promiseUser.then(function(result) {
+	// Double check for a "blank" submission in email before attempting to post node
+    if (result == null) {
+		alert("There was a problem retrieving your FakeNewsFitness User");
+	} else {
+	var url = "http://www.fakenewsfitness.org/node"
+	var postData = JSON.stringify({"type":"test","author":{"id":result},"field_url":{"url":obj.url},"og_group_ref":[{"id": "1"}]});
+	var postRequest = new XMLHttpRequest();
+	postRequest.onload = function () {
+	  var status = postRequest.status;
+      var data = postRequest.responseText;
+  }
+  postRequest.open("POST", url, true);
+  postRequest.setRequestHeader("Content-Type", "application/json");
+  postRequest.setRequestHeader("X-CSRF-Token", sessionToken);
+  postRequest.send(postData);
+	
+  }}, function(err) {
+    alert(err);
+    }
+  );
+  
+}, function(err) {
+  alert(err);
+});
 }
 
 // Listen for messages
@@ -354,7 +412,8 @@ function makeForm(fields, critFields) {
 		if (check == true) {
         sendToServer({
             /* use Jquery with a form serialization library */
-            username: document.getElementById("username").value
+            username: document.getElementById("username").value,
+			url: document.getElementById("url").value
         })
 		} else {
 			alert ('Please fill out required fields');
@@ -402,7 +461,8 @@ function makeForm(fields, critFields) {
     submitAllElement.addEventListener("click", function() {
         sendToServer({
             /* use Jquery with a form serialization library */
-            username: document.getElementById("username").value
+            username: document.getElementById("username").value,
+			url: document.getElementById("url").value
         })
     }, false)
     ctForm.appendChild(submitAllElement);
