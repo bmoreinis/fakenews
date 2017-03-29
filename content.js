@@ -6,6 +6,7 @@ function sendToServer(obj) {
 		  getToken.onload = function () {
 			  var tStatus = getToken.status;
 			  var tData = getToken.responseText;
+			  console.log(tData);
 			    if (tStatus == 200) {
 				resolve(tData);
 				}
@@ -21,10 +22,12 @@ function sendToServer(obj) {
 promiseToken.then(function(result) {
   var promiseUser = new Promise(function(resolve, reject) {
   var getUser = new XMLHttpRequest();
-	  var uurl = "http://www.fakenewsfitness.org/user?mail="+obj.name;
+	  var uurl = "http://www.fakenewsfitness.org/user.json?mail="+obj.username;
 	  getUser.onload = function () {
 		  var uStatus = getUser.status;
+		  console.log(getUser.response)
 		  var uData = JSON.parse(getUser.response);
+		  console.log(uData);
 		  // Check for an email that isn't a user before confirming promise fulfilled
 		  if (uData.list[0] == undefined) {
 			  alert("Email not related to valid FakeNewsFitness user");
@@ -49,7 +52,7 @@ promiseToken.then(function(result) {
 		alert("There was a problem retrieving your FakeNewsFitness User");
 	} else {
 	var url = "http://www.fakenewsfitness.org/node"
-	var postData = JSON.stringify({"type":"test_no_group","author":{"id":result},"field_url":{"url":obj.url}});
+	var postData = JSON.stringify({"type":"test","author":{"id":result},"field_url":{"url":obj.url},"og_group_ref":[{"id": "1"}]});
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
 	  var status = postRequest.status;
@@ -409,7 +412,8 @@ function makeForm(fields, critFields) {
 		if (check == true) {
         sendToServer({
             /* use Jquery with a form serialization library */
-            username: document.getElementById("username").value
+            username: document.getElementById("username").value,
+			url: document.getElementById("url").value
         })
 		} else {
 			alert ('Please fill out required fields');
@@ -457,7 +461,8 @@ function makeForm(fields, critFields) {
     submitAllElement.addEventListener("click", function() {
         sendToServer({
             /* use Jquery with a form serialization library */
-            username: document.getElementById("username").value
+            username: document.getElementById("username").value,
+			url: document.getElementById("url").value
         })
     }, false)
     ctForm.appendChild(submitAllElement);
