@@ -72,7 +72,7 @@ promiseToken.then(function(result) {
 
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-	
+
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
         var whoIsObj = JSON.parse(msg.whois).formatted_data;
@@ -98,7 +98,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 		*/
             ["username","Email Address as User Name","","f",1],
 			["url","Page URL", thisURL[0], "f",0],
-			["pageTitle","Page Title (First <title>)", title, "f",0],
+			["pageTitle","Page Title ( <title> )", title, "f",0],
 			["pageArticle","Article Title (First <H1>)", article, "f",0],
             ["dn","Domain Name",myDomain,"f",1],
             ["tld","Top Level Domain", topLevelDomain, "f",0],
@@ -148,7 +148,7 @@ var controller = (function(){
 	 }
      return href;
    };
-   
+
    function domainFinder() {
 	var myPath = window.location.host.split('.');
 	if (myPath.length === 3) {
@@ -171,15 +171,27 @@ var controller = (function(){
   };
 
   function getTitle () {
-	  var title = document.getElementsByTagName("title")[0].innerText;
-	  return title;
+	  var title = document.getElementsByTagName("title");
+	  console.log(title);
+	  if (title.length == 0) {
+		  return "No title tags found";
+	  } else {
+		  var treturn = title[0].innerText;
+		  return treturn;
+	  }
   }
-  
+
   function getArticle () {
-	  var article = document.getElementsByTagName("h1")[0].innerText;
-	  return article;
+	  var article = document.getElementsByTagName("h1")
+	  console.log(article);
+	  if (article.length == 0) {
+		  return "No h1 tags found";
+	  } else {
+		  var areturn = article[0].innerText;
+		  return areturn;
+	  }
   }
-  
+
   // search document.body for ABOUT US or similar in menu lists
   function aboutFinder () {
 	//insert fxn here
@@ -387,7 +399,7 @@ function makeForm(fields, critFields) {
 		};
 	}, false);
     formName.appendChild(pagerElement);
-	
+
     var submitElement = document.createElement("input"); //input element, Submit button
     submitElement.setAttribute('type',"button");
     submitElement.setAttribute('value',"Submit Data");
@@ -412,7 +424,7 @@ function makeForm(fields, critFields) {
 	cancelElement.addEventListener('click', cancelForm, false);
     formName.appendChild(cancelElement);
 	formDiv.appendChild(formName);
-	
+
 	//Create Page 2 Critical Thinking, and hide it
     var ctForm = document.createElement("form");
 	ctForm.setAttribute('id', "FakeNewsPageTwo")
@@ -456,7 +468,7 @@ function makeForm(fields, critFields) {
 	cancelAllElement.addEventListener('click', cancelForm, false);
     ctForm.appendChild(cancelAllElement);
 	formDiv.appendChild(ctForm);
-	
+
 	if (document.getElementById('FakeNewsForm')) {
 		document.getElementById('FakeNewsForm').replaceWith(formDiv);
 	}
