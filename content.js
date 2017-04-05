@@ -48,6 +48,7 @@ promiseToken.then(function(result) {
     if (result == null) {
 		alert("There was a problem retrieving your FakeNewsFitness User");
 	} else {
+//Begin processing form submission object for Drupal
 	// Determine which title to submit
 	var submitTitle = "";
 	if (obj.pageArticle !== "No h1 tags found") {
@@ -57,8 +58,57 @@ promiseToken.then(function(result) {
 	} else {
 		submitTitle = "No Title";
 	}
+	//Determine which TLD field to submit to
+	var tldSelect = ""
+	var otherTld = ""
+	var selectDomains = ["com","org","gov","net","edu","mil","int"]
+	if (selectDomains.indexOf(obj.topLevelDomain) == -1) {
+		tldSelect = "Other (ICANN)";
+		otherTld = obj.topLevelDomain;
+	} else {
+		tldSelect = obj.topLevelDomain;
+	}
+	//@to do
+	//Format date as unix timestamp
+	
+    //Prep links
+	childLinks = obj.allLinks.childNodes;
+	numLinks = childLinks.length;
+	linkArray = [];
+	for (var l = 0; l < numLinks; l++) {
+		linkArray.push({"url":childLinks[l].innerText});
+	}
+	//Prep whois
+	if (obj.whois !== null) {
+		childWhois = obj.whois.childNodes;
+		numWhois = childWhois.length;
+		if (numWhois > 1) {
+			var regName = childWhois[0].innerText;
+			var regComp = childWhois[1].innerText;
+			var regState = childWhois[2].innerText;
+			var regCountry = childWhois[3].innerText;
+			var regPhone = childWhois[4].innerText;
+			var regEmail = childWhois[5].innerText;
+		} else {
+			var regName = "There was a problem with the WHOIS Lookup";
+			var regComp = "";
+			var regState = "";
+			var regCountry = "";
+			var regPhone = "";
+			var regEmail = "";
+		}
+	}
+	//Prepare question field split on '?'
+	var questions = obj.questions.split('?');
+	var newQuestions = []
+	numQues = questions.length;
+	for (var q = 0; q < numQues; q++) {
+		newQuestions.push({"value":questions[q]});
+	}
+	//The URL to POST to
 	var url = "http://www.fakenewsfitness.org/node"
-	var postData = JSON.stringify({"type":"test","title":submitTitle,"author":{"id":result},"field_url":{"url":obj.url},"og_group_ref":[{"id": "1"}]});
+	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,/*"field_page_last_modified":obj.modifiedDate,*/"field_about_us_summary":obj.aboutUsSummary,"body":{"value":obj.assessment},"field_source_links":linkArray,"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
+	console.log(postData);
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
 	  var status = postRequest.status;
@@ -117,9 +167,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             ["whois", "WHOIS Lookup", whoIsArr, "v",0]
             ];
 		var critThinksFields = [
-			["Critical Question #1 ID", "Critical Question #1 Label"],
-			["Critical Question #2 ID", "Critical Question #2 Label"],
-			["Critical Question #3 ID", "Critical Question #3 Label"]
+			["FNaboutUsSummary", "About Us Summary"],
+			["FNassessment", "Assessment"],
+			["FNquestions", "Questions"]
 		];
         //Build the form
         makeForm(formFields, critThinksFields);
@@ -137,9 +187,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             ["allLinks","Page Links", "","a",0]
             ];
 		var critThinksFields = [
-			["Critical Question #1 ID", "Critical Question #1 Label"],
-			["Critical Question #2 ID", "Critical Question #2 Label"],
-			["Critical Question #3 ID", "Critical Question #3 Label"]
+			["FNaboutUsSummary", "About Us Summary"],
+			["FNassessment", "Assessment"],
+			["FNquestions", "Questions"]
 		];
         //Build the form
         makeForm(formFields, critThinksFields);
@@ -201,7 +251,7 @@ var controller = (function(){
 
   // search document.body for ABOUT US or similar in menu lists
   function aboutFinder () {
-	//insert fxn here
+	//@todo
   };
 
   // search document.body for posted date above or below body
@@ -418,7 +468,16 @@ function makeForm(fields, critFields) {
             username: document.getElementById("username").value,
 			url: document.getElementById("url").value,
 			pageArticle: document.getElementById("pageArticle").value,
-			pageTitle: document.getElementById("pageTitle").value
+			pageTitle: document.getElementById("pageTitle").value,
+			modifiedDate: document.getElementById("modifiedDate").value,
+			domainName: document.getElementById("dn").value,
+			topLevelDomain: document.getElementById("tld").value,
+			allLinks: document.getElementById("allLinks"),
+			whois: document.getElementById("whois"),
+			
+			aboutUsSummary: document.getElementById("FNaboutUsSummary").value,
+			assessment: document.getElementById("FNassessment").value,
+			questions: document.getElementById("FNquestions").value
         })
 		} else {
 			alert ('Please fill out required fields');
@@ -469,7 +528,16 @@ function makeForm(fields, critFields) {
             username: document.getElementById("username").value,
 			url: document.getElementById("url").value,
 			pageArticle: document.getElementById("pageArticle").value,
-			pageTitle: document.getElementById("pageTitle").value
+			pageTitle: document.getElementById("pageTitle").value,
+			modifiedDate: document.getElementById("modifiedDate").value,
+			domainName: document.getElementById("dn").value,
+			topLevelDomain: document.getElementById("tld").value,
+			allLinks: document.getElementById("allLinks"),
+			whois: document.getElementById("whois"),
+			
+			aboutUsSummary: document.getElementById("FNaboutUsSummary").value,
+			assessment: document.getElementById("FNassessment").value,
+			questions: document.getElementById("FNquestions").value
         })
     }, false)
     ctForm.appendChild(submitAllElement);
