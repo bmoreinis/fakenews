@@ -6,7 +6,6 @@ function sendToServer(obj) {
 		  getToken.onload = function () {
 			  var tStatus = getToken.status;
 			  var tData = getToken.responseText;
-			  console.log(tData);
 			    if (tStatus == 200) {
 				resolve(tData);
 				}
@@ -25,9 +24,7 @@ promiseToken.then(function(result) {
 	  var uurl = "http://www.fakenewsfitness.org/user.json?mail="+obj.username;
 	  getUser.onload = function () {
 		  var uStatus = getUser.status;
-		  console.log(getUser.response)
 		  var uData = JSON.parse(getUser.response);
-		  console.log(uData);
 		  // Check for an email that isn't a user before confirming promise fulfilled
 		  if (uData.list[0] == undefined) {
 			  alert("Email not related to valid FakeNewsFitness user");
@@ -51,8 +48,17 @@ promiseToken.then(function(result) {
     if (result == null) {
 		alert("There was a problem retrieving your FakeNewsFitness User");
 	} else {
+	// Determine which title to submit
+	var submitTitle = "";
+	if (obj.pageArticle !== "No h1 tags found") {
+		submitTitle = obj.pageArticle;
+	} else if (obj.pageTitle !== "No title tags found") {
+		submitTitle = obj.pageTitle;
+	} else {
+		submitTitle = "No Title";
+	}
 	var url = "http://www.fakenewsfitness.org/node"
-	var postData = JSON.stringify({"type":"test","author":{"id":result},"field_url":{"url":obj.url},"og_group_ref":[{"id": "1"}]});
+	var postData = JSON.stringify({"type":"test","title":submitTitle,"author":{"id":result},"field_url":{"url":obj.url},"og_group_ref":[{"id": "1"}]});
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
 	  var status = postRequest.status;
@@ -175,7 +181,6 @@ var controller = (function(){
 
   function getTitle () {
 	  var title = document.getElementsByTagName("title");
-	  console.log(title);
 	  if (title.length == 0) {
 		  return "No title tags found";
 	  } else {
@@ -186,7 +191,6 @@ var controller = (function(){
 
   function getArticle () {
 	  var article = document.getElementsByTagName("h1")
-	  console.log(article);
 	  if (article.length == 0) {
 		  return "No h1 tags found";
 	  } else {
@@ -393,7 +397,6 @@ function makeForm(fields, critFields) {
 	pagerElement.setAttribute('id',"submit");
     pagerElement.addEventListener("click", function() {
 		var check = checkRequired();
-		console.log(check);
 		if (check == true) {
 			formName.style.display = 'hidden';
 			ctForm.style.display = 'block';
@@ -413,7 +416,9 @@ function makeForm(fields, critFields) {
         sendToServer({
             /* use Jquery with a form serialization library */
             username: document.getElementById("username").value,
-			url: document.getElementById("url").value
+			url: document.getElementById("url").value,
+			pageArticle: document.getElementById("pageArticle").value,
+			pageTitle: document.getElementById("pageTitle").value
         })
 		} else {
 			alert ('Please fill out required fields');
@@ -462,7 +467,9 @@ function makeForm(fields, critFields) {
         sendToServer({
             /* use Jquery with a form serialization library */
             username: document.getElementById("username").value,
-			url: document.getElementById("url").value
+			url: document.getElementById("url").value,
+			pageArticle: document.getElementById("pageArticle").value,
+			pageTitle: document.getElementById("pageTitle").value
         })
     }, false)
     ctForm.appendChild(submitAllElement);
