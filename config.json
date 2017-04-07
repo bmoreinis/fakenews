@@ -1,0 +1,25 @@
+{"filled_form":[["username","Email Address as User Name","","f",1],
+["url","Page URL","thisURL[0]", "f",0],
+["pageTitle","Page Title ( <title> )", "title", "f",0],
+["pageArticle","Article Title (First <H1>)", "article", "f",0],
+["dn","Domain Name","myDomain","f",1],
+["tld","Top Level Domain", "topLevelDomain", "f",0],
+["params","URL Parameters", "thisURL[1]", "f",0],
+["modifiedDate","Modified Date(s)", "modifiedDate","f",0],
+["allLinks","Page Links", "allLinks","vl",0],
+["whois", "WHOIS Lookup", "whoIsArr", "v",0]
+],
+"critical_thinking":[["FNaboutUsSummary", "About Us Summary"],
+["FNassessment", "Assessment"],
+["FNquestions", "Questions"]
+],
+"blank_form":[["username","Email Address as User Name","","f",1],
+["url","Page URL","","f",0],
+["pageTitle","Page Title (First <title>)", "", "f",0],
+["pageArticle","Article Title (First <H1>)", "", "f",0],
+["dn","Domain Name", "","f",1],
+["tld","Top Level Domain", "","f",0],
+["modifiedDate","Modified Date(s)", "","f",0],
+["allLinks","Page Links", "","a",0]
+]
+};

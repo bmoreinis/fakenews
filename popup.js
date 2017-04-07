@@ -4,7 +4,7 @@
 function httpGet(theUrl)
 {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+    xmlHttp.open( "GET", theUrl, true );
     xmlHttp.send( null );
     return xmlHttp.responseText;
 }
@@ -15,8 +15,11 @@ function httpGet(theUrl)
 
 document.addEventListener('DOMContentLoaded', function() {
   var configFile = chrome.runtime.getURL('/config.json');
-  var config = JSON.parse(httpGet(configFile));
-  console.log(config);
+  var promiseConfig = new Promise(function(resolve, reject) {
+	httpGet(configFile);
+  });
+  promiseConfig.then(function(result) {
+  var config = JSON.parse(result);
   var checkPageButton = document.getElementById('checkPage');
   checkPageButton.addEventListener('click', function() {
 	chrome.tabs.query({active : true}, function(tab) {
@@ -26,8 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var req = new XMLHttpRequest();
             function sendFilled() {
                 var whois = req.responseText;
-				console.log(whois);
-                chrome.tabs.sendMessage(tab[0].id, {text:'build_form_filled', whois: whois}, null);
+                chrome.tabs.sendMessage(tab[0].id, {text:'build_form_filled', whois: whois, config:config}, null);
             };
             var url = new URL(tab[0].url);
 			var domain = ""
@@ -43,9 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	  }
 	  else {
             //Display blank form
-            chrome.tabs.sendMessage(tab[0].id, {text: 'build_form_blank'}, null);
+            chrome.tabs.sendMessage(tab[0].id, {text: 'build_form_blank', config:config}, null);
 	  };
 	  //}, false);
-	});
-  }, false);
+	  });
+    }, false);
+  }, function(err) {
+  console.log(err);
+  });
 }, false);
