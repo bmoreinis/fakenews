@@ -1,13 +1,22 @@
 /* Fake News Fitness Pseudocode
 * https://drive.google.com/open?id=0B54VzDPRtma7dG5mUlBhNW1zX2c 
 */
-
+function httpGet(theUrl)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
 /* 
 * load popup to inform user and offer option button (free / prefill)
 * listen for checkpage button and call CONTROLLER module 
 */
 
 document.addEventListener('DOMContentLoaded', function() {
+  var configFile = chrome.runtime.getURL('/config.json');
+  var config = JSON.parse(httpGet(configFile));
+  console.log(config);
   var checkPageButton = document.getElementById('checkPage');
   checkPageButton.addEventListener('click', function() {
 	chrome.tabs.query({active : true}, function(tab) {
