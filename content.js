@@ -72,11 +72,13 @@ promiseToken.then(function(result) {
 	//Format date as unix timestamp
 	
     //Prep links
-	childLinks = obj.allLinks.childNodes;
-	numLinks = childLinks.length;
-	linkArray = [];
-	for (var l = 0; l < numLinks; l++) {
-		linkArray.push({"url":childLinks[l].innerText});
+	if (obj.allLinks !== null) {
+		childLinks = obj.allLinks.childNodes;
+		numLinks = childLinks.length;
+		linkArray = [];
+		for (var l = 0; l < numLinks; l++) {
+			linkArray.push({"url":childLinks[l].innerText});
+		}
 	}
 	//Prep whois
 	if (obj.whois !== null) {
