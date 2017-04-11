@@ -68,21 +68,6 @@ promiseToken.then(function(result) {
 	} else {
 		tldSelect = obj.topLevelDomain;
 	}
-	//@to do
-	//Try to format date as unix timestamp, otherwise send nothing.
-	try {
-		var dateObj = new Date(obj.modifiedDate);
-		var unixDate = Date.parse(dateObj);
-		console.log(unixDate);
-	}
-	catch(err) {
-		console.log(err);
-	}
-	
-	var sendDate = ""
-	if (unixDate !== NaN) {
-		var sendDate = unixDate;
-	}
 	
     //Prep links
 	if (obj.allLinks !== null) {
@@ -122,7 +107,7 @@ promiseToken.then(function(result) {
 	}
 	//The URL to POST to
 	var url = "http://www.fakenewsfitness.org/node"
-	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,"field_page_last_modified":sendDate,"field_about_us_summary":obj.aboutUsSummary,"body":{"value":obj.assessment},"field_source_links":linkArray,"field_about_us_link":{"url":obj.aboutLink},"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
+	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,"field_page_last_modified":obj.modifiedDate,"field_about_us_summary":obj.aboutUsSummary,"body":{"value":obj.assessment},"field_source_links":linkArray,"field_about_us_link":{"url":obj.aboutLink},"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
 	console.log(postData);
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
