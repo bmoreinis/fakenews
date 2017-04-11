@@ -51,7 +51,7 @@ promiseToken.then(function(result) {
 //Begin processing form submission object for Drupal
 	// Determine which title to submit
 	var submitTitle = "";
-	if (obj.pageArticle !== "No h1 tags found") {
+	if (obj.pageArticle !== "No h1 tags found" && obj.pageArticle !== "") {
 		submitTitle = obj.pageArticle;
 	} else if (obj.pageTitle !== "No title tags found") {
 		submitTitle = obj.pageTitle;
@@ -87,7 +87,7 @@ promiseToken.then(function(result) {
 		if (numWhois > 1) {
 			var regName = childWhois[0].innerText;
 			var regComp = childWhois[1].innerText;
-			var regState = childWhois[2].innerText;
+			var regState = childWhois[2].innerText.substring(0,2);
 			var regCountry = childWhois[3].innerText;
 			var regPhone = childWhois[4].innerText;
 			var regEmail = childWhois[5].innerText;
