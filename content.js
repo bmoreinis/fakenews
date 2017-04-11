@@ -109,7 +109,7 @@ promiseToken.then(function(result) {
 	}
 	//The URL to POST to
 	var url = "http://www.fakenewsfitness.org/node"
-	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,/*"field_page_last_modified":obj.modifiedDate,*/"field_about_us_summary":obj.aboutUsSummary,"body":{"value":obj.assessment},"field_source_links":linkArray,"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
+	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,/*"field_page_last_modified":obj.modifiedDate,*/"field_about_us_summary":obj.aboutUsSummary,"body":{"value":obj.assessment},"field_source_links":linkArray,"field_about_us_link":{"url":obj.aboutLink},"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
 	console.log(postData);
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
@@ -149,6 +149,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 		var thisURL = controller.getURL();
 		var title = controller.getTitle();
 		var article = controller.getArticle();
+		var aboutLink = controller.aboutFinder();
         var formFields = [
         /*f = fixed rows; v = variable rows, parameters to create FN form
 		* array[0] => field id
@@ -166,6 +167,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 			["params","URL Parameters", thisURL[1], "f",0],
             ["modifiedDate","Modified Date(s)", modifiedDate,"f",0],
             ["allLinks","Page Links", allLinks,"vl",0],
+			["aboutLinks", "About Link(s)", aboutLink, "f",0],
             ["whois", "WHOIS Lookup", whoIsArr, "v",0]
             ];
 		var critThinksFields = [
@@ -186,7 +188,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             ["dn","Domain Name", "","f",1],
             ["tld","Top Level Domain", "","f",0],
             ["modifiedDate","Modified Date(s)", "","f",0],
-            ["allLinks","Page Links", "","a",0]
+            ["allLinks","Page Links", "","a",0],
+			["aboutLinks", "About Link(s)", "", "f",0],
             ];
 		var critThinksFields = [
 			["FNaboutUsSummary", "About Us Summary"],
@@ -253,7 +256,26 @@ var controller = (function(){
 
   // search document.body for ABOUT US or similar in menu lists
   function aboutFinder () {
-	//@todo
+	var aboutItems = document.getElementsByTagName("li");
+	var aboutLinks = [];
+	var aboutMax = aboutItems.length;
+	for (var a = 0; a < aboutMax; a++) {
+		var match = aboutItems[a].innerText.match(/((A|a)bout)/);
+		if (match) {
+			var childNodes = aboutItems[a].childNodes;
+			for (var n = 0; n < childNodes.length; n++) {
+				if (childNodes[n].nodeName == "A") {
+					aboutLinks.push(childNodes[n].href);
+				}
+			}
+		}
+	}
+	if (aboutLinks == []) {
+		return "We could not find any about links";
+	} else {
+    //Drupal is set up to handle only one link here.. So we will pick the first one found
+		return aboutLinks[0];
+	}
   };
 
   // search document.body for posted date above or below body
@@ -307,7 +329,8 @@ var controller = (function(){
 	linkFinder : linkFinder,
 	dateFinder : dateFinder,
 	getTitle : getTitle,
-	getArticle : getArticle
+	getArticle : getArticle,
+	aboutFinder : aboutFinder
   };
 
 })();
@@ -475,6 +498,7 @@ function makeForm(fields, critFields) {
 			domainName: document.getElementById("dn").value,
 			topLevelDomain: document.getElementById("tld").value,
 			allLinks: document.getElementById("allLinks"),
+			aboutLink: document.getElementById("aboutLinks").value,
 			whois: document.getElementById("whois"),
 			
 			aboutUsSummary: document.getElementById("FNaboutUsSummary").value,
@@ -535,6 +559,7 @@ function makeForm(fields, critFields) {
 			domainName: document.getElementById("dn").value,
 			topLevelDomain: document.getElementById("tld").value,
 			allLinks: document.getElementById("allLinks"),
+			aboutLink: document.getElementById("aboutLinks").value,
 			whois: document.getElementById("whois"),
 			
 			aboutUsSummary: document.getElementById("FNaboutUsSummary").value,
