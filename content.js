@@ -1,6 +1,25 @@
 function sendToServer(obj) {
-  //Process object that was sent, for values
-  
+  //Process object that was sent, for values on fields that take only values. Default is value to allow new "normal" field situations
+  console.log(obj);
+  for (var property in obj) {
+    if (obj.hasOwnProperty(property)) {
+		console.log(property);
+		console.log(obj[property].value);
+        switch (obj[property]) {
+			case "whois":
+			  console.log('whois broke');
+			  break;
+			case "allLinks":
+			  console.log('allLinks broke');
+			  break;
+			default:
+			  if (obj[property].value) {
+			    obj[property] = obj[property].value;
+			  }
+		}
+    }
+  }
+  console.log(obj);
   //Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
   var promiseToken = new Promise(function(resolve, reject) {
   var getToken = new XMLHttpRequest();
@@ -101,7 +120,7 @@ promiseToken.then(function(result) {
 		}
 	}
 	//Prepare question field split on '?'
-	var questions = obj.questions.split('?');
+	var questions = obj.FNquestions.split('?');
 	var newQuestions = []
 	numQues = questions.length;
 	for (var q = 0; q < numQues; q++) {
@@ -109,7 +128,7 @@ promiseToken.then(function(result) {
 	}
 	//The URL to POST to
 	var url = "https://www.fakenewsfitness.org/node"
-	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,"field_page_last_modified":obj.modifiedDate,"field_about_us_summary":obj.aboutUsSummary,"body":{"value":obj.assessment},"field_source_links":linkArray,"field_about_us_link":{"url":obj.aboutLink},"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
+	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,"field_page_last_modified":obj.modifiedDate,"field_about_us_summary":obj.FNaboutUsSummary,"body":{"value":obj.FNassessment},"field_source_links":linkArray,"field_about_us_link":{"url":obj.aboutLink},"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
 	console.log(postData);
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
@@ -335,6 +354,7 @@ function cancelForm() {
 	document.getElementsByTagName("BODY")[0].style.marginTop="0px";
 };
 
+//add another link input (could be generalized)
 function addLink() {
 	var divElement = document.getElementById('blankLinks');
 	var newElement = document.createElement('input');
@@ -344,6 +364,7 @@ function addLink() {
 	divElement.appendChild(newElement);
 };
 
+//make sure required fields are filled before submitting
 function checkRequired () {
 	var FNrequired = document.getElementsByClassName("FNrequired");
 		var reqmax = FNrequired.length;
@@ -355,6 +376,20 @@ function checkRequired () {
 			}
 		}
 };
+
+//build object to send to server, then send to server
+function buildObject(fields, critFields) {
+	obj = {};
+	fieldsMax = fields.length;
+	critMax = critFields.length;
+	for (var f = 0; f < fieldsMax; f++) {
+		obj[fields[f][0]] = document.getElementById(fields[f][0]);	
+	}
+	for (var c = 0; c <critMax; c++) {
+		obj[critFields[c][0]] = document.getElementById(critFields[c][0]);
+	}
+	return obj;
+}
 
 function makeForm(fields, critFields) {
 	// Move Body Down
@@ -482,8 +517,8 @@ function makeForm(fields, critFields) {
 		console.log(fields);
 		var check = checkRequired();
 		if (check == true) {
-        sendToServer({
-            /* use Jquery with a form serialization library */
+        sendToServer(buildObject(fields, critFields)/*{
+             use Jquery with a form serialization library 
             username: document.getElementById("username").value,
 			url: document.getElementById("url").value,
 			pageArticle: document.getElementById("pageArticle").value,
@@ -498,7 +533,7 @@ function makeForm(fields, critFields) {
 			aboutUsSummary: document.getElementById("FNaboutUsSummary").value,
 			assessment: document.getElementById("FNassessment").value,
 			questions: document.getElementById("FNquestions").value
-        })
+        }*/)
 		} else {
 			alert ('Please fill out required fields');
 		}
@@ -543,8 +578,8 @@ function makeForm(fields, critFields) {
     submitAllElement.setAttribute('value',"Submit All Data");
 	submitAllElement.setAttribute('id',"submitAll");
     submitAllElement.addEventListener("click", function() {
-        sendToServer({
-            /* use Jquery with a form serialization library */
+        sendToServer(buildObject(fields, critFields)/*{
+            use Jquery with a form serialization library 
             username: document.getElementById("username").value,
 			url: document.getElementById("url").value,
 			pageArticle: document.getElementById("pageArticle").value,
@@ -559,7 +594,7 @@ function makeForm(fields, critFields) {
 			aboutUsSummary: document.getElementById("FNaboutUsSummary").value,
 			assessment: document.getElementById("FNassessment").value,
 			questions: document.getElementById("FNquestions").value
-        })
+        }*/)
     }, false)
     ctForm.appendChild(submitAllElement);
 	var cancelAllElement = document.createElement("input"); //input element, cancel
