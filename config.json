@@ -22,7 +22,7 @@
 ["tld","Top Level Domain","","f",0,"field_top_level_domain"],
 ["params","URL Parameters","","f",0,""],
 ["modifiedDate","Modified Date(s)","","f",0,"field_page_last_modified"],
-["allLinks","Page Links","","vl",0,"field_source_links"],
+["allLinks","Page Links","","a",0,"field_source_links"],
 ["aboutLinks","About Link(s)","","f",0,"field_about_us_link"]
 ],
 "typeAndOG":[{"type":"page_check"},{"og_group_ref":1}]
