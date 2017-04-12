@@ -47,7 +47,7 @@ Removing fields:
 Adding fields:
 
 	**WARNING: Currently, we are only set up to add 'basic' fields, by which I mean single-entry, plain text, non-validated (by Drupal) fields, for which Drupal expects the syntax {"field_my_field":"my value"} to POST.
-	Currently, all fields on page 2 are set up as textArea fields for critical thinking.
+	Currently, all fields on page 2 are set up as textArea fields for critical thinking.**
 
 	1) If you want this field to post to Drupal, create your Drupal field (i.e. Structure>Content Types>*Your content type*>Manage Fields>New Field>Type=Text>Create) and note the machine name (looks like "field_my_new_field")
 	2) Create the array for your new field e.g. ["testField","This is a Test Field","",f,0,"field_my_test_field"], (remember the comma at the end!)
@@ -58,7 +58,7 @@ Adding fields:
 Changing Type and OG settings:
 
 	**WARNING: If you want to use a new content type, be sure to use 'existing fields' if you would like to populate the new content type with any of the 'specialized fields'.
-	There are field names there as placeholders so it isn't confusing, but for the most part they currently are not used and field machine name for the auto-filled fields is hard coded. Hopefully not forever.
+	There are field names there as placeholders so it isn't confusing, but for the most part they currently are not used and field machine name for the auto-filled fields is hard coded. Hopefully not forever.**
 
 	You will need to create your content type and/or new OG in Drupal before these changes will work:
 
