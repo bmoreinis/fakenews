@@ -1,13 +1,7 @@
 /* Fake News Fitness Pseudocode
 * https://drive.google.com/open?id=0B54VzDPRtma7dG5mUlBhNW1zX2c 
 */
-function httpGet(theUrl)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", theUrl, true );
-    xmlHttp.send( null );
-    return xmlHttp.responseText;
-}
+
 /* 
 * load popup to inform user and offer option button (free / prefill)
 * listen for checkpage button and call CONTROLLER module 
@@ -16,7 +10,19 @@ function httpGet(theUrl)
 document.addEventListener('DOMContentLoaded', function() {
   var configFile = chrome.runtime.getURL('/config.json');
   var promiseConfig = new Promise(function(resolve, reject) {
-	httpGet(configFile);
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onload = function () {
+			  var configStatus = xmlHttp.status;
+			  var configData = xmlHttp.responseText;
+			    if (configStatus == 200) {
+				resolve(configData);
+				}
+				else {
+				reject(Error("Could not get config data"));
+				}
+		  }
+    xmlHttp.open( "GET", configFile, true );
+    xmlHttp.send( null );
   });
   promiseConfig.then(function(result) {
   var config = JSON.parse(result);

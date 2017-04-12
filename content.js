@@ -1,8 +1,10 @@
-//Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
 function sendToServer(obj) {
+  //Process object that was sent, for values
+  
+  //Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
   var promiseToken = new Promise(function(resolve, reject) {
   var getToken = new XMLHttpRequest();
-		  var turl = "http://www.fakenewsfitness.org/restws/session/token";
+		  var turl = "https://www.fakenewsfitness.org/restws/session/token";
 		  getToken.onload = function () {
 			  var tStatus = getToken.status;
 			  var tData = getToken.responseText;
@@ -21,7 +23,7 @@ function sendToServer(obj) {
 promiseToken.then(function(result) {
   var promiseUser = new Promise(function(resolve, reject) {
   var getUser = new XMLHttpRequest();
-	  var uurl = "http://www.fakenewsfitness.org/user.json?mail="+obj.username;
+	  var uurl = "https://www.fakenewsfitness.org/user.json?mail="+obj.username;
 	  getUser.onload = function () {
 		  var uStatus = getUser.status;
 		  var uData = JSON.parse(getUser.response);
@@ -106,7 +108,7 @@ promiseToken.then(function(result) {
 		newQuestions.push({"value":questions[q]});
 	}
 	//The URL to POST to
-	var url = "http://www.fakenewsfitness.org/node"
+	var url = "https://www.fakenewsfitness.org/node"
 	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,"field_page_last_modified":obj.modifiedDate,"field_about_us_summary":obj.aboutUsSummary,"body":{"value":obj.assessment},"field_source_links":linkArray,"field_about_us_link":{"url":obj.aboutLink},"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
 	console.log(postData);
 	var postRequest = new XMLHttpRequest();
@@ -134,68 +136,61 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
+		//Process WHOIS from message data
         var whoIsObj = JSON.parse(msg.whois).formatted_data;
 		if (whoIsObj.RegistrantName == undefined) {
 			var whoIsArr = ['There was a problem with the WHOIS lookup'];
 		} else {
 			var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
 		};
-        var myDomain = controller.domainFinder();
-        var topLevelDomain = controller.tldParser();
-        var allLinks = controller.linkFinder();
-        var modifiedDate = controller.dateFinder();
+        // Process URL here so we only run controller function once
 		var thisURL = controller.getURL();
-		var title = controller.getTitle();
-		var article = controller.getArticle();
-		var aboutLink = controller.aboutFinder();
-        var formFields = [
-        /*f = fixed rows; v = variable rows, parameters to create FN form
-		* array[0] => field id
-		* array[1] => field label
-		* array[2] => field value
-		* array[3] => field generation type (f, v, vl, a)
-		* array[4] => boolean required
-		*/
-            ["username","Email Address as User Name","","f",1],
-			["url","Page URL", thisURL[0], "f",0],
-			["pageTitle","Page Title ( <title> )", title, "f",0],
-			["pageArticle","Article Title (First <H1>)", article, "f",0],
-            ["dn","Domain Name",myDomain,"f",1],
-            ["tld","Top Level Domain", topLevelDomain, "f",0],
-			["params","URL Parameters", thisURL[1], "f",0],
-            ["modifiedDate","Modified Date(s)", modifiedDate,"f",0],
-            ["allLinks","Page Links", allLinks,"vl",0],
-			["aboutLinks", "About Link(s)", aboutLink, "f",0],
-            ["whois", "WHOIS Lookup", whoIsArr, "v",0]
-            ];
-		var critThinksFields = [
-			["FNaboutUsSummary", "About Us Summary"],
-			["FNassessment", "Assessment"],
-			["FNquestions", "Questions"]
-		];
+		// Add vars to form array from config, for auto-fill. Default is "". This way we can configure new fields that don't autofill in any order
+		var configMax = msg.config.filled_form.length;
+		for (var i = 1; i < configMax; i++) {
+			switch (msg.config.filled_form[i][0]) {
+				case "url":
+				  msg.config.filled_form[i][2] = thisURL[0];
+				  break;
+				case "pageTitle":
+				  msg.config.filled_form[i][2] = controller.getTitle();
+				  break;
+				case "pageArticle":
+				  msg.config.filled_form[i][2] = controller.getArticle();
+				  break;
+				case "dn":
+				  msg.config.filled_form[i][2] = controller.domainFinder();
+				  break;
+				case "tld":
+				  msg.config.filled_form[i][2] = controller.tldParser();
+				  break;
+				case "params":
+				  msg.config.filled_form[i][2] = thisURL[1];
+				  break;
+				case "modifiedDate":
+				  msg.config.filled_form[i][2] = controller.dateFinder();
+				  break;
+				case "allLinks":
+				  msg.config.filled_form[i][2] = controller.linkFinder();
+				  break;
+				case "aboutLinks":
+				  msg.config.filled_form[i][2] = controller.aboutFinder();
+				  break;
+				case "whois":
+				  msg.config.filled_form[i][2] = whoIsArr;
+				  break;
+				default:
+				  msg.config.filled_form[i][2] = ""
+			}
+		}
+
         //Build the form
-        makeForm(formFields, critThinksFields);
+        makeForm(msg.config.filled_form, msg.config.critical_thinking);
 
     }
     else if (msg.text === 'build_form_blank') {
-        var formFields = [
-            ["username","Email Address as User Name","","f",1],
-			["url","Page URL","","f",0],
-			["pageTitle","Page Title (First <title>)", "", "f",0],
-			["pageArticle","Article Title (First <H1>)", "", "f",0],
-            ["dn","Domain Name", "","f",1],
-            ["tld","Top Level Domain", "","f",0],
-            ["modifiedDate","Modified Date(s)", "","f",0],
-            ["allLinks","Page Links", "","a",0],
-			["aboutLinks", "About Link(s)", "", "f",0],
-            ];
-		var critThinksFields = [
-			["FNaboutUsSummary", "About Us Summary"],
-			["FNassessment", "Assessment"],
-			["FNquestions", "Questions"]
-		];
         //Build the form
-        makeForm(formFields, critThinksFields);
+        makeForm(msg.config.blank_form, msg.config.critical_thinking);
     }
 });
 
@@ -484,6 +479,7 @@ function makeForm(fields, critFields) {
     submitElement.setAttribute('value',"Submit Data");
 	submitElement.setAttribute('id',"submit");
     submitElement.addEventListener("click", function() {
+		console.log(fields);
 		var check = checkRequired();
 		if (check == true) {
         sendToServer({
