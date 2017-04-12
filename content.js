@@ -3,19 +3,13 @@ function sendToServer(obj) {
   console.log(obj);
   for (var property in obj) {
     if (obj.hasOwnProperty(property)) {
-		console.log(property);
-		console.log(obj[property].value);
-        switch (obj[property]) {
+        switch (property) {
 			case "whois":
-			  console.log('whois broke');
 			  break;
 			case "allLinks":
-			  console.log('allLinks broke');
 			  break;
 			default:
-			  if (obj[property].value) {
 			    obj[property] = obj[property].value;
-			  }
 		}
     }
   }
@@ -83,41 +77,52 @@ promiseToken.then(function(result) {
 	var tldSelect = ""
 	var otherTld = ""
 	var selectDomains = ["com","org","gov","net","edu","mil","int"]
-	if (selectDomains.indexOf(obj.topLevelDomain) == -1) {
+	if (selectDomains.indexOf(obj.tld) == -1) {
 		tldSelect = "Other (ICANN)";
-		otherTld = obj.topLevelDomain;
+		otherTld = obj.tld;
 	} else {
-		tldSelect = obj.topLevelDomain;
+		tldSelect = obj.tld;
 	}
-	
+	//Check about link for proper URL
+	if (obj.aboutLinks == "undefined") {
+		obj.aboutLinks = "";
+	}
     //Prep links
-	if (obj.allLinks !== null) {
-		childLinks = obj.allLinks.childNodes;
-		numLinks = childLinks.length;
-		linkArray = [];
+	var linkArray = [];
+	try {
+		var childLinks = obj.allLinks.childNodes;
+		var numLinks = childLinks.length;
 		for (var l = 0; l < numLinks; l++) {
-			linkArray.push({"url":childLinks[l].innerText});
+			if (childLinks[l].innerText == "No items were found") {
+				linkArray.push({"url":""});
+			}
+			else {
+				linkArray.push({"url":childLinks[l].innerText});
+			}
 		}
+	}
+	catch(err) {
+		console.log(err);
+		linkArray.push({"url":""});
 	}
 	//Prep whois
-	if (obj.whois !== null) {
+	try {
 		childWhois = obj.whois.childNodes;
-		numWhois = childWhois.length;
-		if (numWhois > 1) {
-			var regName = childWhois[0].innerText;
-			var regComp = childWhois[1].innerText;
-			var regState = childWhois[2].innerText.substring(0,2);
-			var regCountry = childWhois[3].innerText;
-			var regPhone = childWhois[4].innerText;
-			var regEmail = childWhois[5].innerText;
-		} else {
-			var regName = "There was a problem with the WHOIS Lookup";
-			var regComp = "";
-			var regState = "";
-			var regCountry = "";
-			var regPhone = "";
-			var regEmail = "";
-		}
+		var regName = childWhois[0].innerText;
+		var regComp = childWhois[1].innerText;
+		var regState = childWhois[2].innerText.substring(0,2);
+		var regCountry = childWhois[3].innerText;
+		var regPhone = childWhois[4].innerText;
+		var regEmail = childWhois[5].innerText;
+	} 
+	catch(err) {
+		console.log(err);
+		var regName = "There was a problem with the WHOIS Lookup";
+		var regComp = "";
+		var regState = "";
+		var regCountry = "";
+		var regPhone = "";
+		var regEmail = "";
 	}
 	//Prepare question field split on '?'
 	var questions = obj.FNquestions.split('?');
@@ -128,7 +133,7 @@ promiseToken.then(function(result) {
 	}
 	//The URL to POST to
 	var url = "https://www.fakenewsfitness.org/node"
-	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,"field_page_last_modified":obj.modifiedDate,"field_about_us_summary":obj.FNaboutUsSummary,"body":{"value":obj.FNassessment},"field_source_links":linkArray,"field_about_us_link":{"url":obj.aboutLink},"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
+	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.dn},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,"field_page_last_modified":obj.modifiedDate,"field_about_us_summary":obj.FNaboutUsSummary,"body":{"value":obj.FNassessment},"field_source_links":linkArray,"field_about_us_link":{"url":obj.aboutLinks},"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
 	console.log(postData);
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
