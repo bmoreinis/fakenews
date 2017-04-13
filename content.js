@@ -122,6 +122,23 @@ function sendToServer(obj) {
 		}
     }
   }
+  
+  //Check mode (download or post) and do it.
+  if (obj.mode == 'download') {
+	var downloadData = [];
+	  for (var data in rawData) {
+		if (rawData.hasOwnProperty(data)) {
+			var subData = rawData[data];
+			for (var d in subData) {
+				if (subData.hasOwnProperty(d)) {
+					downloadData.push(JSON.stringify(subData));				
+				}
+			}
+	    }
+	  }
+	chrome.runtime.sendMessage({text:'download', downloadData: downloadData}, null);
+  }
+  else {
   //Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
   var promiseToken = new Promise(function(resolve, reject) {
   var getToken = new XMLHttpRequest();
@@ -201,6 +218,7 @@ function sendToServer(obj) {
 }, function(err) {
   alert(err);
 });
+}
 }
 
 // Listen for messages
@@ -431,7 +449,7 @@ function checkRequired () {
 };
 
 //build object to send to server, then send to server
-function buildObject(fields, critFields, config) {
+function buildObject(fields, critFields, config, mode) {
 	obj = {};
 	fieldsMax = fields.length;
 	critMax = critFields.length;
@@ -443,11 +461,9 @@ function buildObject(fields, critFields, config) {
 		obj[critFields[c][0]] = document.getElementById(critFields[c][0]);
 		obj[critFields[c][0]].field = critFields[c][2];
 	}
-	console.log(config);
 	obj.type = config[0].type;
-	console.log(obj.type);
 	obj.OG = config[1].og_group_ref;
-	console.log(obj.OG);
+	obj.mode = mode;
 	return obj;
 }
 
@@ -563,6 +579,7 @@ function makeForm(fields, critFields, config) {
 		if (check == true) {
 			formName.style.display = 'hidden';
 			ctForm.style.display = 'block';
+			ctForm.appendChild(downloadElement);
 		} else {
 			alert ('Please fill out required fields');
 		};
@@ -576,12 +593,23 @@ function makeForm(fields, critFields, config) {
     submitElement.addEventListener("click", function() {
 		var check = checkRequired();
 		if (check == true) {
-        sendToServer(buildObject(fields, critFields, config))
+		var mode = "post";
+        sendToServer(buildObject(fields, critFields, config, mode))
 		} else {
 			alert ('Please fill out required fields');
 		}
     }, false)
     formName.appendChild(submitElement);
+	
+	var downloadElement = document.createElement("input");
+	downloadElement.setAttribute('type','button');
+	downloadElement.setAttribute('value',"Download Input");
+	downloadElement.setAttribute('id','FNdownload');
+	downloadElement.addEventListener('click', function() {
+		var mode = "download";
+        sendToServer(buildObject(fields, critFields, config, mode))
+    }, false)
+    formName.appendChild(downloadElement);
 
 	var cancelElement = document.createElement("input"); //input element, cancel
 	cancelElement.setAttribute('type',"button");
@@ -614,6 +642,7 @@ function makeForm(fields, critFields, config) {
     pageBackElement.addEventListener("click", function() {
 		ctForm.style.display = 'none';
 		formName.style.display = 'block';
+		formName.appendChild(downloadElement);
 	}, false);
     ctForm.appendChild(pageBackElement);
 	var submitAllElement = document.createElement("input"); //input element, Submit All button
@@ -621,7 +650,8 @@ function makeForm(fields, critFields, config) {
     submitAllElement.setAttribute('value',"Submit All Data");
 	submitAllElement.setAttribute('id',"submitAll");
     submitAllElement.addEventListener("click", function() {
-        sendToServer(buildObject(fields, critFields, config))
+		var mode = "post";
+        sendToServer(buildObject(fields, critFields, config, mode))
     }, false)
     ctForm.appendChild(submitAllElement);
 	var cancelAllElement = document.createElement("input"); //input element, cancel
