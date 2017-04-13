@@ -1,8 +1,131 @@
-//Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
 function sendToServer(obj) {
+  //Process object that was sent, for values on fields that take only values. Default is value to allow new "normal" field situations
+  //rawData will be used to build the JSON to post to Drupal
+  var rawData = {}
+  for (var property in obj) {
+    if (obj.hasOwnProperty(property)) {
+		//Change properties to values and generate rawData objects from it, cases for specialized fields, default for generic text fields (to be added / subtracted).
+        switch (property) {
+			case "whois":
+			//Prep whois
+			  try {
+				childWhois = obj.whois.childNodes;
+				rawData.regName = {"field_registrant_name":childWhois[0].innerText};
+				rawData.regComp = {"field_registrant_company":childWhois[1].innerText};
+				rawData.regState = {"field_registrant_state":childWhois[2].innerText.substring(0,2)};
+				rawData.regCountry = {"field_registrant_country":childWhois[3].innerText};
+				rawData.regPhone = {"field_registrant_phone":childWhois[4].innerText};
+				rawData.regEmail = {"field_registrant_email":childWhois[5].innerText};
+			  }
+			  catch(err) {
+				console.log(err);
+				rawData.regName = {"field_registrant_name":""};
+				rawData.regComp = {"field_registrant_company":""};
+				rawData.regState = {"field_registrant_state":""};
+				rawData.regCountry = {"field_registrant_country":""};
+				rawData.regPhone = {"field_registrant_phone":""};
+				rawData.regEmail = {"field_registrant_email":""};
+			  }
+			break;
+			case "allLinks":
+			  //Prep links
+			  var linkArray = [];
+			  try {
+			    var childLinks = obj.allLinks.childNodes;
+				var numLinks = childLinks.length;
+				for (var l = 0; l < numLinks; l++) {
+				  if (childLinks[l].innerText == "No items were found") {
+				    linkArray.push({"url":""});
+				  }
+				  else {
+				    linkArray.push({"url":childLinks[l].innerText});
+				  }
+				}
+			  }
+			  catch(err) {
+				console.log(err);
+				  linkArray.push({"url":""});
+			  }
+			  rawData.allLinks = {"field_source_links":linkArray};
+			break;
+			case "tld":
+			  //Determine which TLD field to submit to
+			  var tldSelect = ""
+			  var otherTld = ""
+			  var selectDomains = ["com","org","gov","net","edu","mil","int"]
+			  if (selectDomains.indexOf(obj.tld.value) == -1) {
+				tldSelect = "Other (ICANN)";
+				otherTld = obj.tld.value;
+			  } else {
+				tldSelect = obj.tld.value;
+			  }
+			  rawData.tld = {"field_top_level_domain":tldSelect}
+			  rawData.otherTld = {"field_other_tld":otherTld}
+			break;
+			case "pageArticle":
+			  // Determine which title to submit
+			  var submitTitle = "";
+			  if (obj.pageArticle.value !== "No h1 tags found" && obj.pageArticle.value !== "") {
+				submitTitle = obj.pageArticle.value;
+			  } else if (obj.pageTitle.value !== "No title tags found") {
+				submitTitle = obj.pageTitle.value;
+			  } else {
+				submitTitle = "No Title";
+			  }
+			  rawData.title = {"title":submitTitle};
+			  rawData.titlefield = {"title_field":submitTitle};
+			break;
+			case "pageTitle":
+			break;
+			case "aboutLinks":
+			  //Check about link for proper URL
+			  if (obj.aboutLinks.value == "undefined") {
+				obj.aboutLinks.value = "";
+			  }
+			  rawData.aboutLinks = {"field_about_us_link":{"url":obj.aboutLinks.value}};
+			break;
+			case "FNquestions":
+			  //Prepare question field split on '?'
+			  var questions = obj.FNquestions.value.split('?');
+			  var newQuestions = []
+			  numQues = questions.length;
+			  for (var q = 0; q < numQues; q++) {
+				newQuestions.push({"value":questions[q]});
+			  }
+			  rawData.FNquestions = {"field_questions_":newQuestions};
+			break;
+			case "url":
+			  rawData.url = {"field_page_url":{"url":obj.url.value}};
+			break;
+			case "dn":
+			  rawData.dn = {"field_domain_name":{"url":obj.dn.value}};
+			break;
+			case "FNassessment":
+			  rawData.FNassessment = {"body":{"value":obj.FNassessment.value}};
+			break;
+			case "type":
+			  rawData.type = {"type":obj.type};
+			  console.log(rawData.type);
+			break;
+			case "OG":
+			  rawData.OG = {"og_group_ref":[{"id": obj.OG}]};
+			  console.log(rawData.OG);
+			break;
+			default:
+			  var objectProperty = obj[property];
+			  var objpropfield = obj[property].field;
+			  var objpropvalue = objectProperty.value;
+			  //check that we set a field to map to in Drupal, we can use this as a config process to not submit a field
+			  if (objpropfield !== "") {
+			    rawData[property] = { [objpropfield] : objpropvalue };
+			  }
+		}
+    }
+  }
+  //Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
   var promiseToken = new Promise(function(resolve, reject) {
   var getToken = new XMLHttpRequest();
-		  var turl = "http://www.fakenewsfitness.org/restws/session/token";
+		  var turl = "https://www.fakenewsfitness.org/restws/session/token";
 		  getToken.onload = function () {
 			  var tStatus = getToken.status;
 			  var tData = getToken.responseText;
@@ -16,12 +139,12 @@ function sendToServer(obj) {
 		  getToken.open("GET", turl, true);
 		  getToken.setRequestHeader("Accept", "application/json");
 		  getToken.send(null);
-});
+  });
 
-promiseToken.then(function(result) {
-  var promiseUser = new Promise(function(resolve, reject) {
-  var getUser = new XMLHttpRequest();
-	  var uurl = "http://www.fakenewsfitness.org/user.json?mail="+obj.username;
+  promiseToken.then(function(result) {
+    var promiseUser = new Promise(function(resolve, reject) {
+    var getUser = new XMLHttpRequest();
+	  var uurl = "https://www.fakenewsfitness.org/user.json?mail="+obj.username.value;
 	  getUser.onload = function () {
 		  var uStatus = getUser.status;
 		  var uData = JSON.parse(getUser.response);
@@ -44,70 +167,21 @@ promiseToken.then(function(result) {
 	  getUser.send(null);
   });
   promiseUser.then(function(result) {
+	rawData.author = {"author":{"id":result}};
 	// Double check for a "blank" submission in email before attempting to post node
     if (result == null) {
 		alert("There was a problem retrieving your FakeNewsFitness User");
 	} else {
-//Begin processing form submission object for Drupal
-	// Determine which title to submit
-	var submitTitle = "";
-	if (obj.pageArticle !== "No h1 tags found" && obj.pageArticle !== "") {
-		submitTitle = obj.pageArticle;
-	} else if (obj.pageTitle !== "No title tags found") {
-		submitTitle = obj.pageTitle;
-	} else {
-		submitTitle = "No Title";
-	}
-	//Determine which TLD field to submit to
-	var tldSelect = ""
-	var otherTld = ""
-	var selectDomains = ["com","org","gov","net","edu","mil","int"]
-	if (selectDomains.indexOf(obj.topLevelDomain) == -1) {
-		tldSelect = "Other (ICANN)";
-		otherTld = obj.topLevelDomain;
-	} else {
-		tldSelect = obj.topLevelDomain;
-	}
-	
-    //Prep links
-	if (obj.allLinks !== null) {
-		childLinks = obj.allLinks.childNodes;
-		numLinks = childLinks.length;
-		linkArray = [];
-		for (var l = 0; l < numLinks; l++) {
-			linkArray.push({"url":childLinks[l].innerText});
-		}
-	}
-	//Prep whois
-	if (obj.whois !== null) {
-		childWhois = obj.whois.childNodes;
-		numWhois = childWhois.length;
-		if (numWhois > 1) {
-			var regName = childWhois[0].innerText;
-			var regComp = childWhois[1].innerText;
-			var regState = childWhois[2].innerText.substring(0,2);
-			var regCountry = childWhois[3].innerText;
-			var regPhone = childWhois[4].innerText;
-			var regEmail = childWhois[5].innerText;
-		} else {
-			var regName = "There was a problem with the WHOIS Lookup";
-			var regComp = "";
-			var regState = "";
-			var regCountry = "";
-			var regPhone = "";
-			var regEmail = "";
-		}
-	}
-	//Prepare question field split on '?'
-	var questions = obj.questions.split('?');
-	var newQuestions = []
-	numQues = questions.length;
-	for (var q = 0; q < numQues; q++) {
-		newQuestions.push({"value":questions[q]});
-	}
 	//The URL to POST to
-	var url = "http://www.fakenewsfitness.org/node"
-	var postData = JSON.stringify({"type":"page_check","title":submitTitle,"title_field":submitTitle,"author":{"id":result},"field_page_url":{"url":obj.url},"field_domain_name":{"url":obj.domainName},"field_top_level_domain":tldSelect,"field_other_tld":otherTld,"field_page_last_modified":obj.modifiedDate,"field_about_us_summary":obj.aboutUsSummary,"body":{"value":obj.assessment},"field_source_links":linkArray,"field_about_us_link":{"url":obj.aboutLink},"field_registrant_name":regName,"field_registrant_company":regComp,"field_registrant_state":regState,"field_registrant_country":regCountry,"field_registrant_phone":regPhone,"field_registrant_email":regEmail,"field_questions_":newQuestions,"og_group_ref":[{"id": "1"}]});
+	var url = "https://www.fakenewsfitness.org/node"
+	var postString = "";
+	for (var prop in rawData) {
+	  if (rawData.hasOwnProperty(prop)) {
+		  var stringProp = JSON.stringify(rawData[prop])
+		  postString = postString+stringProp.slice(1,-1)+',';
+	  }
+	}
+	var postData = '{'+postString.slice(0,-1)+'}';
 	console.log(postData);
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
@@ -134,68 +208,61 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
     // If the received message has the expected format...
     if (msg.text === 'build_form_filled') {
+		//Process WHOIS from message data
         var whoIsObj = JSON.parse(msg.whois).formatted_data;
 		if (whoIsObj.RegistrantName == undefined) {
 			var whoIsArr = ['There was a problem with the WHOIS lookup'];
 		} else {
 			var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
 		};
-        var myDomain = controller.domainFinder();
-        var topLevelDomain = controller.tldParser();
-        var allLinks = controller.linkFinder();
-        var modifiedDate = controller.dateFinder();
+        // Process URL here so we only run controller function once
 		var thisURL = controller.getURL();
-		var title = controller.getTitle();
-		var article = controller.getArticle();
-		var aboutLink = controller.aboutFinder();
-        var formFields = [
-        /*f = fixed rows; v = variable rows, parameters to create FN form
-		* array[0] => field id
-		* array[1] => field label
-		* array[2] => field value
-		* array[3] => field generation type (f, v, vl, a)
-		* array[4] => boolean required
-		*/
-            ["username","Email Address as User Name","","f",1],
-			["url","Page URL", thisURL[0], "f",0],
-			["pageTitle","Page Title ( <title> )", title, "f",0],
-			["pageArticle","Article Title (First <H1>)", article, "f",0],
-            ["dn","Domain Name",myDomain,"f",1],
-            ["tld","Top Level Domain", topLevelDomain, "f",0],
-			["params","URL Parameters", thisURL[1], "f",0],
-            ["modifiedDate","Modified Date(s)", modifiedDate,"f",0],
-            ["allLinks","Page Links", allLinks,"vl",0],
-			["aboutLinks", "About Link(s)", aboutLink, "f",0],
-            ["whois", "WHOIS Lookup", whoIsArr, "v",0]
-            ];
-		var critThinksFields = [
-			["FNaboutUsSummary", "About Us Summary"],
-			["FNassessment", "Assessment"],
-			["FNquestions", "Questions"]
-		];
+		// Add vars to form array from config, for auto-fill. Default is "". This way we can configure new fields that don't autofill in any order
+		var configMax = msg.config.filled_form.length;
+		for (var i = 1; i < configMax; i++) {
+			switch (msg.config.filled_form[i][0]) {
+				case "url":
+				  msg.config.filled_form[i][2] = thisURL[0];
+				  break;
+				case "pageTitle":
+				  msg.config.filled_form[i][2] = controller.getTitle();
+				  break;
+				case "pageArticle":
+				  msg.config.filled_form[i][2] = controller.getArticle();
+				  break;
+				case "dn":
+				  msg.config.filled_form[i][2] = controller.domainFinder();
+				  break;
+				case "tld":
+				  msg.config.filled_form[i][2] = controller.tldParser();
+				  break;
+				case "params":
+				  msg.config.filled_form[i][2] = thisURL[1];
+				  break;
+				case "modifiedDate":
+				  msg.config.filled_form[i][2] = controller.dateFinder();
+				  break;
+				case "allLinks":
+				  msg.config.filled_form[i][2] = controller.linkFinder();
+				  break;
+				case "aboutLinks":
+				  msg.config.filled_form[i][2] = controller.aboutFinder();
+				  break;
+				case "whois":
+				  msg.config.filled_form[i][2] = whoIsArr;
+				  break;
+				default:
+				  msg.config.filled_form[i][2] = ""
+			}
+		}
+
         //Build the form
-        makeForm(formFields, critThinksFields);
+        makeForm(msg.config.filled_form, msg.config.critical_thinking, msg.config.typeAndOG);
 
     }
     else if (msg.text === 'build_form_blank') {
-        var formFields = [
-            ["username","Email Address as User Name","","f",1],
-			["url","Page URL","","f",0],
-			["pageTitle","Page Title (First <title>)", "", "f",0],
-			["pageArticle","Article Title (First <H1>)", "", "f",0],
-            ["dn","Domain Name", "","f",1],
-            ["tld","Top Level Domain", "","f",0],
-            ["modifiedDate","Modified Date(s)", "","f",0],
-            ["allLinks","Page Links", "","a",0],
-			["aboutLinks", "About Link(s)", "", "f",0],
-            ];
-		var critThinksFields = [
-			["FNaboutUsSummary", "About Us Summary"],
-			["FNassessment", "Assessment"],
-			["FNquestions", "Questions"]
-		];
         //Build the form
-        makeForm(formFields, critThinksFields);
+        makeForm(msg.config.blank_form, msg.config.critical_thinking, msg.config.typeAndOG);
     }
 });
 
@@ -340,6 +407,7 @@ function cancelForm() {
 	document.getElementsByTagName("BODY")[0].style.marginTop="0px";
 };
 
+//add another link input (could be generalized)
 function addLink() {
 	var divElement = document.getElementById('blankLinks');
 	var newElement = document.createElement('input');
@@ -349,6 +417,7 @@ function addLink() {
 	divElement.appendChild(newElement);
 };
 
+//make sure required fields are filled before submitting
 function checkRequired () {
 	var FNrequired = document.getElementsByClassName("FNrequired");
 		var reqmax = FNrequired.length;
@@ -361,7 +430,28 @@ function checkRequired () {
 		}
 };
 
-function makeForm(fields, critFields) {
+//build object to send to server, then send to server
+function buildObject(fields, critFields, config) {
+	obj = {};
+	fieldsMax = fields.length;
+	critMax = critFields.length;
+	for (var f = 0; f < fieldsMax; f++) {
+		obj[fields[f][0]] = document.getElementById(fields[f][0]);
+		obj[fields[f][0]].field = fields[f][5];
+	}
+	for (var c = 0; c <critMax; c++) {
+		obj[critFields[c][0]] = document.getElementById(critFields[c][0]);
+		obj[critFields[c][0]].field = critFields[c][2];
+	}
+	console.log(config);
+	obj.type = config[0].type;
+	console.log(obj.type);
+	obj.OG = config[1].og_group_ref;
+	console.log(obj.OG);
+	return obj;
+}
+
+function makeForm(fields, critFields, config) {
 	// Move Body Down
     document.getElementsByTagName("BODY")[0].style.marginTop="420px";
     // Create Form Object Page 1
@@ -461,6 +551,17 @@ function makeForm(fields, critFields) {
 				}
 		        formName.appendChild(inputElement);
 		    	break;
+		case "e": // an empty field
+		        var inputElement = document.createElement("input"); //input element, text
+		        inputElement.setAttribute('type',"text");
+		        inputElement.setAttribute("id",fields[i][0]);
+		        inputElement.value = "";
+				if (fields[i][4] == 1) {
+					inputElement.setAttribute("required","");
+					inputElement.setAttribute("class", "FNrequired")
+				}
+		        formName.appendChild(inputElement);
+		    	break;
 		}
     }
 	//could maybe should be made generic for multiple pages
@@ -486,23 +587,7 @@ function makeForm(fields, critFields) {
     submitElement.addEventListener("click", function() {
 		var check = checkRequired();
 		if (check == true) {
-        sendToServer({
-            /* use Jquery with a form serialization library */
-            username: document.getElementById("username").value,
-			url: document.getElementById("url").value,
-			pageArticle: document.getElementById("pageArticle").value,
-			pageTitle: document.getElementById("pageTitle").value,
-			modifiedDate: document.getElementById("modifiedDate").value,
-			domainName: document.getElementById("dn").value,
-			topLevelDomain: document.getElementById("tld").value,
-			allLinks: document.getElementById("allLinks"),
-			aboutLink: document.getElementById("aboutLinks").value,
-			whois: document.getElementById("whois"),
-			
-			aboutUsSummary: document.getElementById("FNaboutUsSummary").value,
-			assessment: document.getElementById("FNassessment").value,
-			questions: document.getElementById("FNquestions").value
-        })
+        sendToServer(buildObject(fields, critFields, config))
 		} else {
 			alert ('Please fill out required fields');
 		}
@@ -547,23 +632,7 @@ function makeForm(fields, critFields) {
     submitAllElement.setAttribute('value',"Submit All Data");
 	submitAllElement.setAttribute('id',"submitAll");
     submitAllElement.addEventListener("click", function() {
-        sendToServer({
-            /* use Jquery with a form serialization library */
-            username: document.getElementById("username").value,
-			url: document.getElementById("url").value,
-			pageArticle: document.getElementById("pageArticle").value,
-			pageTitle: document.getElementById("pageTitle").value,
-			modifiedDate: document.getElementById("modifiedDate").value,
-			domainName: document.getElementById("dn").value,
-			topLevelDomain: document.getElementById("tld").value,
-			allLinks: document.getElementById("allLinks"),
-			aboutLink: document.getElementById("aboutLinks").value,
-			whois: document.getElementById("whois"),
-			
-			aboutUsSummary: document.getElementById("FNaboutUsSummary").value,
-			assessment: document.getElementById("FNassessment").value,
-			questions: document.getElementById("FNquestions").value
-        })
+        sendToServer(buildObject(fields, critFields, config))
     }, false)
     ctForm.appendChild(submitAllElement);
 	var cancelAllElement = document.createElement("input"); //input element, cancel
