@@ -551,6 +551,17 @@ function makeForm(fields, critFields, config) {
 				}
 		        formName.appendChild(inputElement);
 		    	break;
+		case "e": // an empty field
+		        var inputElement = document.createElement("input"); //input element, text
+		        inputElement.setAttribute('type',"text");
+		        inputElement.setAttribute("id",fields[i][0]);
+		        inputElement.value = "";
+				if (fields[i][4] == 1) {
+					inputElement.setAttribute("required","");
+					inputElement.setAttribute("class", "FNrequired")
+				}
+		        formName.appendChild(inputElement);
+		    	break;
 		}
     }
 	//could maybe should be made generic for multiple pages
