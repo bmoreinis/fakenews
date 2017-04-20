@@ -1,5 +1,5 @@
 {"filled_form":[["username","Email Address as User Name","","f",1,""],
-["OG","Group ID #","","f",1,""],
+["OG","Group ID #","","f",0,""],
 ["url","Page URL","","f",0,"field_page_url"],
 ["pageTitle","Page Title ( <title> )","","f",0,"field_title"],
 ["pageArticle","Article Title (First <H1>)","","f",0,"title"],
@@ -16,7 +16,7 @@
 ["FNquestions","Questions","field_questions_"]
 ],
 "blank_form":[["username","Email Address as User Name","","f",1,""],
-["OG","Group ID #","","f",1,""],
+["OG","Group ID #","","f",0,""],
 ["url","Page URL","","f",0,"field_page_url"],
 ["pageTitle","Page Title ( <title> )", "","f",0,"field_title"],
 ["pageArticle","Article Title (First <H1>)","","f",0,"title"],
@@ -27,5 +27,5 @@
 ["allLinks","Page Links","","a",0,"field_source_links"],
 ["aboutLinks","About Link(s)","","f",0,"field_about_us_link"]
 ],
-"typeAndOG":{"type":"page_check"}
+"typeAndOG":[{"type":"page_check"},{"groupID":1}]
 }
