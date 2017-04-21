@@ -105,11 +105,12 @@ function sendToServer(obj) {
 			break;
 			case "type":
 			  rawData.type = {"type":obj.type};
-			  console.log(rawData.type);
 			break;
 			case "OG":
 			  rawData.OG = {"og_group_ref":[{"id": obj.OG}]};
-			  console.log(rawData.OG);
+			  console.log(obj.OG);
+			break;
+			case "mode":
 			break;
 			default:
 			  var objectProperty = obj[property];
@@ -462,8 +463,15 @@ function buildObject(fields, critFields, config, mode) {
 		obj[critFields[c][0]].field = critFields[c][2];
 	}
 	obj.type = config[0].type;
-	obj.OG = config[1].og_group_ref;
 	obj.mode = mode;
+	console.log(obj.OG.value);
+	if (obj.OG.value == "") {
+		obj.OG = config[1].groupID;
+		console.log(config[1].groupID)
+	} else {
+		obj.OG = obj.OG.value;
+		console.log(obj.OG)
+	}
 	return obj;
 }
 
