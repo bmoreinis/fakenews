@@ -173,8 +173,8 @@ function sendToServer(obj) {
 		    resolve(uData.list[0].uid);
 			    }
 		    else {
-            reject(Error("Something went wrong retrieving user information"));
-			alert("Could not retrieve user data from fakenewsfitness.org");
+              reject(Error("Something went wrong retrieving user information"));
+			  alert("Could not retrieve user data from fakenewsfitness.org");
 		    }
 		  }
 	  }
