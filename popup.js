@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 				else {
 				reject(Error("Could not get config data"));
+				alert("Could not locate config.json")
 				}
 		  }
     xmlHttp.open( "GET", configFile, true );
@@ -34,8 +35,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	  if (checkBox.checked) {
             var req = new XMLHttpRequest();
             function sendFilled() {
+				var reqStatus = req.status;
+				if (reqStatus == 200) {
                 var whois = req.responseText;
                 chrome.tabs.sendMessage(tab[0].id, {text:'build_form_filled', whois: whois, config:config}, null);
+				} else if (reqStatus == 508) {
+					alert("BulkWhoIsAPI is at it's rate limit. Please wait a few seconds and try again");
+				} else {
+					alert("Unknown error from BulkWhoIsAPI, please contact extension administrator");
+				};
             };
             var url = new URL(tab[0].url);
 			var domain = ""

@@ -18,7 +18,6 @@ function sendToServer(obj) {
 				rawData.regEmail = {"field_registrant_email":childWhois[5].innerText};
 			  }
 			  catch(err) {
-				console.log(err);
 				rawData.regName = {"field_registrant_name":""};
 				rawData.regComp = {"field_registrant_company":""};
 				rawData.regState = {"field_registrant_state":""};
@@ -43,7 +42,6 @@ function sendToServer(obj) {
 				}
 			  }
 			  catch(err) {
-				console.log(err);
 				  linkArray.push({"url":""});
 			  }
 			  rawData.allLinks = {"field_source_links":linkArray};
@@ -108,7 +106,6 @@ function sendToServer(obj) {
 			break;
 			case "OG":
 			  rawData.OG = {"og_group_ref":[{"id": obj.OG}]};
-			  console.log(obj.OG);
 			break;
 			case "mode":
 			break;
@@ -132,11 +129,12 @@ function sendToServer(obj) {
 			var subData = rawData[data];
 			for (var d in subData) {
 				if (subData.hasOwnProperty(d)) {
-					downloadData.push(JSON.stringify(subData));				
+					downloadData.push(JSON.stringify(subData).slice(1,-1));			
 				}
 			}
 	    }
 	  }
+	downloadData = '[{'+downloadData+'}]';
 	chrome.runtime.sendMessage({text:'download', downloadData: downloadData}, null);
   }
   else {
@@ -152,6 +150,7 @@ function sendToServer(obj) {
 				}
 				else {
 				reject(Error("This email is not logged into fakenewsfitness.org"));
+				alert("This email is not logged into fakenewsfitness.org");
 				}
 		  }
 		  getToken.open("GET", turl, true);
@@ -174,7 +173,8 @@ function sendToServer(obj) {
 		    resolve(uData.list[0].uid);
 			    }
 		    else {
-            reject(Error("Something went wrong retrieving user information"));
+              reject(Error("Something went wrong retrieving user information"));
+			  alert("Could not retrieve user data from fakenewsfitness.org");
 		    }
 		  }
 	  }
@@ -200,11 +200,15 @@ function sendToServer(obj) {
 	  }
 	}
 	var postData = '{'+postString.slice(0,-1)+'}';
-	console.log(postData);
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
-	  var status = postRequest.status;
+	  var postStatus = postRequest.status;
       var data = postRequest.responseText;
+	  if (postStatus == 201) {
+		  alert("Submit successful.");
+	  } else {
+		  alert("There was a problem with your submission, response was: "+data);
+	  }
   }
   postRequest.open("POST", url, true);
   postRequest.setRequestHeader("Content-Type", "application/json");
@@ -464,13 +468,10 @@ function buildObject(fields, critFields, config, mode) {
 	}
 	obj.type = config[0].type;
 	obj.mode = mode;
-	console.log(obj.OG.value);
 	if (obj.OG.value == "") {
 		obj.OG = config[1].groupID;
-		console.log(config[1].groupID)
 	} else {
 		obj.OG = obj.OG.value;
-		console.log(obj.OG)
 	}
 	return obj;
 }
