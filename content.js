@@ -129,11 +129,12 @@ function sendToServer(obj) {
 			var subData = rawData[data];
 			for (var d in subData) {
 				if (subData.hasOwnProperty(d)) {
-					downloadData.push(JSON.stringify(subData));				
+					downloadData.push(JSON.stringify(subData).slice(1,-1));			
 				}
 			}
 	    }
 	  }
+	downloadData = '[{'+downloadData+'}]';
 	chrome.runtime.sendMessage({text:'download', downloadData: downloadData}, null);
   }
   else {
