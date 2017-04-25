@@ -9,7 +9,11 @@ function sendToServer(obj) {
 			case "whois":
 			//Prep whois
 			  try {
-				childWhois = obj.whois.childNodes;
+				var childWhois = obj.whois.childNodes;
+				if(childWhois[0].tagName == "P") {
+					rawData.regName = {"field_registrant_name":childWhois[1].value};
+					break;
+				}
 				rawData.regName = {"field_registrant_name":childWhois[0].innerText};
 				rawData.regComp = {"field_registrant_company":childWhois[1].innerText};
 				rawData.regState = {"field_registrant_state":childWhois[2].innerText.substring(0,2)};
@@ -18,12 +22,7 @@ function sendToServer(obj) {
 				rawData.regEmail = {"field_registrant_email":childWhois[5].innerText};
 			  }
 			  catch(err) {
-				rawData.regName = {"field_registrant_name":""};
-				rawData.regComp = {"field_registrant_company":""};
-				rawData.regState = {"field_registrant_state":""};
-				rawData.regCountry = {"field_registrant_country":""};
-				rawData.regPhone = {"field_registrant_phone":""};
-				rawData.regEmail = {"field_registrant_email":""};
+				break;
 			  }
 			break;
 			case "allLinks":
@@ -516,9 +515,10 @@ function makeForm(fields, critFields, config) {
                         divElement.appendChild(inputElement);
                     break;
         	case "v":
-                        if (fields[i][2].length > 0) {
+                        if (fields[i][2].length > 1) {
                                 var listNode = document.createElement("OL");
                                 listNode.setAttribute("id", fields[i][0]);
+								listNode.setAttribute("style","list-style:none;");
                                 var itemsArray = fields[i][2];
 								var itemsLength = itemsArray.length;
                                 for(var x = 0; x < itemsLength; x++){
@@ -530,12 +530,19 @@ function makeForm(fields, critFields, config) {
                                 formName.appendChild(listNode);
                         }
                         else {
-                                var listNode = document.createElement("UL");
+                                var listNode = document.createElement("DIV");
                                 listNode.setAttribute("id", fields[i][0]);
-                                var listItem = document.createElement("LI");
-                                var listText = document.createTextNode('No items were found');
+                                var listItem = document.createElement("P");
+                                var listText = document.createTextNode(fields[i][2]);
                                 listItem.appendChild(listText);
                                 listNode.appendChild(listItem);
+								if (listNode.id == "whois") {
+									var manualEntry = document.createElement("INPUT");
+									manualEntry.setAttribute("id","whoisManual");
+									manualEntry.setAttribute("type","text");
+									manualEntry.setAttribute("value","[If you know who owns this site, enter them here]");
+									listNode.appendChild(manualEntry);
+								}
                                 formName.appendChild(listNode);
                         }
 						
