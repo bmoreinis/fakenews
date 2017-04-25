@@ -520,7 +520,8 @@ function makeForm(fields, critFields, config) {
                                 var listNode = document.createElement("OL");
                                 listNode.setAttribute("id", fields[i][0]);
                                 var itemsArray = fields[i][2];
-                                for(var x = 0; x < itemsArray.length; x++){
+								var itemsLength = itemsArray.length;
+                                for(var x = 0; x < itemsLength; x++){
                                         var listItem = document.createElement("LI"); // Create a <li> node
                                         var listText = document.createTextNode(itemsArray[x]);// Create a text node
                                         listItem.appendChild(listText);
@@ -537,13 +538,16 @@ function makeForm(fields, critFields, config) {
                                 listNode.appendChild(listItem);
                                 formName.appendChild(listNode);
                         }
+						
+						
                         break;
                 case "vl":
                     if (fields[i][2].length > 0) {
                             var listNode = document.createElement("OL");
                             listNode.setAttribute("id", fields[i][0]);
                             var itemsArray = fields[i][2];
-                            for(var x = 0; x < itemsArray.length; x++){
+							var itemsLength = itemsArray.length;
+                            for(var x = 0; x < itemsLength; x++){
                                     var listItem = document.createElement("LI"); // Create a <li> node
                                     var itemLink = document.createElement('a')
                                     var linkText = document.createTextNode(itemsArray[x]);// Create a text node
