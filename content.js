@@ -452,6 +452,14 @@ function checkRequired () {
 		}
 };
 
+function removeItem(id) {
+	var itemId = "FNlink"+id.slice(-1);
+	var item = document.getElementById(itemId);
+	item.parentNode.removeChild(item);
+	var removeButton = document.getElementById(id);
+	removeButton.parentNode.removeChild(removeButton);
+};
+
 //build object to send to server, then send to server
 function buildObject(fields, critFields, config, mode) {
 	obj = {};
@@ -555,7 +563,8 @@ function makeForm(fields, critFields, config) {
                             var itemsArray = fields[i][2];
 							var itemsLength = itemsArray.length;
                             for(var x = 0; x < itemsLength; x++){
-                                    var listItem = document.createElement("LI"); // Create a <li> node
+                                    var listItem = document.createElement("LI");
+									listItem.setAttribute("id","FNlink"+x);
                                     var itemLink = document.createElement('a')
                                     var linkText = document.createTextNode(itemsArray[x]);// Create a text node
                                     itemLink.appendChild(linkText);
@@ -563,6 +572,16 @@ function makeForm(fields, critFields, config) {
                                     itemLink.setAttribute('target', '_blank');
                                     listItem.appendChild(itemLink);
                                     listNode.appendChild(listItem);
+									var remove = document.createElement("INPUT");
+									remove.setAttribute("id","FNremove"+x);
+									remove.setAttribute("type","button");
+									remove.setAttribute("value","Remove");
+									var removeID = remove.id
+									remove.addEventListener("click", function() {
+										var removeID = this.id;
+										removeItem(removeID);
+									}, false);
+									listNode.appendChild(remove);
                             }
                             formName.appendChild(listNode);
                     }
