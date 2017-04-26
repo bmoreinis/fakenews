@@ -453,11 +453,35 @@ function checkRequired () {
 };
 
 function removeItem(id) {
-	var itemId = "FNlink"+id.slice(-1);
+	var idNumber = id.replace( /^\D+/g, '');
+	var itemId = "FNlink"+idNumber;
 	var item = document.getElementById(itemId);
 	item.parentNode.removeChild(item);
 	var removeButton = document.getElementById(id);
 	removeButton.parentNode.removeChild(removeButton);
+};
+
+function addLinkItem(item, parentItem) {
+	var listItem = document.createElement("LI");
+	var rand = Math.floor((Math.random() * 100) + 100);
+	listItem.setAttribute("id","FNlink"+rand);
+    var itemLink = document.createElement('a')
+    var linkText = document.createTextNode(item);
+    itemLink.appendChild(linkText);
+    itemLink.href = item;
+    itemLink.setAttribute('target', '_blank');
+    listItem.appendChild(itemLink);
+    parentItem.appendChild(listItem);
+	var remove = document.createElement("INPUT");
+	remove.setAttribute("id","FNremove"+rand);
+	remove.setAttribute("type","button");
+	remove.setAttribute("value","Remove");
+	var removeID = remove.id
+	remove.addEventListener("click", function() {
+		var removeID = this.id;
+		removeItem(removeID);
+	}, false);
+	parentItem.appendChild(remove);
 };
 
 //build object to send to server, then send to server
@@ -594,6 +618,25 @@ function makeForm(fields, critFields, config) {
                             listNode.appendChild(listItem);
                             formName.appendChild(listNode);
                     }
+					if (fields[i][0] == "allLinks") {
+					  var addDiv = document.createElement("DIV");
+					  var addText = document.createElement("INPUT");
+					  var add = document.createElement("INPUT");
+					  add.setAttribute("id","FNadd");
+					  add.setAttribute("type","button");
+					  add.setAttribute("value","Add another Link");
+					  addText.setAttribute("id","FNaddtext");
+					  addText.setAttribute("type","text");
+					  addText.setAttribute("value","[Start with http://]");
+					  add.addEventListener("click", function() {
+						var addItem = document.getElementById("FNaddtext").value;
+						var parentItem = document.getElementById("allLinks");
+						addLinkItem(addItem, parentItem);
+					  }, false);
+					  addDiv.appendChild(add);
+					  addDiv.appendChild(addText);
+					  formName.appendChild(addDiv);
+					}
                     break;
         	case "f":
 		        var inputElement = document.createElement("input"); //input element, text
