@@ -81,25 +81,36 @@ function sendToServer(obj) {
 			  }
 			  rawData.aboutLinks = {"field_about_us_link":{"url":obj.aboutLinks.value}};
 			break;
-			case "FNquestions":
-			  //Prepare question field split on '?'
-			  var questions = obj.FNquestions.value.split('?');
-			  var newQuestions = []
-			  numQues = questions.length;
-			  for (var q = 0; q < numQues; q++) {
-				newQuestions.push({"value":questions[q]});
-			  }
-			  rawData.FNquestions = {"field_questions_":newQuestions};
-			break;
 			case "url":
 			  rawData.url = {"field_page_url":{"url":obj.url.value}};
 			break;
 			case "dn":
 			  rawData.dn = {"field_domain_name":{"url":obj.dn.value}};
 			break;
-			case "FNassessment":
-			  rawData.FNassessment = {"body":{"value":obj.FNassessment.value}};
-			break;
+			case "trustRank":
+              var items = obj.trustRank.childNodes;
+			  var itemsLength = items.length;
+			  for (var i = 0; i < itemsLength; i++) {
+				  if (items[i].childNodes[1].checked == true) {
+					  rawData.trustRank = {"field_trust_rank":parseInt(items[i].childNodes[1].value)};
+					  break;
+				  }
+			  }
+            break;
+            // Page Two //
+            case "FNassessment":
+              rawData.FNassessment = {"body":{"value":obj.FNassessment.value}};
+            break;
+            case "FNquestions":
+              //Prepare question field split on '?'
+              var questions = obj.FNquestions.value.split('?');
+              var newQuestions = []
+              numQues = questions.length;
+              for (var q = 0; q < numQues; q++) {
+                newQuestions.push({"value":questions[q]});
+              }
+              rawData.FNquestions = {"field_questions_":newQuestions};
+            break;
 			case "type":
 			  rawData.type = {"type":obj.type};
 			break;
@@ -660,6 +671,27 @@ function makeForm(fields, critFields, config) {
 				}
 		        formName.appendChild(inputElement);
 		    	break;
+		 case "s5": // https://codepen.io/Buttonpresser/pen/qiuIx
+                var currentLikert = 0;
+                var values5 = ['1 = Full Mistrust', '2 = Some Mistrust','3 = Cannot Tell','4 = Some Trust','5 = Full Trust']
+                var listNode = document.createElement("UL");
+                    listNode.setAttribute("id", fields[i][0]);
+                    listNode.setAttribute("class", "likert");
+                    for(var x = 0; x < 5; x++){
+                        var listItem = document.createElement("LI");
+                        var inputElement = document.createElement("input"); //input element, text
+                        inputElement.setAttribute('type',"radio");
+                        inputElement.setAttribute('name',"likert");
+                        inputElement.setAttribute('value',x+1);
+                        var labelElement = document.createElement("label");
+                        var labelText = document.createTextNode(values5[x]);
+                        labelElement.appendChild(labelText);
+                        listItem.appendChild(labelElement);
+                        listItem.appendChild(inputElement);
+                        listNode.appendChild(listItem);
+                    }
+                formName.appendChild(listNode);
+                break;
 		}
     }
 	//could maybe should be made generic for multiple pages
