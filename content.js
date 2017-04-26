@@ -486,6 +486,7 @@ function addLinkItem(item, parentItem) {
 	var remove = document.createElement("INPUT");
 	remove.setAttribute("id","FNremove"+rand);
 	remove.setAttribute("type","button");
+	remove.setAttribute("class","remove");
 	remove.setAttribute("value","Remove");
 	var removeID = remove.id
 	remove.addEventListener("click", function() {
@@ -611,6 +612,7 @@ function makeForm(fields, critFields, config) {
 									remove.setAttribute("id","FNremove"+x);
 									remove.setAttribute("type","button");
 									remove.setAttribute("value","Remove");
+				    					remove.setAttribute("class","remove");
 									var removeID = remove.id
 									remove.addEventListener("click", function() {
 										var removeID = this.id;
