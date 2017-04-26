@@ -154,9 +154,15 @@ body
   text-align:right
 }
 
-#FakeNewsForm ol.allLinks input.remove {
-	width:50px;
+#FakeNewsForm input.remove {
+	width:100px;
 	background-color:pink;
 	margin:5px;
-	float:right;
+}
+
+#FakeNewsForm input#FNadd {
+  background-color:palegreen;
+  width:170px;
+  margin-left:45px;
+  margin-top:-5px;
 }
