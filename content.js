@@ -76,7 +76,7 @@ function sendToServer(obj) {
 			break;
 			case "aboutLinks":
 			  //Check about link for proper URL
-			  if (obj.aboutLinks.value == "undefined") {
+			  if (obj.aboutLinks.value == undefined) {
 				obj.aboutLinks.value = "No About Links Found";
 			  }
 			  rawData.aboutLinks = {"field_about_us_link":{"url":obj.aboutLinks.value}};
@@ -368,8 +368,9 @@ var controller = (function(){
 			}
 		}
 	}
-	if (aboutLinks == []) {
-		return "We could not find any about links";
+	console.log(aboutLinks);
+	if (aboutLinks.length == 0) {
+		return "No About Links Found";
 	} else {
     //Drupal is set up to handle only one link here.. So we will pick the first one found
 		return aboutLinks[0];
