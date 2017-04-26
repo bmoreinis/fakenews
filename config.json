@@ -9,12 +9,9 @@
 ["modifiedDate","Modified Date(s)","","f",0,"field_page_last_modified"],
 ["allLinks","Page Links","","vl",0,"field_source_links"],
 ["aboutLinks","About Link(s)","","f",0,"field_about_us_link"],
-["whois","WHOIS Lookup","","v",0,""],
-["trustRank","Trust Rank","","s5",1,"field_trust_rank"]
+["whois","WHOIS Lookup","","v",0,""]
 ],
-"critical_thinking":[["FNaboutussummary","About Us Summary","field_about_us_summary"],
-["FNtrustmarkers","Trust Markers","field_trust_markers"],
-["FNmistrustmarkers","Mistrust Markers","field_mistrust_markers"],
+"critical_thinking":[["FNaboutUsSummary","About Us Summary","field_about_us_summary"],
 ["FNassessment","Assessment","body"],
 ["FNquestions","Questions","field_questions_"]
 ],
@@ -28,7 +25,8 @@
 ["params","URL Parameters","","f",0,""],
 ["modifiedDate","Modified Date(s)","","f",0,"field_page_last_modified"],
 ["allLinks","Page Links","","a",0,"field_source_links"],
-["aboutLinks","About Link(s)","","f",0,"field_about_us_link"]
+["aboutLinks","About Link(s)","","f",0,"field_about_us_link"],
+["whois","WHOIS Lookup","","v",0,""]
 ],
 "typeAndOG":[{"type":"page_check"},{"groupID":1}]
 }
