@@ -673,7 +673,7 @@ function makeForm(fields, critFields, config) {
 		    	break;
 		 case "s5": // https://codepen.io/Buttonpresser/pen/qiuIx
                 var currentLikert = 0;
-                var values5 = ['1 = Mistrust', '2 = Somewhat Mistrust','3 = Cannot Tell','4 = Somewhat Trust','5 = Trust']
+                var values5 = ['1 = Full Mistrust', '2 = Some Mistrust','3 = Cannot Tell','4 = Some Trust','5 = Full Trust']
                 var listNode = document.createElement("UL");
                     listNode.setAttribute("id", fields[i][0]);
                     listNode.setAttribute("class", "likert");
