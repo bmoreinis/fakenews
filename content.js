@@ -9,7 +9,11 @@ function sendToServer(obj) {
 			case "whois":
 			//Prep whois
 			  try {
-				childWhois = obj.whois.childNodes;
+				var childWhois = obj.whois.childNodes;
+				if(childWhois[0].tagName == "P") {
+					rawData.regName = {"field_registrant_name":childWhois[1].value};
+					break;
+				}
 				rawData.regName = {"field_registrant_name":childWhois[0].innerText};
 				rawData.regComp = {"field_registrant_company":childWhois[1].innerText};
 				rawData.regState = {"field_registrant_state":childWhois[2].innerText.substring(0,2)};
@@ -18,12 +22,7 @@ function sendToServer(obj) {
 				rawData.regEmail = {"field_registrant_email":childWhois[5].innerText};
 			  }
 			  catch(err) {
-				rawData.regName = {"field_registrant_name":""};
-				rawData.regComp = {"field_registrant_company":""};
-				rawData.regState = {"field_registrant_state":""};
-				rawData.regCountry = {"field_registrant_country":""};
-				rawData.regPhone = {"field_registrant_phone":""};
-				rawData.regEmail = {"field_registrant_email":""};
+				break;
 			  }
 			break;
 			case "allLinks":
@@ -453,6 +452,38 @@ function checkRequired () {
 		}
 };
 
+function removeItem(id) {
+	var idNumber = id.replace( /^\D+/g, '');
+	var itemId = "FNlink"+idNumber;
+	var item = document.getElementById(itemId);
+	item.parentNode.removeChild(item);
+	var removeButton = document.getElementById(id);
+	removeButton.parentNode.removeChild(removeButton);
+};
+
+function addLinkItem(item, parentItem) {
+	var listItem = document.createElement("LI");
+	var rand = Math.floor((Math.random() * 100) + 100);
+	listItem.setAttribute("id","FNlink"+rand);
+    var itemLink = document.createElement('a')
+    var linkText = document.createTextNode(item);
+    itemLink.appendChild(linkText);
+    itemLink.href = item;
+    itemLink.setAttribute('target', '_blank');
+    listItem.appendChild(itemLink);
+    parentItem.appendChild(listItem);
+	var remove = document.createElement("INPUT");
+	remove.setAttribute("id","FNremove"+rand);
+	remove.setAttribute("type","button");
+	remove.setAttribute("value","Remove");
+	var removeID = remove.id
+	remove.addEventListener("click", function() {
+		var removeID = this.id;
+		removeItem(removeID);
+	}, false);
+	parentItem.appendChild(remove);
+};
+
 //build object to send to server, then send to server
 function buildObject(fields, critFields, config, mode) {
 	obj = {};
@@ -516,11 +547,13 @@ function makeForm(fields, critFields, config) {
                         divElement.appendChild(inputElement);
                     break;
         	case "v":
-                        if (fields[i][2].length > 0) {
+                        if (fields[i][2].length > 1) {
                                 var listNode = document.createElement("OL");
                                 listNode.setAttribute("id", fields[i][0]);
+								listNode.setAttribute("style","list-style:none;");
                                 var itemsArray = fields[i][2];
-                                for(var x = 0; x < itemsArray.length; x++){
+								var itemsLength = itemsArray.length;
+                                for(var x = 0; x < itemsLength; x++){
                                         var listItem = document.createElement("LI"); // Create a <li> node
                                         var listText = document.createTextNode(itemsArray[x]);// Create a text node
                                         listItem.appendChild(listText);
@@ -529,22 +562,33 @@ function makeForm(fields, critFields, config) {
                                 formName.appendChild(listNode);
                         }
                         else {
-                                var listNode = document.createElement("UL");
+                                var listNode = document.createElement("DIV");
                                 listNode.setAttribute("id", fields[i][0]);
-                                var listItem = document.createElement("LI");
-                                var listText = document.createTextNode('No items were found');
+                                var listItem = document.createElement("P");
+                                var listText = document.createTextNode(fields[i][2]);
                                 listItem.appendChild(listText);
                                 listNode.appendChild(listItem);
+								if (listNode.id == "whois") {
+									var manualEntry = document.createElement("INPUT");
+									manualEntry.setAttribute("id","whoisManual");
+									manualEntry.setAttribute("type","text");
+									manualEntry.setAttribute("value","[If you know who owns this site, enter them here]");
+									listNode.appendChild(manualEntry);
+								}
                                 formName.appendChild(listNode);
                         }
+						
+						
                         break;
                 case "vl":
                     if (fields[i][2].length > 0) {
                             var listNode = document.createElement("OL");
                             listNode.setAttribute("id", fields[i][0]);
                             var itemsArray = fields[i][2];
-                            for(var x = 0; x < itemsArray.length; x++){
-                                    var listItem = document.createElement("LI"); // Create a <li> node
+							var itemsLength = itemsArray.length;
+                            for(var x = 0; x < itemsLength; x++){
+                                    var listItem = document.createElement("LI");
+									listItem.setAttribute("id","FNlink"+x);
                                     var itemLink = document.createElement('a')
                                     var linkText = document.createTextNode(itemsArray[x]);// Create a text node
                                     itemLink.appendChild(linkText);
@@ -552,6 +596,16 @@ function makeForm(fields, critFields, config) {
                                     itemLink.setAttribute('target', '_blank');
                                     listItem.appendChild(itemLink);
                                     listNode.appendChild(listItem);
+									var remove = document.createElement("INPUT");
+									remove.setAttribute("id","FNremove"+x);
+									remove.setAttribute("type","button");
+									remove.setAttribute("value","Remove");
+									var removeID = remove.id
+									remove.addEventListener("click", function() {
+										var removeID = this.id;
+										removeItem(removeID);
+									}, false);
+									listNode.appendChild(remove);
                             }
                             formName.appendChild(listNode);
                     }
@@ -564,6 +618,25 @@ function makeForm(fields, critFields, config) {
                             listNode.appendChild(listItem);
                             formName.appendChild(listNode);
                     }
+					if (fields[i][0] == "allLinks") {
+					  var addDiv = document.createElement("DIV");
+					  var addText = document.createElement("INPUT");
+					  var add = document.createElement("INPUT");
+					  add.setAttribute("id","FNadd");
+					  add.setAttribute("type","button");
+					  add.setAttribute("value","Add another Link");
+					  addText.setAttribute("id","FNaddtext");
+					  addText.setAttribute("type","text");
+					  addText.setAttribute("value","[Start with http://]");
+					  add.addEventListener("click", function() {
+						var addItem = document.getElementById("FNaddtext").value;
+						var parentItem = document.getElementById("allLinks");
+						addLinkItem(addItem, parentItem);
+					  }, false);
+					  addDiv.appendChild(add);
+					  addDiv.appendChild(addText);
+					  formName.appendChild(addDiv);
+					}
                     break;
         	case "f":
 		        var inputElement = document.createElement("input"); //input element, text

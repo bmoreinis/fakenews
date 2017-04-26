@@ -25,7 +25,8 @@
 ["params","URL Parameters","","f",0,""],
 ["modifiedDate","Modified Date(s)","","f",0,"field_page_last_modified"],
 ["allLinks","Page Links","","a",0,"field_source_links"],
-["aboutLinks","About Link(s)","","f",0,"field_about_us_link"]
+["aboutLinks","About Link(s)","","f",0,"field_about_us_link"],
+["whois","WHOIS Lookup","","v",0,""]
 ],
 "typeAndOG":[{"type":"page_check"},{"groupID":1}]
 }
