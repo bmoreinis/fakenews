@@ -77,7 +77,7 @@ function sendToServer(obj) {
 			case "aboutLinks":
 			  //Check about link for proper URL
 			  if (obj.aboutLinks.value == "undefined") {
-				obj.aboutLinks.value = "";
+				obj.aboutLinks.value = "No About Links Found";
 			  }
 			  rawData.aboutLinks = {"field_about_us_link":{"url":obj.aboutLinks.value}};
 			break;
@@ -244,7 +244,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 		//Process WHOIS from message data
         var whoIsObj = JSON.parse(msg.whois).formatted_data;
 		if (whoIsObj.RegistrantName == undefined) {
-			var whoIsArr = ['There was a problem with the WHOIS lookup'];
+			var whoIsArr = ['No data. Enter from https://whois.icann.org.'];
 		} else {
 			var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
 		};
@@ -306,7 +306,7 @@ var controller = (function(){
    function getURL() {
      var href = window.location.href.split('?');
 	 if (href[1] == undefined) {
-		 href[1] = 'No parameters';
+		 href[1] = 'No parameters. No click-tracking here!';
 	 }
      return href;
    };
@@ -335,7 +335,7 @@ var controller = (function(){
   function getTitle () {
 	  var title = document.getElementsByTagName("title");
 	  if (title.length == 0) {
-		  return "No title tags found";
+		  return "No title tags found. Enter <h1> title.";
 	  } else {
 		  var treturn = title[0].innerText;
 		  return treturn;
@@ -345,7 +345,7 @@ var controller = (function(){
   function getArticle () {
 	  var article = document.getElementsByTagName("h1")
 	  if (article.length == 0) {
-		  return "No h1 tags found";
+		  return "No <h1> title found. Bad markup here!";
 	  } else {
 		  var areturn = article[0].innerText;
 		  return areturn;
@@ -395,7 +395,7 @@ var controller = (function(){
 		return bodyDates.toString();
 		}
 		else {
-		return 'We could not find anything on the page';
+		return 'No dates found.  Enter if you find one.';
 		};
 	};
   };
