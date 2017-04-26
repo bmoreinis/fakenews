@@ -34,7 +34,7 @@ body
 
 #FakeNewsForm form {
     overflow-y: scroll;
-    background-color: #85e8f7;
+    background-color: powderblue;
     position: absolute;
     bottom:0;
     width:93%;
@@ -152,4 +152,11 @@ body
   margin:30px 0;
   padding:0 4.25%;
   text-align:right
+}
+
+#FakeNewsForm ol.allLinks input.remove {
+	width:50px;
+	background-color:pink;
+	margin:5px;
+	float:right;
 }
