@@ -77,7 +77,7 @@ function sendToServer(obj) {
 			case "aboutLinks":
 			  //Check about link for proper URL
 			  if (obj.aboutLinks.value == "undefined") {
-				obj.aboutLinks.value = "";
+				obj.aboutLinks.value = "No About Links Found";
 			  }
 			  rawData.aboutLinks = {"field_about_us_link":{"url":obj.aboutLinks.value}};
 			break;
