@@ -130,7 +130,7 @@ function sendToServer(obj) {
 		}
     }
   }
-  
+
   //Check mode (download or post) and do it.
   if (obj.mode == 'download') {
 	var downloadData = [];
@@ -139,7 +139,7 @@ function sendToServer(obj) {
 			var subData = rawData[data];
 			for (var d in subData) {
 				if (subData.hasOwnProperty(d)) {
-					downloadData.push(JSON.stringify(subData).slice(1,-1));			
+					downloadData.push(JSON.stringify(subData).slice(1,-1));
 				}
 			}
 	    }
@@ -224,12 +224,12 @@ function sendToServer(obj) {
   postRequest.setRequestHeader("Content-Type", "application/json");
   postRequest.setRequestHeader("X-CSRF-Token", sessionToken);
   postRequest.send(postData);
-	
+
   }}, function(err) {
     alert(err);
     }
   );
-  
+
 }, function(err) {
   alert(err);
 });
@@ -335,7 +335,7 @@ var controller = (function(){
   function getTitle () {
 	  var title = document.getElementsByTagName("title");
 	  if (title.length == 0) {
-		  return "No title tags found. Enter <h1> title.";
+		  return "No <title> tag found.";
 	  } else {
 		  var treturn = title[0].innerText;
 		  return treturn;
@@ -345,7 +345,7 @@ var controller = (function(){
   function getArticle () {
 	  var article = document.getElementsByTagName("h1")
 	  if (article.length == 0) {
-		  return "No <h1> title found. Bad markup here!";
+		  return "No <h1> found. Paste Article Title Here.";
 	  } else {
 		  var areturn = article[0].innerText;
 		  return areturn;
@@ -590,8 +590,8 @@ function makeForm(fields, critFields, config) {
 								}
                                 formName.appendChild(listNode);
                         }
-						
-						
+
+
                         break;
                 case "vl":
                     if (fields[i][2].length > 0) {
@@ -728,7 +728,7 @@ function makeForm(fields, critFields, config) {
 		}
     }, false)
     formName.appendChild(submitElement);
-	
+
 	var downloadElement = document.createElement("input");
 	downloadElement.setAttribute('type','button');
 	downloadElement.setAttribute('value',"Download Input");
