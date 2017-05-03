@@ -171,7 +171,7 @@ function sendToServer(obj) {
   promiseToken.then(function(result) {
     var promiseUser = new Promise(function(resolve, reject) {
     var getUser = new XMLHttpRequest();
-	  var uurl = "https://www.fakenewsfitness.org/user.json?mail="+obj.username.value;
+	  var uurl = "https://www.fakenewsfitness.org/user.json?field_extension_id="+obj.extensionId.value;
 	  getUser.onload = function () {
 		  var uStatus = getUser.status;
 		  var uData = JSON.parse(getUser.response);
