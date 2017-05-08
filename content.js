@@ -115,7 +115,7 @@ function sendToServer(obj) {
 			  rawData.type = {"type":obj.type};
 			break;
 			case "OG":
-			  rawData.OG = {"og_group_ref":[{"id": obj.OG}]};
+			  rawData.OG = {"og_group_ref":{"id": obj.OG}};
 			break;
 			case "mode":
 			break;
@@ -368,7 +368,6 @@ var controller = (function(){
 			}
 		}
 	}
-	console.log(aboutLinks);
 	if (aboutLinks.length == 0) {
 		return "No About Links Found";
 	} else {
