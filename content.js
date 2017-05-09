@@ -97,6 +97,16 @@ function sendToServer(obj) {
 				  }
 			  }
             break;
+            case "adContent":
+              var items = obj.adContent.childNodes;
+			  var itemsLength = items.length;
+			  for (var i = 0; i < itemsLength; i++) {
+				  if (items[i].childNodes[1].checked == true) {
+					  rawData.adContent = {"field_ad_content":parseInt(items[i].childNodes[1].value)};
+					  break;
+				  }
+			  }
+            break;
             // Page Two //
             case "FNassessment":
               rawData.FNassessment = {"body":{"value":obj.FNassessment.value}};
@@ -676,6 +686,28 @@ function makeForm(fields, critFields, config) {
 		 case "s5": // https://codepen.io/Buttonpresser/pen/qiuIx
                 var currentLikert = 0;
                 var values5 = ['1 = Full Mistrust', '2 = Some Mistrust','3 = Cannot Tell','4 = Some Trust','5 = Full Trust']
+                var listNode = document.createElement("UL");
+                    listNode.setAttribute("id", fields[i][0]);
+                    listNode.setAttribute("class", "likert");
+                    for(var x = 0; x < 5; x++){
+                        var listItem = document.createElement("LI");
+                        var inputElement = document.createElement("input"); //input element, text
+                        inputElement.setAttribute('type',"radio");
+                        inputElement.setAttribute('name',"likert");
+                        inputElement.setAttribute('value',x+1);
+                        var labelElement = document.createElement("label");
+                        var labelText = document.createTextNode(values5[x]);
+                        labelElement.appendChild(labelText);
+                        listItem.appendChild(labelElement);
+                        listItem.appendChild(inputElement);
+                        listNode.appendChild(listItem);
+                    }
+                formName.appendChild(listNode);
+                break;
+		/* ELI - Can we vary the values but use the same code for the slider? */
+		case "s51": // https://codepen.io/Buttonpresser/pen/qiuIx
+                var currentLikert = 0;
+                var values5 = ['1 = No Ads', 'Some Ads','3 = Many Ads','4 = Too Many Ads','5 = Way Too Many Ads']
                 var listNode = document.createElement("UL");
                     listNode.setAttribute("id", fields[i][0]);
                     listNode.setAttribute("class", "likert");
