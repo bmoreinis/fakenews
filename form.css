@@ -114,7 +114,7 @@ body
   list-style:none;
   width:100%;
   margin:0;
-  padding:0 0 35px;
+  padding:0 0 10px 35px;
   display:block;
   /* border-bottom:2px solid #efefef; */
 }

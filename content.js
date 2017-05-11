@@ -62,9 +62,9 @@ function sendToServer(obj) {
 			case "pageArticle":
 			  // Determine which title to submit
 			  var submitTitle = "";
-			  if (obj.pageArticle.value !== "No h1 tags found" && obj.pageArticle.value !== "") {
+			  if (obj.pageArticle.value !== "No <h1> found. Paste Headline here." && obj.pageArticle.value !== "") {
 				submitTitle = obj.pageArticle.value;
-			  } else if (obj.pageTitle.value !== "No title tags found") {
+			  } else if (obj.pageTitle.value !== "No <title> tag found. Not trustworthy.") {
 				submitTitle = obj.pageTitle.value;
 			  } else {
 				submitTitle = "No Title";
@@ -73,6 +73,8 @@ function sendToServer(obj) {
 			  rawData.titlefield = {"title_field":submitTitle};
 			break;
 			case "pageTitle":
+			break;
+			case "articleAuthor":
 			break;
 			case "aboutLinks":
 			  //Check about link for proper URL
@@ -345,7 +347,7 @@ var controller = (function(){
   function getTitle () {
 	  var title = document.getElementsByTagName("title");
 	  if (title.length == 0) {
-		  return "No <title> tag found.";
+		  return "No <title> tag found. Not trustworthy.";
 	  } else {
 		  var treturn = title[0].innerText;
 		  return treturn;
@@ -355,13 +357,12 @@ var controller = (function(){
   function getArticle () {
 	  var article = document.getElementsByTagName("h1")
 	  if (article.length == 0) {
-		  return "No <h1> found. Paste Article Title Here.";
+		  return "No <h1> found. Paste Headline here.";
 	  } else {
 		  var areturn = article[0].innerText;
 		  return areturn;
 	  }
   }
-
   // search document.body for ABOUT US or similar in menu lists
   function aboutFinder () {
 	var aboutItems = document.getElementsByTagName("li");
@@ -707,7 +708,7 @@ function makeForm(fields, critFields, config) {
 		/* ELI - Can we vary the values but use the same code for the slider? */
 		case "s51": // https://codepen.io/Buttonpresser/pen/qiuIx
                 var currentLikert = 0;
-                var values5 = ['1 = No Ads', 'Some Ads','3 = Many Ads','4 = Too Many Ads','5 = Way Too Many Ads']
+                var values5 = ['1 = No Ads', '1-2 Ads','3 = Some Ads','4 = Many Ads','5 = Too Many Ads']
                 var listNode = document.createElement("UL");
                     listNode.setAttribute("id", fields[i][0]);
                     listNode.setAttribute("class", "likert");
