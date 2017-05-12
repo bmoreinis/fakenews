@@ -62,9 +62,9 @@ function sendToServer(obj) {
 			case "pageArticle":
 			  // Determine which title to submit
 			  var submitTitle = "";
-			  if (obj.pageArticle.value !== "No h1 tags found" && obj.pageArticle.value !== "") {
+			  if (obj.pageArticle.value !== "No <h1> found. Paste Headline here." && obj.pageArticle.value !== "") {
 				submitTitle = obj.pageArticle.value;
-			  } else if (obj.pageTitle.value !== "No title tags found") {
+			  } else if (obj.pageTitle.value !== "No <title> tag found. Not trustworthy.") {
 				submitTitle = obj.pageTitle.value;
 			  } else {
 				submitTitle = "No Title";
@@ -73,6 +73,8 @@ function sendToServer(obj) {
 			  rawData.titlefield = {"title_field":submitTitle};
 			break;
 			case "pageTitle":
+			break;
+			case "articleAuthor":
 			break;
 			case "aboutLinks":
 			  //Check about link for proper URL
@@ -93,6 +95,16 @@ function sendToServer(obj) {
 			  for (var i = 0; i < itemsLength; i++) {
 				  if (items[i].childNodes[1].checked == true) {
 					  rawData.trustRank = {"field_trust_rank":parseInt(items[i].childNodes[1].value)};
+					  break;
+				  }
+			  }
+            break;
+            case "adContent":
+              var items = obj.adContent.childNodes;
+			  var itemsLength = items.length;
+			  for (var i = 0; i < itemsLength; i++) {
+				  if (items[i].childNodes[1].checked == true) {
+					  rawData.adContent = {"field_ad_content":parseInt(items[i].childNodes[1].value)};
 					  break;
 				  }
 			  }
@@ -251,51 +263,51 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         // Process URL here so we only run controller function once
 		var thisURL = controller.getURL();
 		// Add vars to form array from config, for auto-fill. Default is "". This way we can configure new fields that don't autofill in any order
-		var configMax = msg.config.filled_form.length;
+		var configMax = msg.config.filled_form_page_1.length;
 		for (var i = 1; i < configMax; i++) {
-			switch (msg.config.filled_form[i][0]) {
+			switch (msg.config.filled_form_page_1[i][0]) {
 				case "url":
-				  msg.config.filled_form[i][2] = thisURL[0];
+				  msg.config.filled_form_page_1[i][2] = thisURL[0];
 				  break;
 				case "pageTitle":
-				  msg.config.filled_form[i][2] = controller.getTitle();
+				  msg.config.filled_form_page_1[i][2] = controller.getTitle();
 				  break;
 				case "pageArticle":
-				  msg.config.filled_form[i][2] = controller.getArticle();
+				  msg.config.filled_form_page_1[i][2] = controller.getArticle();
 				  break;
 				case "dn":
-				  msg.config.filled_form[i][2] = controller.domainFinder();
+				  msg.config.filled_form_page_1[i][2] = controller.domainFinder();
 				  break;
 				case "tld":
-				  msg.config.filled_form[i][2] = controller.tldParser();
+				  msg.config.filled_form_page_1[i][2] = controller.tldParser();
 				  break;
 				case "params":
-				  msg.config.filled_form[i][2] = thisURL[1];
+				  msg.config.filled_form_page_1[i][2] = thisURL[1];
 				  break;
 				case "modifiedDate":
-				  msg.config.filled_form[i][2] = controller.dateFinder();
+				  msg.config.filled_form_page_1[i][2] = controller.dateFinder();
 				  break;
 				case "allLinks":
-				  msg.config.filled_form[i][2] = controller.linkFinder();
+				  msg.config.filled_form_page_1[i][2] = controller.linkFinder();
 				  break;
 				case "aboutLinks":
-				  msg.config.filled_form[i][2] = controller.aboutFinder();
+				  msg.config.filled_form_page_1[i][2] = controller.aboutFinder();
 				  break;
 				case "whois":
-				  msg.config.filled_form[i][2] = whoIsArr;
+				  msg.config.filled_form_page_1[i][2] = whoIsArr;
 				  break;
 				default:
-				  msg.config.filled_form[i][2] = ""
+				  msg.config.filled_form_page_1[i][2] = ""
 			}
 		}
 
         //Build the form
-        makeForm(msg.config.filled_form, msg.config.critical_thinking, msg.config.typeAndOG);
+        makeForm(msg.config.filled_form_page_1, msg.config.filled_form_page_2, msg.config.typeAndOG);
 
     }
     else if (msg.text === 'build_form_blank') {
         //Build the form
-        makeForm(msg.config.blank_form, msg.config.critical_thinking, msg.config.typeAndOG);
+        makeForm(msg.config.blank_form, msg.config.filled_form_page_2, msg.config.typeAndOG);
     }
 });
 
@@ -335,7 +347,7 @@ var controller = (function(){
   function getTitle () {
 	  var title = document.getElementsByTagName("title");
 	  if (title.length == 0) {
-		  return "No <title> tag found.";
+		  return "No <title> tag found. Not trustworthy.";
 	  } else {
 		  var treturn = title[0].innerText;
 		  return treturn;
@@ -345,13 +357,12 @@ var controller = (function(){
   function getArticle () {
 	  var article = document.getElementsByTagName("h1")
 	  if (article.length == 0) {
-		  return "No <h1> found. Paste Article Title Here.";
+		  return "No <h1> found. Paste Headline here.";
 	  } else {
 		  var areturn = article[0].innerText;
 		  return areturn;
 	  }
   }
-
   // search document.body for ABOUT US or similar in menu lists
   function aboutFinder () {
 	var aboutItems = document.getElementsByTagName("li");
@@ -676,6 +687,28 @@ function makeForm(fields, critFields, config) {
 		 case "s5": // https://codepen.io/Buttonpresser/pen/qiuIx
                 var currentLikert = 0;
                 var values5 = ['1 = Full Mistrust', '2 = Some Mistrust','3 = Cannot Tell','4 = Some Trust','5 = Full Trust']
+                var listNode = document.createElement("UL");
+                    listNode.setAttribute("id", fields[i][0]);
+                    listNode.setAttribute("class", "likert");
+                    for(var x = 0; x < 5; x++){
+                        var listItem = document.createElement("LI");
+                        var inputElement = document.createElement("input"); //input element, text
+                        inputElement.setAttribute('type',"radio");
+                        inputElement.setAttribute('name',"likert");
+                        inputElement.setAttribute('value',x+1);
+                        var labelElement = document.createElement("label");
+                        var labelText = document.createTextNode(values5[x]);
+                        labelElement.appendChild(labelText);
+                        listItem.appendChild(labelElement);
+                        listItem.appendChild(inputElement);
+                        listNode.appendChild(listItem);
+                    }
+                formName.appendChild(listNode);
+                break;
+		/* ELI - Can we vary the values but use the same code for the slider? */
+		case "s51": // https://codepen.io/Buttonpresser/pen/qiuIx
+                var currentLikert = 0;
+                var values5 = ['1 = No Ads', '1-2 Ads','3 = Some Ads','4 = Many Ads','5 = Too Many Ads']
                 var listNode = document.createElement("UL");
                     listNode.setAttribute("id", fields[i][0]);
                     listNode.setAttribute("class", "likert");
