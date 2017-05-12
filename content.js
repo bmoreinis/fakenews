@@ -263,51 +263,51 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         // Process URL here so we only run controller function once
 		var thisURL = controller.getURL();
 		// Add vars to form array from config, for auto-fill. Default is "". This way we can configure new fields that don't autofill in any order
-		var configMax = msg.config.filled_form.length;
+		var configMax = msg.config.filled_form_page_1.length;
 		for (var i = 1; i < configMax; i++) {
-			switch (msg.config.filled_form[i][0]) {
+			switch (msg.config.filled_form_page_1[i][0]) {
 				case "url":
-				  msg.config.filled_form[i][2] = thisURL[0];
+				  msg.config.filled_form_page_1[i][2] = thisURL[0];
 				  break;
 				case "pageTitle":
-				  msg.config.filled_form[i][2] = controller.getTitle();
+				  msg.config.filled_form_page_1[i][2] = controller.getTitle();
 				  break;
 				case "pageArticle":
-				  msg.config.filled_form[i][2] = controller.getArticle();
+				  msg.config.filled_form_page_1[i][2] = controller.getArticle();
 				  break;
 				case "dn":
-				  msg.config.filled_form[i][2] = controller.domainFinder();
+				  msg.config.filled_form_page_1[i][2] = controller.domainFinder();
 				  break;
 				case "tld":
-				  msg.config.filled_form[i][2] = controller.tldParser();
+				  msg.config.filled_form_page_1[i][2] = controller.tldParser();
 				  break;
 				case "params":
-				  msg.config.filled_form[i][2] = thisURL[1];
+				  msg.config.filled_form_page_1[i][2] = thisURL[1];
 				  break;
 				case "modifiedDate":
-				  msg.config.filled_form[i][2] = controller.dateFinder();
+				  msg.config.filled_form_page_1[i][2] = controller.dateFinder();
 				  break;
 				case "allLinks":
-				  msg.config.filled_form[i][2] = controller.linkFinder();
+				  msg.config.filled_form_page_1[i][2] = controller.linkFinder();
 				  break;
 				case "aboutLinks":
-				  msg.config.filled_form[i][2] = controller.aboutFinder();
+				  msg.config.filled_form_page_1[i][2] = controller.aboutFinder();
 				  break;
 				case "whois":
-				  msg.config.filled_form[i][2] = whoIsArr;
+				  msg.config.filled_form_page_1[i][2] = whoIsArr;
 				  break;
 				default:
-				  msg.config.filled_form[i][2] = ""
+				  msg.config.filled_form_page_1[i][2] = ""
 			}
 		}
 
         //Build the form
-        makeForm(msg.config.filled_form, msg.config.critical_thinking, msg.config.typeAndOG);
+        makeForm(msg.config.filled_form_page_1, msg.config.filled_form_page_2, msg.config.typeAndOG);
 
     }
     else if (msg.text === 'build_form_blank') {
         //Build the form
-        makeForm(msg.config.blank_form, msg.config.critical_thinking, msg.config.typeAndOG);
+        makeForm(msg.config.blank_form, msg.config.filled_form_page_2, msg.config.typeAndOG);
     }
 });
 
