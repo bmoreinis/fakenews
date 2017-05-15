@@ -549,15 +549,11 @@ function buildObject(fields, fieldsP2, config, mode) {
 	p2Max = fieldsP2.length;
 	for (var f = 0; f < p1Max; f++) {
 		obj[fields[f][0]] = document.getElementById(fields[f][0]);
-		console.log(obj[fields[f][0]]);
 		obj[fields[f][0]].field = fields[f][5];
-		console.log(obj[fields[f][0]].field);
 	}
 	for (var c = 0; c <p2Max; c++) {
 		obj[fieldsP2[c][0]] = document.getElementById(fieldsP2[c][0]);
-		console.log(obj[fieldsP2[c][0]]);
 		obj[fieldsP2[c][0]].field = fieldsP2[c][2];
-		console.log(obj[fieldsP2[c][0]].field);
 	}
 	obj.type = config[0].type;
 	obj.mode = mode;
