@@ -549,11 +549,15 @@ function buildObject(fields, fieldsP2, config, mode) {
 	p2Max = fieldsP2.length;
 	for (var f = 0; f < p1Max; f++) {
 		obj[fields[f][0]] = document.getElementById(fields[f][0]);
+		console.log(obj[fields[f][0]]);
 		obj[fields[f][0]].field = fields[f][5];
+		console.log(obj[fields[f][0]].field);
 	}
 	for (var c = 0; c <p2Max; c++) {
 		obj[fieldsP2[c][0]] = document.getElementById(fieldsP2[c][0]);
+		console.log(obj[fieldsP2[c][0]]);
 		obj[fieldsP2[c][0]].field = fieldsP2[c][2];
+		console.log(obj[fieldsP2[c][0]].field);
 	}
 	obj.type = config[0].type;
 	obj.mode = mode;
@@ -747,7 +751,7 @@ function makeForm(fields, fieldsP2, config) {
 				var currentLikert = 0;
 				var values3 = ['1 = Not Clickbait', '2 = Some Bait Markers','3 = Definitely Clickbait']
 				var listNode = document.createElement("UL");
-					listNode.setAttribute("id", fieldsP2[i][0]);
+					listNode.setAttribute("id", fields[i][0]);
 					listNode.setAttribute("class", "likert");
 					for(var x = 0; x < 3; x++){
 						var listItem = document.createElement("LI");
@@ -1018,7 +1022,7 @@ function makeForm(fields, fieldsP2, config) {
 				var currentLikert = 0;
 				var values5 = ['1 = Full Mistrust', '2 = Some Mistrust','3 = Cannot Tell','4 = Some Trust','5 = Full Trust']
 				var listNode = document.createElement("UL");
-					listNode.setAttribute("id", fields[i][0]);
+					listNode.setAttribute("id", fieldsP2[i][0]);
 					listNode.setAttribute("class", "likert");
 					for(var x = 0; x < 5; x++){
 						var listItem = document.createElement("LI");
