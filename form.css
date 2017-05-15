@@ -116,7 +116,6 @@ body
   margin:0;
   padding:0 0 35px;
   display:block;
-  border-bottom:2px solid #efefef;
 }
 #FakeNewsForm form .likert:last-of-type {border-bottom:0;}
 

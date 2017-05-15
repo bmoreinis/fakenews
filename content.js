@@ -4,40 +4,40 @@ function sendToServer(obj) {
 var rawData = {}
 for (var property in obj) {
 	if (obj.hasOwnProperty(property)) {
-		//Change properties to values and generate rawData objects from it, cases for specialized fields, default for generic text fields (to be added / subtracted).
+	//Change properties to values and generate rawData objects from it, cases for specialized fields, default for generic text fields (to be added / subtracted).
 		switch (property) {
 			case "url":
-			rawData.url = {"field_page_url":{"url":obj.url.value}};
+				rawData.url = {"field_page_url":{"url":obj.url.value}};
 			break;
 			case "dn":
-			rawData.dn = {"field_domain_name":{"url":obj.dn.value}};
+				rawData.dn = {"field_domain_name":{"url":obj.dn.value}};
 			break;
 			case "tld":
-			//Determine which TLD field to submit to
-			var tldSelect = ""
-			var otherTld = ""
-			var selectDomains = ["com","org","gov","net","edu","mil","int"]
-			if (selectDomains.indexOf(obj.tld.value) == -1) {
-				tldSelect = "Other (ICANN)";
-				otherTld = obj.tld.value;
-			} else {
-				tldSelect = obj.tld.value;
-			}
-			rawData.tld = {"field_top_level_domain":tldSelect}
-			rawData.otherTld = {"field_other_tld":otherTld}
+				//Determine which TLD field to submit to
+				var tldSelect = ""
+				var otherTld = ""
+				var selectDomains = ["com","org","gov","net","edu","mil","int"]
+				if (selectDomains.indexOf(obj.tld.value) == -1) {
+					tldSelect = "Other (ICANN)";
+					otherTld = obj.tld.value;
+				} else {
+					tldSelect = obj.tld.value;
+				}
+				rawData.tld = {"field_top_level_domain":tldSelect}
+				rawData.otherTld = {"field_other_tld":otherTld}
 			break;
 			case "pageArticle":
-			// Determine which title to submit
-			var submitTitle = "";
-			if (obj.pageArticle.value !== "No <h1> found. Paste Headline here." && obj.pageArticle.value !== "") {
-				submitTitle = obj.pageArticle.value;
-			} else if (obj.pageTitle.value !== "No <title> tag found. Not trustworthy.") {
-				submitTitle = obj.pageTitle.value;
-			} else {
-				submitTitle = "No Title";
-			}
-			rawData.title = {"title":submitTitle};
-			rawData.titlefield = {"title_field":submitTitle};
+				// Determine which title to submit
+				var submitTitle = "";
+				if (obj.pageArticle.value !== "No <h1> found. Paste Headline here." && obj.pageArticle.value !== "") {
+					submitTitle = obj.pageArticle.value;
+				} else if (obj.pageTitle.value !== "No <title> tag found. Not trustworthy.") {
+					submitTitle = obj.pageTitle.value;
+				} else {
+					submitTitle = "No Title";
+				}
+				rawData.title = {"title":submitTitle};
+				rawData.titlefield = {"title_field":submitTitle};
 			break;
 			case "pageTitle":
 			break;
@@ -48,36 +48,36 @@ for (var property in obj) {
 			case "headlineMatch":
 			break;
 			case "adContent":
-			var items = obj.adContent.childNodes;
-			var itemsLength = items.length;
-			for (var i = 0; i < itemsLength; i++) {
-				if (items[i].childNodes[1].checked == true) {
-					rawData.adContent = {"field_ad_content":parseInt(items[i].childNodes[1].value)};
-					break;
+				var items = obj.adContent.childNodes;
+				var itemsLength = items.length;
+				for (var i = 0; i < itemsLength; i++) {
+					if (items[i].childNodes[1].checked == true) {
+						rawData.adContent = {"field_ad_content":parseInt(items[i].childNodes[1].value)};
+						break;
+					}
 				}
-			}
 			break;
 			case "clickbaitRank":
 			break;
 			case "allLinks":
-			//Prep links
-			var linkArray = [];
-			try {
-				var childLinks = obj.allLinks.childNodes;
-				var numLinks = childLinks.length;
-				for (var l = 0; l < numLinks; l++) {
-				if (childLinks[l].innerText == "No items were found") {
+				//Prep links
+				var linkArray = [];
+				try {
+					var childLinks = obj.allLinks.childNodes;
+					var numLinks = childLinks.length;
+					for (var l = 0; l < numLinks; l++) {
+					if (childLinks[l].innerText == "No items were found") {
+						linkArray.push({"url":""});
+					}
+					else {
+						linkArray.push({"url":childLinks[l].innerText});
+					}
+					}
+				}
+				catch(err) {
 					linkArray.push({"url":""});
 				}
-				else {
-					linkArray.push({"url":childLinks[l].innerText});
-				}
-				}
-			}
-			catch(err) {
-				linkArray.push({"url":""});
-			}
-			rawData.allLinks = {"field_source_links":linkArray};
+				rawData.allLinks = {"field_source_links":linkArray};
 			break;
 			case "otherSources":
 			break;
@@ -88,76 +88,76 @@ for (var property in obj) {
 			case "myBias":
 			break;
 			case "aboutLinks":
-			//Check about link for proper URL
-			if (obj.aboutLinks.value == undefined) {
-				obj.aboutLinks.value = "No About Links Found";
-			}
-			rawData.aboutLinks = {"field_about_us_link":{"url":obj.aboutLinks.value}};
+				//Check about link for proper URL
+				if (obj.aboutLinks.value == undefined) {
+					obj.aboutLinks.value = "No About Links Found";
+				}
+				rawData.aboutLinks = {"field_about_us_link":{"url":obj.aboutLinks.value}};
 			break;
 			case "aboutSummary":
 			break;
 			case "whois":
-			//Prep whois
-			try {
-				var childWhois = obj.whois.childNodes;
-				if(childWhois[0].tagName == "P") {
-					rawData.regName = {"field_registrant_name":childWhois[1].value};
+				//Prep whois
+				try {
+					var childWhois = obj.whois.childNodes;
+					if(childWhois[0].tagName == "P") {
+						rawData.regName = {"field_registrant_name":childWhois[1].value};
+						break;
+					}
+					rawData.regName = {"field_registrant_name":childWhois[0].innerText};
+					rawData.regComp = {"field_registrant_company":childWhois[1].innerText};
+					rawData.regState = {"field_registrant_state":childWhois[2].innerText.substring(0,2)};
+					rawData.regCountry = {"field_registrant_country":childWhois[3].innerText};
+					rawData.regPhone = {"field_registrant_phone":childWhois[4].innerText};
+					rawData.regEmail = {"field_registrant_email":childWhois[5].innerText};
+				}
+				catch(err) {
 					break;
 				}
-				rawData.regName = {"field_registrant_name":childWhois[0].innerText};
-				rawData.regComp = {"field_registrant_company":childWhois[1].innerText};
-				rawData.regState = {"field_registrant_state":childWhois[2].innerText.substring(0,2)};
-				rawData.regCountry = {"field_registrant_country":childWhois[3].innerText};
-				rawData.regPhone = {"field_registrant_phone":childWhois[4].innerText};
-				rawData.regEmail = {"field_registrant_email":childWhois[5].innerText};
-			}
-			catch(err) {
-				break;
-			}
 			break;
 			case "trustMarkers":
 			break;
 			case "mistrustMarkers":
 			break;
 			case "trustRank":
-			var items = obj.trustRank.childNodes;
-			var itemsLength = items.length;
-			for (var i = 0; i < itemsLength; i++) {
-				if (items[i].childNodes[1].checked == true) {
-					rawData.trustRank = {"field_trust_rank":parseInt(items[i].childNodes[1].value)};
-					break;
+				var items = obj.trustRank.childNodes;
+				var itemsLength = items.length;
+				for (var i = 0; i < itemsLength; i++) {
+					if (items[i].childNodes[1].checked == true) {
+						rawData.trustRank = {"field_trust_rank":parseInt(items[i].childNodes[1].value)};
+						break;
+					}
 				}
-			}
 			break;
 			case "FNassessment":
-			rawData.FNassessment = {"body":{"value":obj.FNassessment.value}};
+				rawData.FNassessment = {"body":{"value":obj.FNassessment.value}};
 			break;
-			case "FNquestions":
-			//Prepare question field split on '?'
-			var questions = obj.FNquestions.value.split('?');
-			var newQuestions = []
-			numQues = questions.length;
-			for (var q = 0; q < numQues; q++) {
-				newQuestions.push({"value":questions[q]});
-			}
-			rawData.FNquestions = {"field_questions_":newQuestions};
+				case "FNquestions":
+				//Prepare question field split on '?'
+				var questions = obj.FNquestions.value.split('?');
+				var newQuestions = []
+				numQues = questions.length;
+				for (var q = 0; q < numQues; q++) {
+					newQuestions.push({"value":questions[q]});
+				}
+				rawData.FNquestions = {"field_questions_":newQuestions};
 			break;
 			case "type":
-			rawData.type = {"type":obj.type};
+				rawData.type = {"type":obj.type};
 			break;
 			case "OG":
-			rawData.OG = {"og_group_ref":{"id": obj.OG}};
+				rawData.OG = {"og_group_ref":{"id": obj.OG}};
 			break;
 			case "mode":
 			break;
 			default:
-			var objectProperty = obj[property];
-			var objpropfield = obj[property].field;
-			var objpropvalue = objectProperty.value;
-			//check that we set a field to map to in Drupal, we can use this as a config process to not submit a field
-			if (objpropfield !== "") {
-				rawData[property] = { [objpropfield] : objpropvalue };
-			}
+				var objectProperty = obj[property];
+				var objpropfield = obj[property].field;
+				var objpropvalue = objectProperty.value;
+				//check that we set a field to map to in Drupal, we can use this as a config process to not submit a field
+				if (objpropfield !== "") {
+					rawData[property] = { [objpropfield] : objpropvalue };
+				}
 		}
 	}
 }
@@ -545,9 +545,9 @@ function addLinkItem(item, parentItem) {
 //build object to send to server, then send to server
 function buildObject(fields, fieldsP2, config, mode) {
 	obj = {};
-	fieldsMax = fields.length;
+	p1Max = fields.length;
 	p2Max = fieldsP2.length;
-	for (var f = 0; f < fieldsMax; f++) {
+	for (var f = 0; f < p1Max; f++) {
 		obj[fields[f][0]] = document.getElementById(fields[f][0]);
 		obj[fields[f][0]].field = fields[f][5];
 	}
@@ -636,40 +636,38 @@ function makeForm(fields, fieldsP2, config) {
 								}
 								formName.appendChild(listNode);
 						}
-
-
 						break;
-				case "vl":
-					if (fields[i][2].length > 0) {
-							var listNode = document.createElement("OL");
-							listNode.setAttribute("id", fields[i][0]);
-							var itemsArray = fields[i][2];
-							var itemsLength = itemsArray.length;
-							for(var x = 0; x < itemsLength; x++){
-									var listItem = document.createElement("LI");
-									listItem.setAttribute("id","FNlink"+x);
-									var itemLink = document.createElement('a')
-									var linkText = document.createTextNode(itemsArray[x]);// Create a text node
-									itemLink.appendChild(linkText);
-									itemLink.href = itemsArray[x];
-									itemLink.setAttribute('target', '_blank');
-									listItem.appendChild(itemLink);
-									listNode.appendChild(listItem);
-									var remove = document.createElement("INPUT");
-									remove.setAttribute("id","FNremove"+x);
-									remove.setAttribute("type","button");
-									remove.setAttribute("value","Remove");
-										remove.setAttribute("class","remove");
-									var removeID = remove.id
-									remove.addEventListener("click", function() {
-										var removeID = this.id;
-										removeItem(removeID);
-									}, false);
-									listNode.appendChild(remove);
-							}
-							formName.appendChild(listNode);
+			case "vl":
+				if (fields[i][2].length > 0) {
+						var listNode = document.createElement("OL");
+						listNode.setAttribute("id", fields[i][0]);
+						var itemsArray = fields[i][2];
+						var itemsLength = itemsArray.length;
+						for(var x = 0; x < itemsLength; x++){
+								var listItem = document.createElement("LI");
+								listItem.setAttribute("id","FNlink"+x);
+								var itemLink = document.createElement('a')
+								var linkText = document.createTextNode(itemsArray[x]);// Create a text node
+								itemLink.appendChild(linkText);
+								itemLink.href = itemsArray[x];
+								itemLink.setAttribute('target', '_blank');
+								listItem.appendChild(itemLink);
+								listNode.appendChild(listItem);
+								var remove = document.createElement("INPUT");
+								remove.setAttribute("id","FNremove"+x);
+								remove.setAttribute("type","button");
+								remove.setAttribute("value","Remove");
+									remove.setAttribute("class","remove");
+								var removeID = remove.id
+								remove.addEventListener("click", function() {
+									var removeID = this.id;
+									removeItem(removeID);
+								}, false);
+								listNode.appendChild(remove);
+						}
+						formName.appendChild(listNode);
 					}
-					else {
+				else {
 							var listNode = document.createElement("UL");
 							listNode.setAttribute("id", fields[i][0]);
 							var listItem = document.createElement("LI");
@@ -678,26 +676,26 @@ function makeForm(fields, fieldsP2, config) {
 							listNode.appendChild(listItem);
 							formName.appendChild(listNode);
 					}
-					if (fields[i][0] == "allLinks") {
-					var addDiv = document.createElement("DIV");
-					var addText = document.createElement("INPUT");
-					var add = document.createElement("INPUT");
-					add.setAttribute("id","FNadd");
-					add.setAttribute("type","button");
-					add.setAttribute("value","Add another Link");
-					addText.setAttribute("id","FNaddtext");
-					addText.setAttribute("type","text");
-					addText.setAttribute("value","[Start with http://]");
-					add.addEventListener("click", function() {
-						var addItem = document.getElementById("FNaddtext").value;
-						var parentItem = document.getElementById("allLinks");
-						addLinkItem(addItem, parentItem);
-					}, false);
-					addDiv.appendChild(add);
-					addDiv.appendChild(addText);
-					formName.appendChild(addDiv);
-					}
-					break;
+				if (fields[i][0] == "allLinks") {
+				var addDiv = document.createElement("DIV");
+				var addText = document.createElement("INPUT");
+				var add = document.createElement("INPUT");
+				add.setAttribute("id","FNadd");
+				add.setAttribute("type","button");
+				add.setAttribute("value","Add another Link");
+				addText.setAttribute("id","FNaddtext");
+				addText.setAttribute("type","text");
+				addText.setAttribute("value","[Start with http://]");
+				add.addEventListener("click", function() {
+					var addItem = document.getElementById("FNaddtext").value;
+					var parentItem = document.getElementById("allLinks");
+					addLinkItem(addItem, parentItem);
+				}, false);
+				addDiv.appendChild(add);
+				addDiv.appendChild(addText);
+				formName.appendChild(addDiv);
+				}
+				break;
 			case "f":
 				var inputElement = document.createElement("input"); //input element, text
 				inputElement.setAttribute('type',"text");
@@ -709,7 +707,7 @@ function makeForm(fields, fieldsP2, config) {
 				}
 				formName.appendChild(inputElement);
 				break;
-		case "e": // an empty field
+			case "e": // an empty field
 				var inputElement = document.createElement("input"); //input element, text
 				inputElement.setAttribute('type',"text");
 				inputElement.setAttribute("id",fields[i][0]);
@@ -720,11 +718,11 @@ function makeForm(fields, fieldsP2, config) {
 				}
 				formName.appendChild(inputElement);
 				break;
-		case "lt": // an empty paragraph text field
+			case "lt": // an empty paragraph text field
 				var inputElement = document.createElement("textarea"); //input element, textarea
 				inputElement.setAttribute('type',"text");
-				inputElement.setAttribute('rows',"10");
-				inputElement.setAttribute('cols',"50");
+				inputElement.setAttribute('rows',"5");
+				inputElement.setAttribute('cols',"150");
 				inputElement.setAttribute("id",fields[i][0]);
 				inputElement.value = "";
 				if (fields[i][4] == 1) {
@@ -733,28 +731,7 @@ function makeForm(fields, fieldsP2, config) {
 				}
 				formName.appendChild(inputElement);
 				break;
-		 case "s5": // https://codepen.io/Buttonpresser/pen/qiuIx
-				var currentLikert = 0;
-				var values5 = ['1 = Full Mistrust', '2 = Some Mistrust','3 = Cannot Tell','4 = Some Trust','5 = Full Trust']
-				var listNode = document.createElement("UL");
-					listNode.setAttribute("id", fields[i][0]);
-					listNode.setAttribute("class", "likert");
-					for(var x = 0; x < 5; x++){
-						var listItem = document.createElement("LI");
-						var inputElement = document.createElement("input"); //input element, text
-						inputElement.setAttribute('type',"radio");
-						inputElement.setAttribute('name',"likert");
-						inputElement.setAttribute('value',x+1);
-						var labelElement = document.createElement("label");
-						var labelText = document.createTextNode(values5[x]);
-						labelElement.appendChild(labelText);
-						listItem.appendChild(labelElement);
-						listItem.appendChild(inputElement);
-						listNode.appendChild(listItem);
-					}
-				formName.appendChild(listNode);
-				break;
-		case "b": // a boolean checkbox
+			case "b": // a boolean checkbox
 				var inputElement = document.createElement("input"); //input element, text
 				inputElement.setAttribute('type',"checkbox");
 				inputElement.setAttribute("id",fields[i][0]);
@@ -766,7 +743,28 @@ function makeForm(fields, fieldsP2, config) {
 				formName.appendChild(inputElement);
 				break;
 		/* ELI - Can we vary the values but use the same code for the slider? */
-		case "s51": // https://codepen.io/Buttonpresser/pen/qiuIx
+		 case "s3": // https://codepen.io/Buttonpresser/pen/qiuIx
+				var currentLikert = 0;
+				var values3 = ['1 = Not Clickbait', '2 = Some Bait Markers','3 = Definitely Clickbait']
+				var listNode = document.createElement("UL");
+					listNode.setAttribute("id", fieldsP2[i][0]);
+					listNode.setAttribute("class", "likert");
+					for(var x = 0; x < 3; x++){
+						var listItem = document.createElement("LI");
+						var inputElement = document.createElement("input"); //input element, text
+						inputElement.setAttribute('type',"radio");
+						inputElement.setAttribute('name',"likerts3");
+						inputElement.setAttribute('value',x+1);
+						var labelElement = document.createElement("label");
+						var labelText = document.createTextNode(values3[x]);
+						labelElement.appendChild(labelText);
+						listItem.appendChild(labelElement);
+						listItem.appendChild(inputElement);
+						listNode.appendChild(listItem);
+					}
+				formName.appendChild(listNode);
+				break;
+			case "s51": // https://codepen.io/Buttonpresser/pen/qiuIx
 				var currentLikert = 0;
 				var values5 = ['1 = No Ads', '1-2 Ads','3 = Some Ads','4 = Many Ads','5 = Too Many Ads']
 				var listNode = document.createElement("UL");
@@ -776,7 +774,7 @@ function makeForm(fields, fieldsP2, config) {
 						var listItem = document.createElement("LI");
 						var inputElement = document.createElement("input"); //input element, text
 						inputElement.setAttribute('type',"radio");
-						inputElement.setAttribute('name',"likert");
+						inputElement.setAttribute('name',"likerts51");
 						inputElement.setAttribute('value',x+1);
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values5[x]);
@@ -786,7 +784,7 @@ function makeForm(fields, fieldsP2, config) {
 						listNode.appendChild(listItem);
 					}
 				formName.appendChild(listNode);
-				break;
+			break;
 		}
 	}
 	//could maybe should be made generic for multiple pages
@@ -859,15 +857,15 @@ function makeForm(fields, fieldsP2, config) {
 			case "lt": // an empty paragraph text field
 				var inputElement = document.createElement("textarea"); //input element, textarea
 				inputElement.setAttribute('type',"text");
-				inputElement.setAttribute('rows',"10");
-				inputElement.setAttribute('cols',"50");
+				inputElement.setAttribute('rows',"5");
+				inputElement.setAttribute('cols',"150");
 				inputElement.setAttribute("id",fieldsP2[i][0]);
 				inputElement.value = "";
 				if (fieldsP2[i][4] == 1) {
 					inputElement.setAttribute("required","");
 					inputElement.setAttribute("class", "FNrequired")
 				}
-				formName.appendChild(inputElement);
+				p2Form.appendChild(inputElement);
 				break;
 			case "a":
 					var divElement = document.createElement("div");
@@ -878,7 +876,7 @@ function makeForm(fields, fieldsP2, config) {
 						newLink.setAttribute('class','newField');
 						newLink.addEventListener('click', addLink, false);
 						divElement.appendChild(newLink);
-						formName.appendChild(divElement);
+						p2Form.appendChild(divElement);
 					var inputElement = document.createElement("input"); //input element, text
 						inputElement.setAttribute('type',"text");
 						inputElement.setAttribute("id",fieldsP2[i][0]);
@@ -903,7 +901,7 @@ function makeForm(fields, fieldsP2, config) {
 										listItem.appendChild(listText);
 										listNode.appendChild(listItem);
 								}
-								formName.appendChild(listNode);
+								p2Form.appendChild(listNode);
 						}
 						else {
 								var listNode = document.createElement("DIV");
@@ -919,51 +917,51 @@ function makeForm(fields, fieldsP2, config) {
 									manualEntry.setAttribute("value","[If you know who owns this site, enter them here]");
 									listNode.appendChild(manualEntry);
 								}
-								formName.appendChild(listNode);
+								p2Form.appendChild(listNode);
 						}
 
 
 						break;
-				case "vl":
-					if (fieldsP2[i][2].length > 0) {
-							var listNode = document.createElement("OL");
-							listNode.setAttribute("id", fieldsP2[i][0]);
-							var itemsArray = fieldsP2[i][2];
-							var itemsLength = itemsArray.length;
-							for(var x = 0; x < itemsLength; x++){
-									var listItem = document.createElement("LI");
-									listItem.setAttribute("id","FNlink"+x);
-									var itemLink = document.createElement('a')
-									var linkText = document.createTextNode(itemsArray[x]);// Create a text node
-									itemLink.appendChild(linkText);
-									itemLink.href = itemsArray[x];
-									itemLink.setAttribute('target', '_blank');
-									listItem.appendChild(itemLink);
-									listNode.appendChild(listItem);
-									var remove = document.createElement("INPUT");
-									remove.setAttribute("id","FNremove"+x);
-									remove.setAttribute("type","button");
-									remove.setAttribute("value","Remove");
-										remove.setAttribute("class","remove");
-									var removeID = remove.id
-									remove.addEventListener("click", function() {
-										var removeID = this.id;
-										removeItem(removeID);
-									}, false);
-									listNode.appendChild(remove);
-							}
-							formName.appendChild(listNode);
-					}
-					else {
-							var listNode = document.createElement("UL");
-							listNode.setAttribute("id", fieldsP2[i][0]);
-							var listItem = document.createElement("LI");
-							var listText = document.createTextNode('No items were found');
-							listItem.appendChild(listText);
-							listNode.appendChild(listItem);
-							formName.appendChild(listNode);
-					}
-					if (fieldsP2[i][0] == "allLinks") {
+			case "vl":
+				if (fieldsP2[i][2].length > 0) {
+						var listNode = document.createElement("OL");
+						listNode.setAttribute("id", fieldsP2[i][0]);
+						var itemsArray = fieldsP2[i][2];
+						var itemsLength = itemsArray.length;
+						for(var x = 0; x < itemsLength; x++){
+								var listItem = document.createElement("LI");
+								listItem.setAttribute("id","FNlink"+x);
+								var itemLink = document.createElement('a')
+								var linkText = document.createTextNode(itemsArray[x]);// Create a text node
+								itemLink.appendChild(linkText);
+								itemLink.href = itemsArray[x];
+								itemLink.setAttribute('target', '_blank');
+								listItem.appendChild(itemLink);
+								listNode.appendChild(listItem);
+								var remove = document.createElement("INPUT");
+								remove.setAttribute("id","FNremove"+x);
+								remove.setAttribute("type","button");
+								remove.setAttribute("value","Remove");
+									remove.setAttribute("class","remove");
+								var removeID = remove.id
+								remove.addEventListener("click", function() {
+									var removeID = this.id;
+									removeItem(removeID);
+								}, false);
+								listNode.appendChild(remove);
+						}
+						p2Form.appendChild(listNode);
+				}
+				else {
+						var listNode = document.createElement("UL");
+						listNode.setAttribute("id", fieldsP2[i][0]);
+						var listItem = document.createElement("LI");
+						var listText = document.createTextNode('No items were found');
+						listItem.appendChild(listText);
+						listNode.appendChild(listItem);
+						p2Form.appendChild(listNode);
+				}
+				if (fieldsP2[i][0] == "allLinks") {
 					var addDiv = document.createElement("DIV");
 					var addText = document.createElement("INPUT");
 					var add = document.createElement("INPUT");
@@ -980,9 +978,9 @@ function makeForm(fields, fieldsP2, config) {
 					}, false);
 					addDiv.appendChild(add);
 					addDiv.appendChild(addText);
-					formName.appendChild(addDiv);
-					}
-					break;
+					p2Form.appendChild(addDiv);
+						}
+				break;
 			case "f":
 				var inputElement = document.createElement("input"); //input element, text
 				inputElement.setAttribute('type',"text");
@@ -992,9 +990,9 @@ function makeForm(fields, fieldsP2, config) {
 					inputElement.setAttribute("required","");
 					inputElement.setAttribute("class", "FNrequired")
 				}
-				formName.appendChild(inputElement);
+				p2Form.appendChild(inputElement);
 				break;
-		case "e": // an empty field
+			case "e": // an empty field
 				var inputElement = document.createElement("input"); //input element, text
 				inputElement.setAttribute('type',"text");
 				inputElement.setAttribute("id",fieldsP2[i][0]);
@@ -1003,9 +1001,9 @@ function makeForm(fields, fieldsP2, config) {
 					inputElement.setAttribute("required","");
 					inputElement.setAttribute("class", "FNrequired")
 				}
-				formName.appendChild(inputElement);
+				p2Form.appendChild(inputElement);
 				break;
-		case "b": // a boolean checkbox
+			case "b": // a boolean checkbox
 				var inputElement = document.createElement("input"); //input element, text
 				inputElement.setAttribute('type',"checkbox");
 				inputElement.setAttribute("id",fieldsP2[i][0]);
@@ -1014,31 +1012,31 @@ function makeForm(fields, fieldsP2, config) {
 					inputElement.setAttribute("required","");
 					inputElement.setAttribute("class", "FNrequired")
 				}
-				formName.appendChild(inputElement);
+				p2Form.appendChild(inputElement);
 				break;
-		 case "s3": // https://codepen.io/Buttonpresser/pen/qiuIx
+			case "s5": // https://codepen.io/Buttonpresser/pen/qiuIx
 				var currentLikert = 0;
-				var values3 = ['1 = Not Clickbait', '2 = Some Bait Markers','3 = Definitely Clickbait']
+				var values5 = ['1 = Full Mistrust', '2 = Some Mistrust','3 = Cannot Tell','4 = Some Trust','5 = Full Trust']
 				var listNode = document.createElement("UL");
-					listNode.setAttribute("id", fieldsP2[i][0]);
+					listNode.setAttribute("id", fields[i][0]);
 					listNode.setAttribute("class", "likert");
-					for(var x = 0; x < 3; x++){
+					for(var x = 0; x < 5; x++){
 						var listItem = document.createElement("LI");
 						var inputElement = document.createElement("input"); //input element, text
 						inputElement.setAttribute('type',"radio");
-						inputElement.setAttribute('name',"likert");
+						inputElement.setAttribute('name',"likerts5");
 						inputElement.setAttribute('value',x+1);
 						var labelElement = document.createElement("label");
-						var labelText = document.createTextNode(values3[x]);
+						var labelText = document.createTextNode(values5[x]);
 						labelElement.appendChild(labelText);
 						listItem.appendChild(labelElement);
 						listItem.appendChild(inputElement);
 						listNode.appendChild(listItem);
 					}
-				formName.appendChild(listNode);
+				p2Form.appendChild(listNode);
 				break;
 		/* ELI - Can we vary the values but use the same code for the slider? */
-		case "s31": // https://codepen.io/Buttonpresser/pen/qiuIx
+			case "s31": // https://codepen.io/Buttonpresser/pen/qiuIx
 				var currentLikert = 0;
 				var values31 = ['1 = No Bias', '2 = Some Bias','3 = High Bias']
 				var listNode = document.createElement("UL");
@@ -1048,7 +1046,7 @@ function makeForm(fields, fieldsP2, config) {
 						var listItem = document.createElement("LI");
 						var inputElement = document.createElement("input"); //input element, text
 						inputElement.setAttribute('type',"radio");
-						inputElement.setAttribute('name',"likert");
+						inputElement.setAttribute('name',"likerts31");
 						inputElement.setAttribute('value',x+1);
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values31[x]);
@@ -1059,7 +1057,7 @@ function makeForm(fields, fieldsP2, config) {
 					}
 				p2Form.appendChild(listNode);
 				break;
-		case "s52": // https://codepen.io/Buttonpresser/pen/qiuIx
+			case "s52": // https://codepen.io/Buttonpresser/pen/qiuIx
 				var currentLikert = 0;
 				var values52 = ['1 = Very Anti', '2 = Some Anti','3 = Neutral / Open','4 = Some Pro','5 = Very Pro']
 				var listNode = document.createElement("UL");
@@ -1069,7 +1067,7 @@ function makeForm(fields, fieldsP2, config) {
 						var listItem = document.createElement("LI");
 						var inputElement = document.createElement("input"); //input element, text
 						inputElement.setAttribute('type',"radio");
-						inputElement.setAttribute('name',"likert");
+						inputElement.setAttribute('name',"likerts52");
 						inputElement.setAttribute('value',x+1);
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values52[x]);
@@ -1078,7 +1076,7 @@ function makeForm(fields, fieldsP2, config) {
 						listItem.appendChild(inputElement);
 						listNode.appendChild(listItem);
 					}
-				formName.appendChild(listNode);
+				p2Form.appendChild(listNode);
 				break;
 		}
 	}
