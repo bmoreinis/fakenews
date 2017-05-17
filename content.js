@@ -277,77 +277,69 @@ alert(err);
 
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-
 	// If the received message has the expected format...
-	if (msg.text === 'build_form_filled') {
-		//Process WHOIS from message data
-		var whoIsObj = JSON.parse(msg.whois).formatted_data;
-		if (whoIsObj.RegistrantName == undefined) {
-			var whoIsArr = ['No data. Enter from https://whois.icann.org.'];
-		} else {
-			var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
-		};
-		// Process URL here so we only run controller function once
-		var thisURL = controller.getURL();
+	//Process WHOIS from message data
+	var whoIsObj = JSON.parse(msg.whois).formatted_data;
+	if (whoIsObj.RegistrantName == undefined) {
+		var whoIsArr = ['No data. Enter from https://whois.icann.org.'];
+	} else {
+		var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
+	};
+	// Process URL here so we only run controller function once
+	var thisURL = controller.getURL();
 
-		// Add vars to twoform arrays from config, for auto-fill. Default is "".
-		// This way we can configure new fields that don't autofill in any order
-
-		// Build first page array
-		var configMax1 = msg.config.filled_form_page_1.length;
-		for (var i = 1; i < configMax1; i++) {
-			switch (msg.config.filled_form_page_1[i][0]) {
-				case "url":
-				msg.config.filled_form_page_1[i][2] = thisURL[0];
-				break;
-				case "pageTitle":
-				msg.config.filled_form_page_1[i][2] = controller.getTitle();
-				break;
-				case "pageArticle":
-				msg.config.filled_form_page_1[i][2] = controller.getArticle();
-				break;
-				case "dn":
-				msg.config.filled_form_page_1[i][2] = controller.domainFinder();
-				break;
-				case "tld":
-				msg.config.filled_form_page_1[i][2] = controller.tldParser();
-				break;
-				case "modifiedDate":
-				msg.config.filled_form_page_1[i][2] = controller.dateFinder();
-				break;
-				default:
-				msg.config.filled_form_page_1[i][2] = ""
-			}
+	// Add vars to twoform arrays from config, for auto-fill. Default is "".
+	// This way we can configure new fields that don't autofill in any order
+	// Build first page array
+	var configMax1 = msg.config.filled_form_page_1.length;
+	for (var i = 1; i < configMax1; i++) {
+		switch (msg.config.filled_form_page_1[i][0]) {
+			case "url":
+			msg.config.filled_form_page_1[i][2] = thisURL[0];
+			break;
+			case "pageTitle":
+			msg.config.filled_form_page_1[i][2] = controller.getTitle();
+			break;
+			case "pageArticle":
+			msg.config.filled_form_page_1[i][2] = controller.getArticle();
+			break;
+			case "dn":
+			msg.config.filled_form_page_1[i][2] = controller.domainFinder();
+			break;
+			case "tld":
+			msg.config.filled_form_page_1[i][2] = controller.tldParser();
+			break;
+			case "modifiedDate":
+			msg.config.filled_form_page_1[i][2] = controller.dateFinder();
+			break;
+			default:
+			msg.config.filled_form_page_1[i][2] = ""
 		}
-		// Add vars to form array p2 from config, for auto-fill.
-		// Default is "". This way we can configure new fields that don't autofill in any order
-		// Build second page array
-		var configMax2 = msg.config.filled_form_page_2.length;
-		for (var i = 1; i < configMax2; i++) {
-			switch (msg.config.filled_form_page_2[i][0]) {
-				case "allLinks":
-				msg.config.filled_form_page_2[i][2] = controller.linkFinder();
-				break;
-				case "aboutLinks":
-				msg.config.filled_form_page_2[i][2] = controller.aboutFinder();
-				break;
-				case "whois":
-				msg.config.filled_form_page_2[i][2] = whoIsArr;
-				break;
-				default:
-				msg.config.filled_form_page_2[i][2] = ""
-			}
+	}
+	// Add vars to form array p2 from config, for auto-fill.
+	// Default is "". This way we can configure new fields that don't autofill in any order
+	// Build second page array
+	var configMax2 = msg.config.filled_form_page_2.length;
+	for (var i = 1; i < configMax2; i++) {
+		switch (msg.config.filled_form_page_2[i][0]) {
+			case "allLinks":
+			msg.config.filled_form_page_2[i][2] = controller.linkFinder();
+			break;
+			case "aboutLinks":
+			msg.config.filled_form_page_2[i][2] = controller.aboutFinder();
+			break;
+			case "whois":
+			msg.config.filled_form_page_2[i][2] = whoIsArr;
+			break;
+			default:
+			msg.config.filled_form_page_2[i][2] = ""
 		}
-
-		//Build the form
-		makeForm(msg.config.filled_form_page_1, msg.config.filled_form_page_2, msg.config.typeAndOG);
-
 	}
-	else if (msg.text === 'build_form_blank') {
-		//Build the form
-		makeForm(msg.config.blank_form, msg.config.filled_form_page_2, msg.config.typeAndOG);
-	}
-});
+
+	//Build the form
+	makeForm(msg.config.filled_form_page_1, msg.config.filled_form_page_2, msg.config.typeAndOG);
+	});
+
 
 //flow controller revealing module - contains various page parsing methods
 var controller = (function(){
@@ -471,7 +463,7 @@ function backlinkCounter () {
 	//insert fxn here
 }
 
-//return public methods
+//return public methods MBM1
 return {
 	getURL : getURL,
 	domainFinder : domainFinder,
@@ -554,14 +546,14 @@ function addLinkItem(item, parentItem) {
 function buildObject(fields, fieldsP2, config, mode) {
 	obj = {};
 	p1Max = fields.length;
-	p2Max = fieldsP2.length;
 	for (var f = 0; f < p1Max; f++) {
 		obj[fields[f][0]] = document.getElementById(fields[f][0]);
-		obj[fields[f][0]].field = fields[f][5];
+		obj[fields[f][0]].field = fields[f][6];
 	}
+	p2Max = fieldsP2.length;
 	for (var c = 0; c <p2Max; c++) {
 		obj[fieldsP2[c][0]] = document.getElementById(fieldsP2[c][0]);
-		obj[fieldsP2[c][0]].field = fieldsP2[c][2];
+		obj[fieldsP2[c][0]].field = fieldsP2[c][6];
 	}
 	obj.type = config[0].type;
 	obj.mode = mode;
@@ -572,7 +564,7 @@ function buildObject(fields, fieldsP2, config, mode) {
 	}
 	return obj;
 }
-// create form on page
+// create form on page one
 function makeForm(fields, fieldsP2, config) {
 	// Move Body Down
 	document.getElementsByTagName("BODY")[0].style.marginTop="420px";
@@ -794,6 +786,20 @@ function makeForm(fields, fieldsP2, config) {
 				formName.appendChild(listNode);
 			break;
 		}
+		// MBM1
+		console.log(fields[i][0]);
+		console.log(fields[i][6]);
+		if (fields[i][6] != "") {
+			var	helpHref="http://"+fields[i][6];	
+			var helpLink = document.createElement("a");
+			helpLink.href = helpHref;
+			helpLink.className +=" help-link";
+			helpLink.setAttribute('target', '_blank');
+			var helpImg = document.createElement("img");
+			helpImg.src = "http://findicons.com/files/icons/694/longhorn_r2/128/help.png";
+			helpLink.appendChild(helpImg);
+			formName.appendChild(helpLink);
+		}
 	}
 	//could maybe should be made generic for multiple pages
 	var pagerElement = document.createElement("input"); //input element, pager
@@ -850,7 +856,7 @@ function makeForm(fields, fieldsP2, config) {
 	p2Form.setAttribute('id', "FakeNewsPageTwo")
 	p2Form.setAttribute('style','display:none');
 
-	// MBM THIS IS WHERE THE HARD STUFF GOES
+	// Create form on page 2
 	for(var i = 0; i < fieldsP2.length; i++){
 		var labelElement = document.createElement("label");
 		labelElement.setAttribute("for", fieldsP2[i][0]);
