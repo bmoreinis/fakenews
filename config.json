@@ -1,10 +1,10 @@
 {
 	"filled_form_page_1":[
-		["OG","Group ID #"												,"","f",1,"","google.com"],
-		["extensionId","Email as Username"								,"","f",1,"","google.com"],
-		["url","Page URL"												,"","f",0,"field_page_url","google.com"],
-		["dn","Domain Name"												,"","f",0,"field_domain_name",""],
-		["tld","Top Level Domain ( TLD )"								,"","f",0,"field_top_level_domain",""],
+		["OG","Group ID #"												,"","f",1,"","fakenewsfitness.org/classes/auerbach-science"],
+		["extensionId","Email as Username"								,"","f",1,"",""],
+		["url","Page URL"												,"","f",0,"field_page_url",""],
+		["dn","Domain Name"												,"","f",0,"field_domain_name","http://fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"],
+		["tld","Top Level Domain ( TLD )"								,"","f",0,"field_top_level_domain","http://fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"],
 		["pageArticle","Headline ( First <H1> ) - Paste headline here!"	,"","f",0,"title",""],
 		["pageTitle","Page Title ( <title> ) - Could be headline?"		,"","f",0,"field_title",""],
 		["articleAuthor","Article Author"								,"","f",0,"field_article_author",""],
