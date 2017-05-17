@@ -41,12 +41,6 @@ for (var property in obj) {
 			break;
 			case "pageTitle":
 			break;
-			case "articleAuthor":
-			break;
-			case "modifiedDate":
-			break;
-			case "headlineMatch":
-			break;
 			case "adContent":
 				var items = obj.adContent.childNodes;
 				var itemsLength = items.length;
@@ -58,6 +52,14 @@ for (var property in obj) {
 				}
 			break;
 			case "clickbaitRank":
+				var items = obj.adContent.childNodes;
+				var itemsLength = items.length;
+				for (var i = 0; i < itemsLength; i++) {
+					if (items[i].childNodes[1].checked == true) {
+						rawData.adContent = {"field_clickbait_rank":parseInt(items[i].childNodes[1].value)};
+						break;
+					}
+				}
 			break;
 			case "allLinks":
 				//Prep links
@@ -79,13 +81,25 @@ for (var property in obj) {
 				}
 				rawData.allLinks = {"field_source_links":linkArray};
 			break;
-			case "otherSources":
-			break;
-			case "claimEvidence":
-			break;
 			case "biasLevel":
+				var items = obj.adContent.childNodes;
+				var itemsLength = items.length;
+				for (var i = 0; i < itemsLength; i++) {
+					if (items[i].childNodes[1].checked == true) {
+						rawData.adContent = {"field_bias_level":parseInt(items[i].childNodes[1].value)};
+						break;
+					}
+				}
 			break;
 			case "myBias":
+				var items = obj.adContent.childNodes;
+				var itemsLength = items.length;
+				for (var i = 0; i < itemsLength; i++) {
+					if (items[i].childNodes[1].checked == true) {
+						rawData.adContent = {"field_my_bias":parseInt(items[i].childNodes[1].value)};
+						break;
+					}
+				}
 			break;
 			case "aboutLinks":
 				//Check about link for proper URL
@@ -93,8 +107,6 @@ for (var property in obj) {
 					obj.aboutLinks.value = "No About Links Found";
 				}
 				rawData.aboutLinks = {"field_about_us_link":{"url":obj.aboutLinks.value}};
-			break;
-			case "aboutSummary":
 			break;
 			case "whois":
 				//Prep whois
@@ -114,10 +126,6 @@ for (var property in obj) {
 				catch(err) {
 					break;
 				}
-			break;
-			case "trustMarkers":
-			break;
-			case "mistrustMarkers":
 			break;
 			case "trustRank":
 				var items = obj.trustRank.childNodes;
