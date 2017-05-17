@@ -31,6 +31,10 @@ body
     background-color:transparent;
 }
 
+a.help-link img {
+  width:25px;
+  height:25px;
+}
 
 #FakeNewsForm form {
     overflow-y: scroll;
