@@ -398,22 +398,30 @@ var controller = (function(){
 
 // search document.body for ABOUT US or similar in menu lists
   function aboutFinder () {
-	var aboutItems = document.getElementsByTagName("li");
+	var aboutItems = document.getElementsByTagName("a");
 	var aboutLinks = [];
 	var aboutMax = aboutItems.length;
 	for (var a = 0; a < aboutMax; a++) {
-		var match = aboutItems[a].innerText.match(/((A|a)bout)/);
+		var match = aboutItems[a].href.match(/((A|a)bout(.+)(U|u)s)/);
 		if (match) {
-			var childNodes = aboutItems[a].childNodes;
-			for (var n = 0; n < childNodes.length; n++) {
-				if (childNodes[n].nodeName == "A") {
-					aboutLinks.push(childNodes[n].href);
-				}
-			}
+		  console.log(aboutItems[a].href);
+		  var baseToCheck = aboutItems[a].href.split("/")[2].split(".");
+		  if (baseToCheck.length === 3) {
+			var domainToCheck = baseToCheck[1]+"."+baseToCheck[2];
+		  }
+		  else {
+			var domainToCheck = baseToCheck[0]+"."+baseToCheck[1];
+		  }
+		  //check that link is inside of this domain
+		  console.log(controller.domainFinder());
+		  console.log(domainToCheck);
+		  if (controller.domainFinder() == domainToCheck) {
+			aboutLinks.push(aboutItems[a].href);
+		  }
 		}
 	}
 	if (aboutLinks.length == 0) {
-		return "No About Links Found";
+		return "";
 	} else {
 	//Drupal is set up to handle only one link here.. So we will pick the first one found
 		return aboutLinks[0];
@@ -690,7 +698,7 @@ function makeForm(fields, fieldsP2, config) {
 							var listNode = document.createElement("UL");
 							listNode.setAttribute("id", fields[i][0]);
 							var listItem = document.createElement("LI");
-							var listText = document.createTextNode('No items were found');
+							var listText = document.createTextNode("");
 							listItem.appendChild(listText);
 							listNode.appendChild(listItem);
 							formName.appendChild(listNode);
