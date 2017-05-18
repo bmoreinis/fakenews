@@ -281,7 +281,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	//Process WHOIS from message data
 	var whoIsObj = JSON.parse(msg.whois).formatted_data;
 	if (whoIsObj.RegistrantName == undefined) {
-		var whoIsArr = ['No data. Enter from https://whois.icann.org.'];
+		var whoIsArr = ['https://whois.icann.org/en/lookup?name='+controller.domainFinder()];
 	} else {
 		var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
 	};
@@ -946,8 +946,10 @@ function makeForm(fields, fieldsP2, config) {
 						else {
 								var listNode = document.createElement("DIV");
 								listNode.setAttribute("id", fieldsP2[i][0]);
-								var listItem = document.createElement("P");
-								var listText = document.createTextNode(fieldsP2[i][2]);
+								var listItem = document.createElement("A");
+								listItem.href = fieldsP2[i][2];
+								listItem.setAttribute('target', '_blank');
+								var listText = document.createTextNode('No Data. Click Here to look up on ICANN WHOIS');
 								listItem.appendChild(listText);
 								listNode.appendChild(listItem);
 								if (listNode.id == "whois") {
