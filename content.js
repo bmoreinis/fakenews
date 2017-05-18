@@ -52,15 +52,29 @@ for (var property in obj) {
 				}
 			break;
 			case "clickbaitRank":
-				var items = obj.adContent.childNodes;
+				var items = obj.clickbaitRank.childNodes;
 				var itemsLength = items.length;
 				for (var i = 0; i < itemsLength; i++) {
 					if (items[i].childNodes[1].checked == true) {
-						rawData.adContent = {"field_clickbait_rank":parseInt(items[i].childNodes[1].value)};
+						rawData.clickbaitRank = {"field_clickbait_rank":parseInt(items[i].childNodes[1].value)};
 						break;
 					}
 				}
 			break;
+			/*case "otherSources":
+			  var sourceArray = [];
+			  var childSources = obj.otherSources.childNodes[0].childNodes;
+			  var childMax = childSources.length;
+			  for (s = 0; s < childMax; s++) {
+				  if(childSources[s].childNodes[0]) {
+					  var check = childSources[s].childNodes[0].tagName;
+					  if(check == "LI") {
+					    sourceArray.push(childSources[s].childNodes[0].textContent);
+					  }
+				  }
+			  }
+			  rawData.otherSources = {"field_other_cited_sources":sourceArray};
+			break;*/
 			case "allLinks":
 				//Prep links
 				var linkArray = [];
@@ -82,21 +96,21 @@ for (var property in obj) {
 				rawData.allLinks = {"field_source_links":linkArray};
 			break;
 			case "biasLevel":
-				var items = obj.adContent.childNodes;
+				var items = obj.biasLevel.childNodes;
 				var itemsLength = items.length;
 				for (var i = 0; i < itemsLength; i++) {
 					if (items[i].childNodes[1].checked == true) {
-						rawData.adContent = {"field_bias_level":parseInt(items[i].childNodes[1].value)};
+						rawData.biasLevel = {"field_bias_level":parseInt(items[i].childNodes[1].value)};
 						break;
 					}
 				}
 			break;
-			case "myBias":
-				var items = obj.adContent.childNodes;
+			case "yourBias":
+				var items = obj.yourBias.childNodes;
 				var itemsLength = items.length;
 				for (var i = 0; i < itemsLength; i++) {
 					if (items[i].childNodes[1].checked == true) {
-						rawData.adContent = {"field_my_bias":parseInt(items[i].childNodes[1].value)};
+						rawData.yourBias = {"field_your_bias":parseInt(items[i].childNodes[1].value)};
 						break;
 					}
 				}
@@ -112,7 +126,7 @@ for (var property in obj) {
 				//Prep whois
 				try {
 					var childWhois = obj.whois.childNodes;
-					if(childWhois[0].tagName == "P") {
+					if(childWhois[0].tagName == "A") {
 						rawData.regName = {"field_registrant_name":childWhois[1].value};
 						break;
 					}
@@ -249,6 +263,7 @@ promiseUser.then(function(result) {
 	}
 	}
 	var postData = '{'+postString.slice(0,-1)+'}';
+	console.log(postData);
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
 	var postStatus = postRequest.status;
@@ -404,7 +419,6 @@ var controller = (function(){
 	for (var a = 0; a < aboutMax; a++) {
 		var match = aboutItems[a].href.match(/((A|a)bout(.+)(U|u)s)/);
 		if (match) {
-		  console.log(aboutItems[a].href);
 		  var baseToCheck = aboutItems[a].href.split("/")[2].split(".");
 		  if (baseToCheck.length === 3) {
 			var domainToCheck = baseToCheck[1]+"."+baseToCheck[2];
@@ -413,8 +427,6 @@ var controller = (function(){
 			var domainToCheck = baseToCheck[0]+"."+baseToCheck[1];
 		  }
 		  //check that link is inside of this domain
-		  console.log(controller.domainFinder());
-		  console.log(domainToCheck);
 		  if (controller.domainFinder() == domainToCheck) {
 			aboutLinks.push(aboutItems[a].href);
 		  }
@@ -549,15 +561,25 @@ function addLinkItem(item, parentItem) {
 	var listItem = document.createElement("LI");
 	var rand = Math.floor((Math.random() * 100) + 100);
 	listItem.setAttribute("id","FNlink"+rand);
-	var itemLink = document.createElement('a')
+	if (parentItem == "allLinks") {
+	  var itemLink = document.createElement('a')
+	} else {
+	  var itemLink = document.createElement('li')
+	}
 	var linkText = document.createTextNode(item);
 	itemLink.appendChild(linkText);
-	itemLink.href = item;
-	itemLink.setAttribute('target', '_blank');
+	if (parentItem == "allLinks") {
+	  itemLink.href = item;
+	  itemLink.setAttribute('target', '_blank');
+	}
 	listItem.appendChild(itemLink);
 	parentItem.appendChild(listItem);
 	var resetValue = document.getElementById("FNaddtext")
-	resetValue.value = "[Begin with http://]";
+	if (parentItem == "allLinks") {
+	  resetValue.value = "[Begin with http://]";
+	} else {
+	  resetValue.value = "";
+	}
 	var remove = document.createElement("INPUT");
 	remove.setAttribute("id","FNremove"+rand);
 	remove.setAttribute("type","button");
@@ -577,12 +599,12 @@ function buildObject(fields, fieldsP2, config, mode) {
 	p1Max = fields.length;
 	for (var f = 0; f < p1Max; f++) {
 		obj[fields[f][0]] = document.getElementById(fields[f][0]);
-		obj[fields[f][0]].field = fields[f][6];
+		obj[fields[f][0]].field = fields[f][5];
 	}
 	p2Max = fieldsP2.length;
 	for (var c = 0; c <p2Max; c++) {
 		obj[fieldsP2[c][0]] = document.getElementById(fieldsP2[c][0]);
-		obj[fieldsP2[c][0]].field = fieldsP2[c][6];
+		obj[fieldsP2[c][0]].field = fieldsP2[c][5];
 	}
 	obj.type = config[0].type;
 	obj.mode = mode;
@@ -701,25 +723,25 @@ function makeForm(fields, fieldsP2, config) {
 							listNode.setAttribute("id", fields[i][0]);
 							formName.appendChild(listNode);
 					}
-				if (fields[i][0] == "allLinks") {
 				var addDiv = document.createElement("DIV");
 				var addText = document.createElement("INPUT");
 				var add = document.createElement("INPUT");
 				add.setAttribute("id","FNadd");
 				add.setAttribute("type","button");
-				add.setAttribute("value","Add another Link");
+				add.setAttribute("value","Add another");
 				addText.setAttribute("id","FNaddtext");
 				addText.setAttribute("type","text");
+				if (fields[i][0] == "allLinks") {
 				addText.setAttribute("value","[Start with http://]");
+				}
 				add.addEventListener("click", function() {
 					var addItem = document.getElementById("FNaddtext").value;
-					var parentItem = document.getElementById("allLinks");
+					var parentItem = document.getElementById(fields[i][0]);
 					addLinkItem(addItem, parentItem);
 				}, false);
 				addDiv.appendChild(add);
 				addDiv.appendChild(addText);
 				formName.appendChild(addDiv);
-				}
 				break;
 			case "f":
 				var inputElement = document.createElement("input"); //input element, text
@@ -812,8 +834,6 @@ function makeForm(fields, fieldsP2, config) {
 			break;
 		}
 		// MBM1
-		console.log(fields[i][0]);
-		console.log(fields[i][6]);
 		if (fields[i][6] != "") {
 			var	helpHref="https://"+fields[i][6];	
 			var helpLink = document.createElement("a");
@@ -993,31 +1013,35 @@ function makeForm(fields, fieldsP2, config) {
 								listNode.appendChild(remove);
 						}
 						p2Form.appendChild(listNode);
-				}
+					}
 				else {
-						var listNode = document.createElement("UL");
-						listNode.setAttribute("id", fieldsP2[i][0]);
-						p2Form.appendChild(listNode);
-				}
+							var listNode = document.createElement("UL");
+							listNode.setAttribute("id", fieldsP2[i][0]);
+							p2Form.appendChild(listNode);
+					}
+				var addDiv = document.createElement("DIV");
+				var addText = document.createElement("INPUT");
+				var add = document.createElement("INPUT");
+				add.setAttribute("id","FNadd");
+				add.setAttribute("type","button");
 				if (fieldsP2[i][0] == "allLinks") {
-					var addDiv = document.createElement("DIV");
-					var addText = document.createElement("INPUT");
-					var add = document.createElement("INPUT");
-					add.setAttribute("id","FNadd");
-					add.setAttribute("type","button");
-					add.setAttribute("value","Add another Link");
-					addText.setAttribute("id","FNaddtext");
-					addText.setAttribute("type","text");
-					addText.setAttribute("value","[Start with http://]");
-					add.addEventListener("click", function() {
-						var addItem = document.getElementById("FNaddtext").value;
-						var parentItem = document.getElementById("allLinks");
-						addLinkItem(addItem, parentItem);
-					}, false);
-					addDiv.appendChild(add);
-					addDiv.appendChild(addText);
-					p2Form.appendChild(addDiv);
-						}
+				  add.setAttribute("value","Add Link");
+				} else {
+				  add.setAttribute("value","Add Resource");
+				}
+				addText.setAttribute("id","FNaddtext");
+				addText.setAttribute("type","text");
+				if (fieldsP2[i][0] == "allLinks") {
+				addText.setAttribute("value","[Start with http://]");
+				}
+				add.addEventListener("click", function() {
+					var addItem = this.parentNode.childNodes[1].value;
+					var parentItem = this.parentNode;
+					addLinkItem(addItem, parentItem);
+				}, false);
+				addDiv.appendChild(add);
+				addDiv.appendChild(addText);
+				listNode.appendChild(addDiv);
 				break;
 			case "f":
 				var inputElement = document.createElement("input"); //input element, text
