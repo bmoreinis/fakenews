@@ -28,22 +28,6 @@
 		["FNassessment","Assessment Notes: Why this rank?"				,"","lt",0,"body",""],
 		["FNquestions","Questions (for Commenters)"						,"","lt",0,"field_questions_",""]
 		],
-	"blank_form":[
-		["OG","Group ID #"												,"","f",1,"",""],
-		["extensionId"													,"Email as Username","","f",1,"",""],
-		["pageArticle","Headline ( First <H1> ) - Paste headline here!"	,"","f",0,"title",""],
-		["pageTitle","Page Title ( <title> ) - Could be headline?"		,"","f",0,"field_title",""],
-		["articleAuthor","Article Author"								,"","f",0,"field_article_author",""],
-		["modifiedDate","Dateline or Posted/Modified Date"				,"","f",0,"field_page_last_modified",""],
-		["adContent","Advertising / Content Ratio ( Click one )"		,"","s51",1,"field_ad_content",""],
-		["url","Page URL"												,"","f",0,"field_page_url",""],
-		["dn","Domain Name"												,"","f",0,"field_domain_name",""],
-		["tld","Top Level Domain ( TLD )"								,"","f",0,"field_top_level_domain",""],
-		["aboutLinks","About Us Link"									,"","f",0,"field_about_us_link",""],
-		["whois","WHOIS Lookup"											,"","v",0,"",""],
-		["allLinks","Page Links - remove non-sources"					,"","vl",0,"field_source_links",""],
-		["trustRank","Initial Trust Rank ( Click one )"					,"","s5",1,"field_trust_rank",""]
-		],
 	"typeAndOG":[
 		{"type":"page_check"},{"groupID":1}
 	]
