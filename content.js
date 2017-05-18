@@ -556,6 +556,8 @@ function addLinkItem(item, parentItem) {
 	itemLink.setAttribute('target', '_blank');
 	listItem.appendChild(itemLink);
 	parentItem.appendChild(listItem);
+	var resetValue = document.getElementById("FNaddtext")
+	resetValue.value = "[Begin with http://]";
 	var remove = document.createElement("INPUT");
 	remove.setAttribute("id","FNremove"+rand);
 	remove.setAttribute("type","button");
@@ -697,10 +699,6 @@ function makeForm(fields, fieldsP2, config) {
 				else {
 							var listNode = document.createElement("UL");
 							listNode.setAttribute("id", fields[i][0]);
-							var listItem = document.createElement("LI");
-							var listText = document.createTextNode("");
-							listItem.appendChild(listText);
-							listNode.appendChild(listItem);
 							formName.appendChild(listNode);
 					}
 				if (fields[i][0] == "allLinks") {
@@ -997,10 +995,6 @@ function makeForm(fields, fieldsP2, config) {
 				else {
 						var listNode = document.createElement("UL");
 						listNode.setAttribute("id", fieldsP2[i][0]);
-						var listItem = document.createElement("LI");
-						var listText = document.createTextNode('No items were found');
-						listItem.appendChild(listText);
-						listNode.appendChild(listItem);
 						p2Form.appendChild(listNode);
 				}
 				if (fieldsP2[i][0] == "allLinks") {
