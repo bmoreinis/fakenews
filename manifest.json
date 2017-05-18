@@ -23,6 +23,10 @@
     }
   ],
   
+    "web_accessible_resources": [
+    "help.png"
+  ],
+  
   "permissions": [
    "activeTab",
    "downloads"

@@ -790,13 +790,14 @@ function makeForm(fields, fieldsP2, config) {
 		console.log(fields[i][0]);
 		console.log(fields[i][6]);
 		if (fields[i][6] != "") {
-			var	helpHref="http://"+fields[i][6];	
+			var	helpHref="https://"+fields[i][6];	
 			var helpLink = document.createElement("a");
 			helpLink.href = helpHref;
 			helpLink.className +=" help-link";
 			helpLink.setAttribute('target', '_blank');
 			var helpImg = document.createElement("img");
-			helpImg.src = "http://findicons.com/files/icons/694/longhorn_r2/128/help.png";
+			var helpIcon = chrome.extension.getURL("/help.png");
+			helpImg.src = helpIcon;
 			helpLink.appendChild(helpImg);
 			formName.appendChild(helpLink);
 		}
