@@ -292,7 +292,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	// This way we can configure new fields that don't autofill in any order
 	// Build first page array
 	var configMax1 = msg.config.filled_form_page_1.length;
-	for (var i = 1; i < configMax1; i++) {
+	for (var i = 0; i < configMax1; i++) {
 		switch (msg.config.filled_form_page_1[i][0]) {
 			case "url":
 			msg.config.filled_form_page_1[i][2] = thisURL[0];
@@ -320,7 +320,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	// Default is "". This way we can configure new fields that don't autofill in any order
 	// Build second page array
 	var configMax2 = msg.config.filled_form_page_2.length;
-	for (var i = 1; i < configMax2; i++) {
+	for (var i = 0; i < configMax2; i++) {
 		switch (msg.config.filled_form_page_2[i][0]) {
 			case "allLinks":
 			msg.config.filled_form_page_2[i][2] = controller.linkFinder();
@@ -345,7 +345,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 var controller = (function(){
 
 // get domain from active tab
- function getURL() {
+  function getURL() {
 	 var href = window.location.href.split('?');
 	 if (href[1] == undefined) {
 		 href[1] = 'No parameters. No click-tracking here!';
@@ -353,7 +353,7 @@ var controller = (function(){
 	 return href;
  };
 
- function domainFinder() {
+  function domainFinder() {
 	var myPath = window.location.host.split('.');
 	if (myPath.length === 3) {
 		return myPath[1]+"."+myPath[2]
@@ -364,7 +364,7 @@ var controller = (function(){
 };
 
 // extract tld from url of active tab
-function tldParser() {
+  function tldParser() {
 	var myPath = window.location.host.split('.');
 	if (myPath.length === 3) {
 		return myPath[2]
@@ -375,7 +375,7 @@ function tldParser() {
 };
 
 // extract <title> from HTML
-function getTitle () {
+  function getTitle () {
 	var title = document.getElementsByTagName("title");
 	if (title.length == 0) {
 		return "No <title> tag found. Not trustworthy.";
@@ -386,7 +386,7 @@ function getTitle () {
 }
 
 // extract first <h1> from HTML
-function getArticle () {
+  function getArticle () {
 	var article = document.getElementsByTagName("h1")
 	if (article.length == 0) {
 		return "No <h1> found. Paste Headline here.";
@@ -397,7 +397,7 @@ function getArticle () {
 }
 
 // search document.body for ABOUT US or similar in menu lists
-function aboutFinder () {
+  function aboutFinder () {
 	var aboutItems = document.getElementsByTagName("li");
 	var aboutLinks = [];
 	var aboutMax = aboutItems.length;
@@ -448,10 +448,29 @@ function dateFinder () {
 function linkFinder () {
 	var array = [];
 	var paragraphs = document.getElementsByTagName("p");
-		for(var i=0, max=paragraphs.length; i<max; i++) {
-			for(var x=0, Xmax=paragraphs[i].children.length; x<Xmax; x++) {
+	// set maximum number of links to pre-fill
+	var maxLinks = 5;
+		for(var i=0, max = paragraphs.length; i<max; i++) {
+			for(var x=0, Xmax = paragraphs[i].children.length; x < Xmax; x++) {
 				if (paragraphs[i].children[x].tagName == "A") {
-					array.push(paragraphs[i].children[x].href)
+				  var url = paragraphs[i].children[x].href
+				  //check that it's not an internal link
+				  if (url.indexOf("http") == 0 ) {
+					var baseToCheck = url.split("/")[2].split(".");
+					if (baseToCheck.length === 3) {
+					  var domainToCheck = baseToCheck[1]+"."+baseToCheck[2];
+					}
+					else {
+					  var domainToCheck = baseToCheck[0]+"."+baseToCheck[1];
+					}
+					//check that link is a source e.g. outside of this domain
+					if (controller.domainFinder() !== domainToCheck) {
+				    //enforce max links setting
+				      if (array.length < maxLinks) {
+					    array.push(paragraphs[i].children[x].href)
+				      }
+					}
+				  }
 				}
 			}
 		}
