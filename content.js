@@ -157,10 +157,11 @@ for (var property in obj) {
 				case "FNquestions":
 				//Prepare question field split on '?'
 				var questions = obj.FNquestions.value.split('?');
+				console.log(questions);
 				var newQuestions = []
 				numQues = questions.length;
-				for (var q = 0; q < numQues; q++) {
-					newQuestions.push({"value":questions[q]});
+				for (var q = 0; q < numQues-1; q++) {
+					newQuestions.push({"value":questions[q]+"?"});
 				}
 				rawData.FNquestions = {"field_questions_":newQuestions};
 			break;
