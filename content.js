@@ -157,7 +157,6 @@ for (var property in obj) {
 				case "FNquestions":
 				//Prepare question field split on '?'
 				var questions = obj.FNquestions.value.split('?');
-				console.log(questions);
 				var newQuestions = []
 				numQues = questions.length;
 				for (var q = 0; q < numQues-1; q++) {
@@ -264,7 +263,6 @@ promiseUser.then(function(result) {
 	}
 	}
 	var postData = '{'+postString.slice(0,-1)+'}';
-	console.log(postData);
 	var postRequest = new XMLHttpRequest();
 	postRequest.onload = function () {
 	var postStatus = postRequest.status;
