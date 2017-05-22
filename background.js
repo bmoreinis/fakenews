@@ -8,3 +8,55 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 	  chrome.downloads.download({ url: doc, filename: filename, conflictAction: 'overwrite', saveAs: true });
   }
 });
+
+//Transferred from popup.js when deprecated
+chrome.browserAction.onClicked.addListener(function() {
+  var configFile = chrome.runtime.getURL('/config.json');
+  var promiseConfig = new Promise(function(resolve, reject) {
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onload = function () {
+			  var configStatus = xmlHttp.status;
+			  var configData = xmlHttp.responseText;
+			    if (configStatus == 200) {
+				resolve(configData);
+				}
+				else {
+				reject(Error("Could not get config data"));
+				alert("Could not locate config.json")
+				}
+		  }
+    xmlHttp.open( "GET", configFile, true );
+    xmlHttp.send( null );
+  });
+  promiseConfig.then(function(result) {
+  var config = JSON.parse(result);
+  chrome.tabs.query({active : true}, function(tab) {
+    //Check if user wants form pre-filled
+    var req = new XMLHttpRequest();
+        function sendFilled() {
+		  var reqStatus = req.status;
+		  if (reqStatus == 200) {
+            var whois = req.responseText;
+            chrome.tabs.sendMessage(tab[0].id, {text:'build_form_filled', whois: whois, config:config}, null);
+		  } else if (reqStatus == 508) {
+			alert("BulkWhoIsAPI is at it's rate limit. Please wait a few seconds and try again");
+		  } else {
+			alert("Unknown error from BulkWhoIsAPI, please contact extension administrator");
+		  };
+        };
+        var url = new URL(tab[0].url);
+		var domain = ""
+        var raw = url.hostname.split(".");
+		if (raw.length == 3) {
+		  domain = raw[1]+"."+raw[2];
+		} else {
+		  domain = raw[0]+"."+raw[1];
+		}
+        req.open("GET","http://api.bulkwhoisapi.com/whoisAPI.php?domain="+domain+"&token=usemeforfree");
+        req.onload = sendFilled;
+        req.send(null);
+    });
+  }, function(err) {
+  console.log(err);
+  });
+}, false);
