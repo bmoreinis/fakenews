@@ -269,6 +269,7 @@ promiseUser.then(function(result) {
 	var data = postRequest.responseText;
 	if (postStatus == 201) {
 		alert("Submit successful.");
+		Tracker=window.open("http://www.fakenewsfitness.org/new-page-check","tracker","", "");
 	} else {
 		alert("There was a problem with your submission, response was: "+data);
 	}
@@ -281,7 +282,6 @@ postRequest.send(postData);
 }}, function(err) {
 	alert(err);
 	}
-);
 
 }, function(err) {
 alert(err);
