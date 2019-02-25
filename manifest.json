@@ -3,17 +3,17 @@
 
   "name": "FakeNewsFitness Plugin",
   "description": "This extension will analyze a page for truth value",
-  "version": "2.62",
+  "version": "2.63",
 
   "browser_action": {
    "default_icon": "icon.png"
   },
-  
+
   "background": {
     "scripts": ["background.js"],
     "persistent": false
   },
-  
+
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
@@ -21,11 +21,11 @@
 	  "css" : ["form.css"]
     }
   ],
-  
+
     "web_accessible_resources": [
     "help.png"
   ],
-  
+
   "permissions": [
    "activeTab",
    "downloads"

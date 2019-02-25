@@ -9,8 +9,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
   }
 });
 
-//Transferred from popup.js when deprecated
-chrome.browserAction.onClicked.addListener(function() {
+// Now users updated function signature as of 25 Feb 2019
+// See: https://developer.chrome.com/extensions/browserAction#event-onClicked
+chrome.browserAction.onClicked.addListener(function(tab) {
   var configFile = chrome.runtime.getURL('/config.json');
   var promiseConfig = new Promise(function(resolve, reject) {
 	var xmlHttp = new XMLHttpRequest();
@@ -29,22 +30,20 @@ chrome.browserAction.onClicked.addListener(function() {
     xmlHttp.send( null );
   });
   promiseConfig.then(function(result) {
-  var config = JSON.parse(result);
-  chrome.tabs.query({active : true}, function(tab) {
-    //Check if user wants form pre-filled
+    var config = JSON.parse(result);
     var req = new XMLHttpRequest();
         function sendFilled() {
 		  var reqStatus = req.status;
 		  if (reqStatus == 200) {
             var whois = req.responseText;
-            chrome.tabs.sendMessage(tab[0].id, {text:'build_form_filled', whois: whois, config:config}, null);
+            chrome.tabs.sendMessage(tab.id, {text:'build_form_filled', whois: whois, config:config}, null);
 		  } else if (reqStatus == 508) {
 			alert("BulkWhoIsAPI is at it's rate limit. Please wait a few seconds and try again");
 		  } else {
 			alert("Unknown error from BulkWhoIsAPI, please contact extension administrator");
 		  };
         };
-        var url = new URL(tab[0].url);
+        var url = new URL(tab.url);
 		var domain = ""
         var raw = url.hostname.split(".");
 		if (raw.length == 3) {
@@ -55,8 +54,5 @@ chrome.browserAction.onClicked.addListener(function() {
         req.open("GET","http://api.bulkwhoisapi.com/whoisAPI.php?domain="+domain+"&token=usemeforfree");
         req.onload = sendFilled;
         req.send(null);
-    });
-  }, function(err) {
-  console.log(err);
   });
-}, false);
+});
