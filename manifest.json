@@ -1,17 +1,21 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
 
   "name": "FakeNewsFitness Plugin",
   "description": "This extension will analyze a page for truth value",
-  "version": "2.63",
+  "version": "3.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApqIVnPxC2i1cX2H9Xa6iPwwZcMbnrUqmjQDbnlNbrp0X0RbDIn8Q8HIRbSrB84UMbrP82aOyoXS/7CeItqqfUNil899cq2xloUcUpfHsd9S3jV597RzxoWHVzA2v8iTMnKAIKe4w42RYx5JMvzcDwIMyhR69SMhdN7wuIQWZ71iGhegOdU5vUUT4aDPshQHHmRZlRBZuBo9FuZnN3BCiq8u4Rx0vIIfEkVpdy0I1zZDM5j9VZBI2WlGxswoibrFB+/5TvNHWnXMXfwZE6Yai+q7fZ6HfZVg0bbb9bMKEGRqeRHkscnHYtWt4YV958SdsVqJm+YHqgxLGgQAvESGeuwIDAQAB",
+  "oauth2": {
+    "client_id": "177922651464-nrorc5elms85e9n7t7ha229e6j4ejuj1.apps.googleusercontent.com",
+    "scopes":["https://www.googleapis.com/auth/drive"]
+  },
 
-  "browser_action": {
+  "action": {
    "default_icon": "icon.png"
   },
 
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js"
   },
 
   "content_scripts": [
@@ -21,13 +25,23 @@
 	  "css" : ["form.css"]
     }
   ],
-
     "web_accessible_resources": [
-    "help.png"
-  ],
+      {
+        "resources": [
+          "help.png", "config.json"
+        ],
+        "matches": [
+          "*://*/*"
+        ]
+      }],
 
   "permissions": [
-   "activeTab",
-   "downloads"
-   ]
+     "activeTab",
+     "downloads",
+     "identity"
+   ],
+
+  "host_permissions": [
+    "*://*/*"
+  ]
 }
