@@ -1,7 +1,7 @@
 {
 	"filled_form_page_1":[
-		["OG","Group ID #"												,"","f",1,"","fakenewsfitness.org/classes/auerbach-science"],
-		["extensionId","Email as Username"								,"","f",1,"",""],
+		["OG","Group ID #"												,"","f",1,"field_og","fakenewsfitness.org/classes/auerbach-science"],
+		["extensionId","Email as Username"								,"","f",1,"field_extension_id",""],
 		["url","Page URL"												,"","f",0,"field_page_url",""],
 		["dn","Domain Name"												,"","f",0,"field_domain_name","fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"],
 		["tld","Top Level Domain ( TLD )"								,"","f",0,"field_top_level_domain","fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"],
@@ -19,7 +19,7 @@
 		["claimEvidence","Evidence for Claims"							,"","lt",0,"field_evidence_for_claims",""],
 		["aboutLinks","About Us Link"									,"","f",0,"field_about_us_link",""],
 		["aboutSummary","About Us Summary"								,"","lt",0,"field_about_us_summary",""],
-		["whois","WHOIS Lookup"											,"","v",0,"",""],
+		["whois","WHOIS Lookup"											,"","v",0,"field_whois",""],
 		["biasLevel","Bias Level ( Click one )"							,"","s31",0,"field_bias_level",""],
 		["yourBias","Your Bias Level ( Click one )"						,"","s52",0,"field_your_bias",""],
 		["trustRank","Initial Trust Rank ( Click one )"					,"","s5",0,"field_trust_rank",""],
@@ -30,5 +30,6 @@
 		],
 	"typeAndOG":[
 		{"type":"page_check"},{"groupID":1}
-	]
+	],
+	"documentTitle": "My Fake News Assessment"
 }

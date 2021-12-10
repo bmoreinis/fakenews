@@ -1,305 +1,48 @@
+var fieldNameLookupObject = {};
 function sendToServer(obj) {
-//Process object that was sent, for values on fields that take only values. Default is value to allow new "normal" field situations
-//rawData will be used to build the JSON to post to Drupal
-var rawData = {}
-for (var property in obj) {
-	if (obj.hasOwnProperty(property)) {
-	//Change properties to values and generate rawData objects from it, cases for specialized fields, default for generic text fields (to be added / subtracted).
-		switch (property) {
-			case "url":
-				rawData.url = {"field_page_url":{"url":obj.url.value}};
-			break;
-			case "dn":
-				rawData.dn = {"field_domain_name":{"url":obj.dn.value}};
-			break;
-			case "tld":
-				//Determine which TLD field to submit to
-				var tldSelect = ""
-				var otherTld = ""
-				var selectDomains = ["com","org","gov","net","edu","mil","int"]
-				if (selectDomains.indexOf(obj.tld.value) == -1) {
-					tldSelect = "Other (ICANN)";
-					otherTld = obj.tld.value;
+	//build the document
+	documentObject = {};
+	documentObject.title = '';
+	documentObject.body = {};
+	documentObject.body.content = [];
+
+	for(var i = 0; i < obj.fieldValue.length; i++){
+		fieldValueItem = obj.fieldValue[i];
+		documentObject = addDocumentItem(documentObject, fieldValueItem['field'], fieldValueItem['fieldName'], fieldValueItem['value']);
+	}
+
+	//Check mode (download or post) and do it.
+	if (obj.mode == 'download') {
+		chrome.runtime.sendMessage({text:'download', downloadData: JSON.stringify(documentObject)}, null);
+	}
+	else {
+		htmlToPost = convertObjectToHtml(documentObject);
+		createDriveFile(htmlToPost, googleDriveDocumentTitle )
+			.then(data => {
+				if (data.error) {
+					errorMessage = data.error.message ? "There was an error submitting your data: " + data.error.message : "There was an unknown error submitting your data.";
+					alert(errorMessage)
 				} else {
-					tldSelect = obj.tld.value;
+					alert("Thank you for submitting your data. Please visit your Google Drive and view the document " + googleDriveDocumentTitle + ".")
 				}
-				rawData.tld = {"field_top_level_domain":tldSelect}
-				rawData.otherTld = {"field_other_tld":otherTld}
-			break;
-			case "pageArticle":
-				// Determine which title to submit
-				var submitTitle = "";
-				if (obj.pageArticle.value !== "No <h1> found. Paste Headline here." && obj.pageArticle.value !== "") {
-					submitTitle = obj.pageArticle.value;
-				} else if (obj.pageTitle.value !== "No <title> tag found. Not trustworthy.") {
-					submitTitle = obj.pageTitle.value;
-				} else {
-					submitTitle = "No Title";
-				}
-				rawData.title = {"title":submitTitle};
-				rawData.titlefield = {"title_field":submitTitle};
-			break;
-			case "pageTitle":
-			break;
-			case "adContent":
-				var items = obj.adContent.childNodes;
-				var itemsLength = items.length;
-				for (var i = 0; i < itemsLength; i++) {
-					if (items[i].childNodes[1].checked == true) {
-						rawData.adContent = {"field_ad_content":parseInt(items[i].childNodes[1].value)};
-						break;
-					}
-				}
-			break;
-			case "clickbaitRank":
-				var items = obj.clickbaitRank.childNodes;
-				var itemsLength = items.length;
-				for (var i = 0; i < itemsLength; i++) {
-					if (items[i].childNodes[1].checked == true) {
-						rawData.clickbaitRank = {"field_clickbait_rank":parseInt(items[i].childNodes[1].value)};
-						break;
-					}
-				}
-			break;
-			/*case "otherSources":
-			  var sourceArray = [];
-			  var childSources = obj.otherSources.childNodes[0].childNodes;
-			  var childMax = childSources.length;
-			  for (s = 0; s < childMax; s++) {
-				  if(childSources[s].childNodes[0]) {
-					  var check = childSources[s].childNodes[0].tagName;
-					  if(check == "LI") {
-					    sourceArray.push(childSources[s].childNodes[0].textContent);
-					  }
-				  }
-			  }
-			  rawData.otherSources = {"field_other_cited_sources":sourceArray};
-			break;*/
-			case "allLinks":
-				//Prep links
-				var linkArray = [];
-				try {
-					var childLinks = obj.allLinks.childNodes;
-					var numLinks = childLinks.length;
-					for (var l = 0; l < numLinks; l++) {
-					if (childLinks[l].innerText == "No items were found") {
-						linkArray.push({"url":""});
-					}
-					else {
-						linkArray.push({"url":childLinks[l].innerText});
-					}
-					}
-				}
-				catch(err) {
-					linkArray.push({"url":""});
-				}
-				rawData.allLinks = {"field_source_links":linkArray};
-			break;
-			case "biasLevel":
-				var items = obj.biasLevel.childNodes;
-				var itemsLength = items.length;
-				for (var i = 0; i < itemsLength; i++) {
-					if (items[i].childNodes[1].checked == true) {
-						rawData.biasLevel = {"field_bias_level":parseInt(items[i].childNodes[1].value)};
-						break;
-					}
-				}
-			break;
-			case "yourBias":
-				var items = obj.yourBias.childNodes;
-				var itemsLength = items.length;
-				for (var i = 0; i < itemsLength; i++) {
-					if (items[i].childNodes[1].checked == true) {
-						rawData.yourBias = {"field_your_bias":parseInt(items[i].childNodes[1].value)};
-						break;
-					}
-				}
-			break;
-			case "aboutLinks":
-				//Check about link for proper URL
-				if (obj.aboutLinks.value == undefined) {
-					obj.aboutLinks.value = "No About Links Found";
-				}
-				rawData.aboutLinks = {"field_about_us_link":{"url":obj.aboutLinks.value}};
-			break;
-			case "whois":
-				//Prep whois
-				try {
-					var childWhois = obj.whois.childNodes;
-					if(childWhois[0].tagName == "A") {
-						rawData.regName = {"field_registrant_name":childWhois[1].value};
-						break;
-					}
-					rawData.regName = {"field_registrant_name":childWhois[0].innerText};
-					rawData.regComp = {"field_registrant_company":childWhois[1].innerText};
-					rawData.regState = {"field_registrant_state":childWhois[2].innerText.substring(0,2)};
-					rawData.regCountry = {"field_registrant_country":childWhois[3].innerText};
-					rawData.regPhone = {"field_registrant_phone":childWhois[4].innerText};
-					rawData.regEmail = {"field_registrant_email":childWhois[5].innerText};
-				}
-				catch(err) {
-					break;
-				}
-			break;
-			case "trustRank":
-				var items = obj.trustRank.childNodes;
-				var itemsLength = items.length;
-				for (var i = 0; i < itemsLength; i++) {
-					if (items[i].childNodes[1].checked == true) {
-						rawData.trustRank = {"field_trust_rank":parseInt(items[i].childNodes[1].value)};
-						break;
-					}
-				}
-			break;
-			case "FNassessment":
-				rawData.FNassessment = {"body":{"value":obj.FNassessment.value}};
-			break;
-				case "FNquestions":
-				//Prepare question field split on '?'
-				var questions = obj.FNquestions.value.split('?');
-				var newQuestions = []
-				numQues = questions.length;
-				for (var q = 0; q < numQues-1; q++) {
-					newQuestions.push({"value":questions[q]+"?"});
-				}
-				rawData.FNquestions = {"field_questions_":newQuestions};
-			break;
-			case "type":
-				rawData.type = {"type":obj.type};
-			break;
-			case "OG":
-				rawData.OG = {"og_group_ref":{"id": obj.OG}};
-			break;
-			case "mode":
-			break;
-			default:
-				var objectProperty = obj[property];
-				var objpropfield = obj[property].field;
-				var objpropvalue = objectProperty.value;
-				//check that we set a field to map to in Drupal, we can use this as a config process to not submit a field
-				if (objpropfield !== "") {
-					rawData[property] = { [objpropfield] : objpropvalue };
-				}
-		}
-	}
-}
+			});
+	//Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
 
-//Check mode (download or post) and do it.
-if (obj.mode == 'download') {
-	var downloadData = [];
-	for (var data in rawData) {
-		if (rawData.hasOwnProperty(data)) {
-			var subData = rawData[data];
-			for (var d in subData) {
-				if (subData.hasOwnProperty(d)) {
-					downloadData.push(JSON.stringify(subData).slice(1,-1));
-				}
-			}
-		}
 	}
-	downloadData = '[{'+downloadData+'}]';
-	chrome.runtime.sendMessage({text:'download', downloadData: downloadData}, null);
-}
-else {
-//Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
-var promiseToken = new Promise(function(resolve, reject) {
-var getToken = new XMLHttpRequest();
-		var turl = "https://www.fakenewsfitness.org/restws/session/token";
-		getToken.onload = function () {
-			var tStatus = getToken.status;
-			var tData = getToken.responseText;
-				if (tStatus == 200) {
-				resolve(tData);
-				}
-				else {
-				reject(Error("This email is not logged into fakenewsfitness.org"));
-				alert("This email is not logged into fakenewsfitness.org");
-				}
-		}
-		getToken.open("GET", turl, true);
-		getToken.setRequestHeader("Accept", "application/json");
-		getToken.send(null);
-});
-
-promiseToken.then(function(result) {
-	var promiseUser = new Promise(function(resolve, reject) {
-	var getUser = new XMLHttpRequest();
-	var uurl = "https://www.fakenewsfitness.org/user.json?field_extension_id="+obj.extensionId.value;
-	getUser.onload = function () {
-		var uStatus = getUser.status;
-		var uData = JSON.parse(getUser.response);
-		// Check for an email that isn't a user before confirming promise fulfilled
-		if (uData.list[0] == undefined) {
-			alert("Email not related to valid FakeNewsFitness user");
-		} else {
-			if (uStatus == 200) {
-			resolve(uData.list[0].uid);
-				}
-			else {
-			reject(Error("Something went wrong retrieving user information"));
-			alert("Could not retrieve user data from fakenewsfitness.org");
-			}
-		}
-	}
-	getUser.open("GET", uurl, true);
-	getUser.setRequestHeader("Accept", "application/json");
-	sessionToken = result;
-	getUser.setRequestHeader("X-CSRF-Token", sessionToken);
-	getUser.send(null);
-});
-promiseUser.then(function(result) {
-	rawData.author = {"author":{"id":result}};
-	// Double check for a "blank" submission in email before attempting to post node
-	if (result == null) {
-		alert("There was a problem retrieving your FakeNewsFitness User");
-	} else {
-	//The URL to POST to
-	var url = "https://www.fakenewsfitness.org/node"
-	var postString = "";
-	for (var prop in rawData) {
-	if (rawData.hasOwnProperty(prop)) {
-		var stringProp = JSON.stringify(rawData[prop])
-		postString = postString+stringProp.slice(1,-1)+',';
-	}
-	}
-	var postData = '{'+postString.slice(0,-1)+'}';
-	var postRequest = new XMLHttpRequest();
-	postRequest.onload = function () {
-	var postStatus = postRequest.status;
-	var data = postRequest.responseText;
-	if (postStatus == 201) {
-		alert("Submit successful.");
-		Tracker=window.open("http://www.fakenewsfitness.org/new-page-check","tracker","", "");
-	} else {
-		alert("There was a problem with your submission, response was: "+data);
-	}
-}
-postRequest.open("POST", url, true);
-postRequest.setRequestHeader("Content-Type", "application/json");
-postRequest.setRequestHeader("X-CSRF-Token", sessionToken);
-postRequest.send(postData);
-
-}}, function(err) {
-	alert(err);
-	}
-);
-
-}, function(err) {
-alert(err);
-});
-}
 }
 
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	// If the received message has the expected format...
 	//Process WHOIS from message data
-	var whoIsObj = JSON.parse(msg.whois).formatted_data;
-	if (whoIsObj.RegistrantName == undefined) {
-		var whoIsArr = ['https://whois.icann.org/en/lookup?name='+controller.domainFinder()];
-	} else {
-		var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
-	};
+	//TODO - add back whois lookup with new service
+	// var whoIsObj = JSON.parse(msg.whois).formatted_data;
+	// if (whoIsObj.RegistrantName == undefined) {
+	// 	var whoIsArr = ['https://whois.icann.org/en/lookup?name='+controller.domainFinder()];
+	// } else {
+	// 	var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
+	// };
+	whoIsArr = [];
 	// Process URL here so we only run controller function once
 	var thisURL = controller.getURL();
 
@@ -353,8 +96,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
 	//Build the form
 	makeForm(msg.config.filled_form_page_1, msg.config.filled_form_page_2, msg.config.typeAndOG);
+	googleDriveDocumentTitle = msg.config.documentTitle;
+	googleDriveAPIToken = msg.googleDriveAPIToken
 	});
-
 
 //flow controller revealing module - contains various page parsing methods
 var controller = (function(){
@@ -595,16 +339,17 @@ function addLinkItem(item, parentItem) {
 
 //build object to send to server, then send to server
 function buildObject(fields, fieldsP2, config, mode) {
+	fieldValueObject = [];
 	obj = {};
-	p1Max = fields.length;
-	for (var f = 0; f < p1Max; f++) {
+	for (var f = 0; f < fields.length; f++) {
 		obj[fields[f][0]] = document.getElementById(fields[f][0]);
-		obj[fields[f][0]].field = fields[f][5];
+		fieldName = fieldNameLookupObject[fields[f][0]];
+		fieldValueObject.push({"field": fields[f][5], "value": getFieldValue(fields[f]), "fieldName": fieldName});
 	}
-	p2Max = fieldsP2.length;
-	for (var c = 0; c <p2Max; c++) {
+	for (var c = 0; c <fieldsP2.length; c++) {
 		obj[fieldsP2[c][0]] = document.getElementById(fieldsP2[c][0]);
-		obj[fieldsP2[c][0]].field = fieldsP2[c][5];
+		fieldName = fieldNameLookupObject[fieldsP2[c][0]];
+		fieldValueObject.push({"field": fieldsP2[c][5], "value": getFieldValue(fieldsP2[c]), "fieldName": fieldName});
 	}
 	obj.type = config[0].type;
 	obj.mode = mode;
@@ -613,7 +358,46 @@ function buildObject(fields, fieldsP2, config, mode) {
 	} else {
 		obj.OG = obj.OG.value;
 	}
+	obj.fieldValue = fieldValueObject;
 	return obj;
+}
+
+function getFieldValue(fieldData) {
+	fieldValue = document.getElementById(fieldData[0]).value;
+	if (fieldData[3][0] === 's') {
+		fieldValue = getLikertValue(obj[fieldData[0]]);
+	} else if (fieldData[3] === 'b') {
+		fieldValue = getCheckboxValue(obj[fieldData[0]]);
+	} else if (fieldData[3] === 'vl') {
+		fieldValue = getListValue(obj[fieldData[0]]);
+	}
+	return fieldValue ? fieldValue : '';
+}
+
+function getLikertValue(fieldData) {
+	value = '';
+	var items = fieldData.childNodes;
+	for (var i = 0; i < items.length; i++) {
+		if (items[i].childNodes[1].checked === true) {
+			value = parseInt(items[i].childNodes[1].value);
+			return value;
+		}
+	}
+}
+
+function getCheckboxValue(fieldData) {
+	return fieldData.checked ? 'yes' : 'no';
+}
+
+function getListValue(fieldData) {
+	try {
+		value = fieldData.childNodes[0].innerText;
+		value = value.replaceAll('\n', '; ')
+	}
+	catch(err) {
+		value = '';
+	}
+	return value;
 }
 // create form on page one
 function makeForm(fields, fieldsP2, config) {
@@ -625,6 +409,7 @@ function makeForm(fields, fieldsP2, config) {
 	// Build Page 1 Elements
 	var formName = document.createElement("form");
 	for(var i = 0; i < fields.length; i++){
+		fieldNameLookupObject[fields[i][0]] = fields[i][1];
 		var labelElement = document.createElement("label");
 		labelElement.setAttribute("for", fields[i][0]);
 		if (fields[i][4] == 0) {
@@ -835,14 +620,13 @@ function makeForm(fields, fieldsP2, config) {
 		}
 		// MBM1
 		if (fields[i][6] != "") {
-			var	helpHref="https://"+fields[i][6];	
+			var	helpHref="https://"+fields[i][6];
 			var helpLink = document.createElement("a");
 			helpLink.href = helpHref;
 			helpLink.className +=" help-link";
 			helpLink.setAttribute('target', '_blank');
 			var helpImg = document.createElement("img");
-			var helpIcon = chrome.extension.getURL("/help.png");
-			helpImg.src = helpIcon;
+			helpImg.src = chrome.runtime.getURL("/help.png");
 			helpLink.appendChild(helpImg);
 			formName.appendChild(helpLink);
 		}
@@ -904,6 +688,7 @@ function makeForm(fields, fieldsP2, config) {
 
 	// Create form on page 2
 	for(var i = 0; i < fieldsP2.length; i++){
+		fieldNameLookupObject[fieldsP2[i][0]] = fieldsP2[i][1];
 		var labelElement = document.createElement("label");
 		labelElement.setAttribute("for", fieldsP2[i][0]);
 		if (fieldsP2[i][4] == 0) {
@@ -1178,3 +963,70 @@ function makeForm(fields, fieldsP2, config) {
 	document.getElementsByTagName('body')[0].appendChild(formDiv);
 	};
 };
+
+async function createDriveFile(fileData = '', fileName = '') {
+	sectionBoundary = '981273423198471923847';
+	metaData = {'name': fileName};
+	dataToSend = '--' + sectionBoundary + '\n' +
+		'Content-Type: application/json\n' +
+		'\n' +
+		JSON.stringify(metaData) +
+		'\n' +
+		'--' + sectionBoundary + '\n' +
+		'Content-Type: text/html\n' +
+		'\n' +
+		fileData +
+		'\n' +
+		'--' + sectionBoundary + '--';
+	url = "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
+		const response = await fetch(url, {
+			method: 'POST', // *GET, POST, PUT, DELETE, etc.
+			mode: 'cors', // no-cors, *cors, same-origin
+			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+			credentials: 'same-origin', // include, *same-origin, omit
+			headers: {
+				'Content-Type': 'multipart/related; boundary=' + sectionBoundary,
+				'Accept': 'text/html',
+				'Content-Length': dataToSend.length,
+				'Authorization': 'Bearer ' + googleDriveAPIToken
+				// 'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			redirect: 'follow', // manual, *follow, error
+			referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+			body: dataToSend // body data type must match "Content-Type" header
+		});
+	responseJson = response.json();
+	return responseJson;
+}
+
+//create the document as an object so it can be manipulated, if needed
+function addDocumentItem(documentObject, tag, header, text) {
+	item = {};
+	item.tag = tag;
+	item.header = header;
+	item.text = text;
+	documentObject.body.content.push(item);
+	return documentObject;
+}
+
+function convertObjectToHtml(dataObject) {
+	htmlString = '<html><body>';
+	for (const [key, value] of Object.entries(dataObject.body.content)) {
+		htmlString += '<h3 sectionId="' + replaceHtmlTags(value.tag) + '">' + replaceHtmlTags(value.header) + '</h3>';
+		htmlString += '<p sectionId="' + replaceHtmlTags(value.tag) + '">' + replaceHtmlTags(value.text) + '</p>';
+	}
+	htmlString += '</body></html>';
+	return htmlString;
+}
+
+function replaceHtmlTags(value) {
+	try {
+		value = value.toString().replaceAll('<', "{");
+		value = value.toString().replaceAll('>', "}");
+	} catch(err) {
+		console.log(err);
+		console.log(value);
+	}
+
+	return value;
+}
