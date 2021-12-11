@@ -281,6 +281,9 @@ function addLink() {
 function checkRequired () {
 	var FNrequired = document.getElementsByClassName("FNrequired");
 		var reqmax = FNrequired.length;
+		if (reqmax === 0) {
+			return true;
+		}
 		for (var r = 0; r<reqmax; r++) {
 			if (FNrequired[r].value == "") {
 				return false;
@@ -353,10 +356,11 @@ function buildObject(fields, fieldsP2, config, mode) {
 	}
 	obj.type = config[0].type;
 	obj.mode = mode;
-	if (obj.OG.value == "") {
+	if (obj.OG && obj.OG.value == "") {
 		obj.OG = config[1].groupID;
 	} else {
-		obj.OG = obj.OG.value;
+		obj.OG = {};
+		obj.OG.value = '';
 	}
 	obj.fieldValue = fieldValueObject;
 	return obj;
@@ -973,7 +977,7 @@ async function createDriveFile(fileData = '', fileName = '') {
 		JSON.stringify(metaData) +
 		'\n' +
 		'--' + sectionBoundary + '\n' +
-		'Content-Type: text/html\n' +
+		'Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\n' +
 		'\n' +
 		fileData +
 		'\n' +

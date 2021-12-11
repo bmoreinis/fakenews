@@ -1,7 +1,5 @@
 {
 	"filled_form_page_1":[
-		["OG","Group ID #"												,"","f",1,"field_og","fakenewsfitness.org/classes/auerbach-science"],
-		["extensionId","Email as Username"								,"","f",1,"field_extension_id",""],
 		["url","Page URL"												,"","f",0,"field_page_url",""],
 		["dn","Domain Name"												,"","f",0,"field_domain_name","fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"],
 		["tld","Top Level Domain ( TLD )"								,"","f",0,"field_top_level_domain","fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"],
