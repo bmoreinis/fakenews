@@ -33,16 +33,7 @@ function sendToServer(obj) {
 
 // Listen for messages
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-	// If the received message has the expected format...
-	//Process WHOIS from message data
-	//TODO - add back whois lookup with new service
-	// var whoIsObj = JSON.parse(msg.whois).formatted_data;
-	// if (whoIsObj.RegistrantName == undefined) {
-	// 	var whoIsArr = ['https://whois.icann.org/en/lookup?name='+controller.domainFinder()];
-	// } else {
-	// 	var whoIsArr = [whoIsObj.RegistrantName, whoIsObj.RegistrantOrganization, whoIsObj["RegistrantState/Province"], whoIsObj.RegistrantCountry, whoIsObj.RegistrantPhone, whoIsObj.RegistrantEmail];
-	// };
-	whoIsArr = [];
+	
 	// Process URL here so we only run controller function once
 	var thisURL = controller.getURL();
 
@@ -87,7 +78,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 			msg.config.filled_form_page_2[i][2] = controller.aboutFinder();
 			break;
 			case "whois":
-			msg.config.filled_form_page_2[i][2] = whoIsArr;
+			msg.config.filled_form_page_2[i][2] = msg.whois;
 			break;
 			default:
 			msg.config.filled_form_page_2[i][2] = ""
