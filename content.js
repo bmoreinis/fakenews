@@ -1,14 +1,18 @@
 var fieldNameLookupObject = {};
 function sendToServer(obj) {
 	//build the document
-	documentObject = {};
+	var documentObject = {};
 	documentObject.title = '';
 	documentObject.body = {};
 	documentObject.body.content = [];
+	var studentName = '';
 
 	for(var i = 0; i < obj.fieldValue.length; i++){
 		fieldValueItem = obj.fieldValue[i];
 		documentObject = addDocumentItem(documentObject, fieldValueItem['field'], fieldValueItem['fieldName'], fieldValueItem['value']);
+		if (fieldValueItem['field'] === 'field_student_name') {
+			studentName = fieldValueItem['value'];
+		}
 	}
 
 	//Check mode (download or post) and do it.
@@ -16,8 +20,11 @@ function sendToServer(obj) {
 		chrome.runtime.sendMessage({text:'download', downloadData: JSON.stringify(documentObject)}, null);
 	}
 	else {
-		htmlToPost = convertObjectToHtml(documentObject);
-		createDriveFile(htmlToPost, googleDriveDocumentTitle )
+		const htmlToPost = convertObjectToHtml(documentObject);
+		var documentTitle = studentName ? googleDriveDocumentTitle + ' by ' + studentName : googleDriveDocumentTitle;
+		const today = new Date();
+		documentTitle += " (" + (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear() + ")";
+		createDriveFile(htmlToPost, documentTitle )
 			.then(data => {
 				if (data.error) {
 					errorMessage = data.error.message ? "There was an error submitting your data: " + data.error.message : "There was an unknown error submitting your data.";
