@@ -26,8 +26,6 @@ function sendToServer(obj) {
 					alert("Thank you for submitting your data. Please visit your Google Drive and view the document " + googleDriveDocumentTitle + ".")
 				}
 			});
-	//Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
-
 	}
 }
 
@@ -365,6 +363,8 @@ function getFieldValue(fieldData) {
 		fieldValue = getCheckboxValue(obj[fieldData[0]]);
 	} else if (fieldData[3] === 'vl') {
 		fieldValue = getListValue(obj[fieldData[0]]);
+	} else if (fieldData[3] === 'v') {
+		fieldValue = getArrayValue(obj[fieldData[0]]);
 	}
 	return fieldValue ? fieldValue : '';
 }
@@ -393,6 +393,16 @@ function getListValue(fieldData) {
 		value = '';
 	}
 	return value;
+}
+
+function getArrayValue(fieldData) {
+	value = '';
+	var items = fieldData.childNodes;
+	for (var i = 0; i < items.length; i++) {
+		value += items[i].childNodes[0].textContent + "\n";
+	}
+	//remove the last line break
+	return value.length > 0 ? value.substring(0, value.length - 1) : "";
 }
 // create form on page one
 function makeForm(fields, fieldsP2, config) {
@@ -1018,6 +1028,7 @@ function replaceHtmlTags(value) {
 	try {
 		value = value.toString().replaceAll('<', "{");
 		value = value.toString().replaceAll('>', "}");
+		value = value.toString().replaceAll('\n', "<br />");
 	} catch(err) {
 		console.log(err);
 		console.log(value);
