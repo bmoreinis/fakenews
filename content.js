@@ -1,14 +1,18 @@
 var fieldNameLookupObject = {};
 function sendToServer(obj) {
 	//build the document
-	documentObject = {};
+	var documentObject = {};
 	documentObject.title = '';
 	documentObject.body = {};
 	documentObject.body.content = [];
+	var studentName = '';
 
 	for(var i = 0; i < obj.fieldValue.length; i++){
 		fieldValueItem = obj.fieldValue[i];
 		documentObject = addDocumentItem(documentObject, fieldValueItem['field'], fieldValueItem['fieldName'], fieldValueItem['value']);
+		if (fieldValueItem['field'] === 'field_student_name') {
+			studentName = fieldValueItem['value'];
+		}
 	}
 
 	//Check mode (download or post) and do it.
@@ -16,8 +20,11 @@ function sendToServer(obj) {
 		chrome.runtime.sendMessage({text:'download', downloadData: JSON.stringify(documentObject)}, null);
 	}
 	else {
-		htmlToPost = convertObjectToHtml(documentObject);
-		createDriveFile(htmlToPost, googleDriveDocumentTitle )
+		const htmlToPost = convertObjectToHtml(documentObject);
+		var documentTitle = studentName ? googleDriveDocumentTitle + ' by ' + studentName : googleDriveDocumentTitle;
+		const today = new Date();
+		documentTitle += " (" + (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear() + ")";
+		createDriveFile(htmlToPost, documentTitle )
 			.then(data => {
 				if (data.error) {
 					errorMessage = data.error.message ? "There was an error submitting your data: " + data.error.message : "There was an unknown error submitting your data.";
@@ -26,8 +33,6 @@ function sendToServer(obj) {
 					alert("Thank you for submitting your data. Please visit your Google Drive and view the document " + googleDriveDocumentTitle + ".")
 				}
 			});
-	//Promise Pattern for 3 requests to Drupal (get session token, get user id from email input, POST node if previous promises fulfilled)
-
 	}
 }
 
@@ -44,25 +49,25 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	for (var i = 0; i < configMax1; i++) {
 		switch (msg.config.filled_form_page_1[i][0]) {
 			case "url":
-			msg.config.filled_form_page_1[i][2] = thisURL[0];
-			break;
+				msg.config.filled_form_page_1[i][2] = thisURL[0];
+				break;
 			case "pageTitle":
-			msg.config.filled_form_page_1[i][2] = controller.getTitle();
-			break;
+				msg.config.filled_form_page_1[i][2] = controller.getTitle();
+				break;
 			case "pageArticle":
-			msg.config.filled_form_page_1[i][2] = controller.getArticle();
-			break;
+				msg.config.filled_form_page_1[i][2] = controller.getArticle();
+				break;
 			case "dn":
-			msg.config.filled_form_page_1[i][2] = controller.domainFinder();
-			break;
+				msg.config.filled_form_page_1[i][2] = controller.domainFinder();
+				break;
 			case "tld":
-			msg.config.filled_form_page_1[i][2] = controller.tldParser();
-			break;
+				msg.config.filled_form_page_1[i][2] = controller.tldParser();
+				break;
 			case "modifiedDate":
-			msg.config.filled_form_page_1[i][2] = controller.dateFinder();
-			break;
+				msg.config.filled_form_page_1[i][2] = controller.dateFinder();
+				break;
 			default:
-			msg.config.filled_form_page_1[i][2] = ""
+				msg.config.filled_form_page_1[i][2] = ""
 		}
 	}
 	// Add vars to form array p2 from config, for auto-fill.
@@ -72,16 +77,16 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	for (var i = 0; i < configMax2; i++) {
 		switch (msg.config.filled_form_page_2[i][0]) {
 			case "allLinks":
-			msg.config.filled_form_page_2[i][2] = controller.linkFinder();
-			break;
+				msg.config.filled_form_page_2[i][2] = controller.linkFinder();
+				break;
 			case "aboutLinks":
-			msg.config.filled_form_page_2[i][2] = controller.aboutFinder();
-			break;
+				msg.config.filled_form_page_2[i][2] = controller.aboutFinder();
+				break;
 			case "whois":
-			msg.config.filled_form_page_2[i][2] = msg.whois;
-			break;
+				msg.config.filled_form_page_2[i][2] = msg.whois;
+				break;
 			default:
-			msg.config.filled_form_page_2[i][2] = ""
+				msg.config.filled_form_page_2[i][2] = ""
 		}
 	}
 
@@ -200,37 +205,63 @@ function dateFinder () {
 };
 
 // lists all links within body of page
-function linkFinder () {
-	var array = [];
-	var paragraphs = document.getElementsByTagName("p");
-	// set maximum number of links to pre-fill
-	var maxLinks = 5;
-		for(var i=0, max = paragraphs.length; i<max; i++) {
-			for(var x=0, Xmax = paragraphs[i].children.length; x < Xmax; x++) {
-				if (paragraphs[i].children[x].tagName == "A") {
-				  var url = paragraphs[i].children[x].href
-				  //check that it's not an internal link
-				  if (url.indexOf("http") == 0 ) {
-					var baseToCheck = url.split("/")[2].split(".");
-					if (baseToCheck.length === 3) {
-					  var domainToCheck = baseToCheck[1]+"."+baseToCheck[2];
-					}
-					else {
-					  var domainToCheck = baseToCheck[0]+"."+baseToCheck[1];
-					}
-					//check that link is a source e.g. outside of this domain
-					if (controller.domainFinder() !== domainToCheck) {
-				    //enforce max links setting
-				      if (array.length < maxLinks) {
-					    array.push(paragraphs[i].children[x].href)
-				      }
-					}
-				  }
+	function linkFinder () {
+		var linkList = [];
+		var link;
+		var article = '';
+		var articleElements = document.getElementsByTagName("article");
+		if (articleElements.length != 0) {
+			article = articleElements[0];
+		} else {
+			articleElements = document.getElementsByTagName("div");
+			for (var i = 0; i < articleElements.length; i++) {
+				if (articleElements[i].getAttribute('id') === 'content') {
+					article = articleElements[i];
 				}
 			}
 		}
-	return array;
-};
+		if (article) {
+			const allLinks = article.getElementsByTagName('a');
+			for (var i = 0; i < allLinks.length; i++) {
+				link = allLinks[i].getAttribute('href');
+				if (link && link.indexOf('http') === 0 &&
+					!checkSelfReferralLink(link) &&
+					!checkSocialPostLink(link)) {
+					linkList.push(link);
+				}
+			}
+		}
+		return linkList;
+	};
+
+
+function checkSocialPostLink(link) {
+	const socialPostUrls = [
+		'https://www.facebook.com/dialog/feed',
+		'https://api.whatsapp.com/send',
+		'https://twitter.com/intent/tweet',
+		'https://www.linkedin.com/shareArticle',
+		'https://pinterest.com/pin/create'
+	];
+	for (var i = 0; i < socialPostUrls.length; i++) {
+		if (link.indexOf(socialPostUrls[i]) === 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function checkSelfReferralLink(link) {
+	var baseToCheck = link.split("/")[2].split(".");
+	if (baseToCheck.length === 3) {
+		var domainToCheck = baseToCheck[1]+"."+baseToCheck[2];
+	}
+	else {
+		var domainToCheck = baseToCheck[0]+"."+baseToCheck[1];
+	}
+	//check that link is a source e.g. outside of this domain
+	return controller.domainFinder() === domainToCheck;
+}
 
 // does something like http://smallseotools.com/backlink-checker/
 function backlinkCounter () {
@@ -365,6 +396,8 @@ function getFieldValue(fieldData) {
 		fieldValue = getCheckboxValue(obj[fieldData[0]]);
 	} else if (fieldData[3] === 'vl') {
 		fieldValue = getListValue(obj[fieldData[0]]);
+	} else if (fieldData[3] === 'v') {
+		fieldValue = getArrayValue(obj[fieldData[0]]);
 	}
 	return fieldValue ? fieldValue : '';
 }
@@ -385,14 +418,28 @@ function getCheckboxValue(fieldData) {
 }
 
 function getListValue(fieldData) {
+	var value = '';
 	try {
-		value = fieldData.childNodes[0].innerText;
-		value = value.replaceAll('\n', '; ')
+		for (var i = 0; i < fieldData.childNodes.length; i++) {
+			if (fieldData.childNodes[i].innerText) {
+				value += fieldData.childNodes[i].innerText + "\n"
+			}
+		}
 	}
 	catch(err) {
 		value = '';
 	}
 	return value;
+}
+
+function getArrayValue(fieldData) {
+	value = '';
+	var items = fieldData.childNodes;
+	for (var i = 0; i < items.length; i++) {
+		value += items[i].childNodes[0].textContent + "\n";
+	}
+	//remove the last line break
+	return value.length > 0 ? value.substring(0, value.length - 1) : "";
 }
 // create form on page one
 function makeForm(fields, fieldsP2, config) {
@@ -1018,6 +1065,7 @@ function replaceHtmlTags(value) {
 	try {
 		value = value.toString().replaceAll('<', "{");
 		value = value.toString().replaceAll('>', "}");
+		value = value.toString().replaceAll('\n', "<br />");
 	} catch(err) {
 		console.log(err);
 		console.log(value);

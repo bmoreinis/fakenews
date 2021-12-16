@@ -53,6 +53,7 @@ function whoisLookup( tab_url, config ) {
 
 function formatWhois( data ) {
 	var output = [];
+	var val = '';
 	var fields = {
 		'registrant': 'Registrant Contact',
 		'registration_date': 'Registration Date',
@@ -61,10 +62,20 @@ function formatWhois( data ) {
 
 	Object.keys( fields ).forEach( function(f ) {
 		if ( data[f] ) {
-			var val = Array.isArray( data[f] ) ? data[f].join("\n") : data[f];
+			if (f === 'registration_date') {
+				val = formatDate(data[f]);
+			} else {
+				val = Array.isArray( data[f] ) ? data[f].join(", ") : data[f];
+			}
+
 			output.push( fields[f] + ': ' + val );
 		}
 	});
 
 	return output;
+}
+
+function formatDate (dateString) {
+	var dateArray = dateString.split("-");
+	return dateArray[1]+ "/" +dateArray[2]+ "/" +dateArray[0];
 }
