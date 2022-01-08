@@ -114,6 +114,22 @@ a.help-link img {
 #FakeNewsForm div#blankLinks input.newField {
 }
 
+input[type=checkbox]
+{
+  -webkit-appearance:checkbox;
+}
+
+#FakeNewsForm input#headlinMatch {
+  color: white!important;
+  width: 1.15em;
+  height: 1.5em;
+  border: 0.15em solid black;
+  background-color: white!important;
+  border-radius: 0.15em;
+  margin-left: 120px;
+  transform: translateY(-0.075em);
+}
+
 #FakeNewsForm form .likert {
   list-style:none;
   width:100%;
