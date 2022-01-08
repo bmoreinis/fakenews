@@ -23,7 +23,7 @@ body
     top: 0;
     left: 0;
     z-index: 200;
-    height: 400px;
+    height: 800px;
     padding:15px;
     width: 100%;
     border-radius: 10px;
@@ -107,6 +107,7 @@ a.help-link img {
     line-height: 1.75;
 }
 
+
 #FakeNewsForm div#blankLinks input.emptyField {
     width:600px;
 }
@@ -114,10 +115,9 @@ a.help-link img {
 #FakeNewsForm div#blankLinks input.newField {
 }
 
-input[type=checkbox]
-{
-  -webkit-appearance:checkbox;
-}
+/* -- Checkbox Fix -- */
+
+input[type=checkbox]{ -webkit-appearance:checkbox;}
 
 #FakeNewsForm input#headlinMatch {
   color: white!important;
@@ -130,8 +130,16 @@ input[type=checkbox]
   transform: translateY(-0.075em);
 }
 
+/* -- Radio Button Fix -- */
+
+input[type="radio"] { -webkit-appearance: radio; }
+input[type="submit"], input[type="button"] { -webkit-appearance: button; }
+select { -webkit-appearance:textfield; }
+input[type="checkbox"], input[type="radio"] {
+    width: auto;
+}
 #FakeNewsForm form .likert {
-  list-style:none;
+    list-style:none;
   width:100%;
   margin:0;
   padding:0 0 35px;
@@ -158,15 +166,18 @@ input[type=checkbox]
 }
 #FakeNewsForm form .likert li input[type=radio] {
   display:inline-block;
+  -moz-appearance: radio !important;
+  -webkit-appearance: radio !important;
   position:relative;
   top:0;
   /*left:50%;
   margin-left:-6px;*/
   width: auto;
   margin-left:5px;
-
 }
+
 #FakeNewsForm form .likert li label {width:100%;}
+
 #FakeNewsForm form .buttons {
   margin:30px 0;
   padding:0 4.25%;
