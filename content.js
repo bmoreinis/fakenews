@@ -631,9 +631,10 @@ function makeForm(fields, fieldsP2, config) {
 						inputElement.setAttribute('value',x+1);
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values3[x]);
+						listItem.appendChild(inputElement);
 						labelElement.appendChild(labelText);
 						listItem.appendChild(labelElement);
-						listItem.appendChild(inputElement);
+
 						listNode.appendChild(listItem);
 					}
 				formName.appendChild(listNode);
@@ -648,13 +649,13 @@ function makeForm(fields, fieldsP2, config) {
 						var listItem = document.createElement("LI");
 						var inputElement = document.createElement("input"); //input element, text
 						inputElement.setAttribute('type',"radio");
-						inputElement.setAttribute('name',"likerts51");
+						inputElement.setAttribute('name',"likerts5");
 						inputElement.setAttribute('value',x+1);
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values5[x]);
+						listItem.appendChild(inputElement);
 						labelElement.appendChild(labelText);
 						listItem.appendChild(labelElement);
-						listItem.appendChild(inputElement);
 						listNode.appendChild(listItem);
 					}
 				formName.appendChild(listNode);
