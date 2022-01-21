@@ -21,7 +21,8 @@ function sendToServer(obj) {
 	}
 	else {
 		const htmlToPost = convertObjectToHtml(documentObject);
-		var documentTitle = studentName ? googleDriveDocumentTitle + ' by ' + studentName : googleDriveDocumentTitle;
+		const documentTitleWithArticleTitle = googleDriveDocumentTitle + controller.getTitle();
+		var documentTitle = studentName ? documentTitleWithArticleTitle + ' by ' + studentName : documentTitleWithArticleTitle;
 		const today = new Date();
 		documentTitle += " (" + (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear() + ")";
 		createDriveFile(htmlToPost, documentTitle )
