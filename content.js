@@ -31,7 +31,7 @@ function sendToServer(obj) {
 					errorMessage = data.error.message ? "There was an error submitting your data: " + data.error.message : "There was an unknown error submitting your data.";
 					alert(errorMessage)
 				} else {
-					alert("Thank you for submitting your data. Please visit your Google Drive and view the document " + googleDriveDocumentTitle + ".")
+					alert("Thank you for submitting your data. Please visit your Google Drive and view the document " + documentTitle + ".")
 				}
 			});
 	}
@@ -42,6 +42,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	
 	// Process URL here so we only run controller function once
 	var thisURL = controller.getURL();
+
+	const jsonLd = controller.getJsonLd();
 
 	// Add vars to twoform arrays from config, for auto-fill. Default is "".
 	// This way we can configure new fields that don't autofill in any order
@@ -65,7 +67,16 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 				msg.config.filled_form_page_1[i][2] = controller.tldParser();
 				break;
 			case "modifiedDate":
-				msg.config.filled_form_page_1[i][2] = controller.dateFinder();
+				msg.config.filled_form_page_1[i][2] = controller.dateFinder(jsonLd);
+				break;
+			case "articleAuthor":
+				msg.config.filled_form_page_1[i][2] = controller.getJsonLdValue(jsonLd,"author", "name");
+				break;
+			case "articleAuthorLink":
+				msg.config.filled_form_page_1[i][2] = controller.getAuthorLink(jsonLd);
+				break;
+			case "pageType":
+				msg.config.filled_form_page_1[i][2] = controller.getJsonLdValue(jsonLd,"@type");
 				break;
 			default:
 				msg.config.filled_form_page_1[i][2] = ""
@@ -141,16 +152,60 @@ var controller = (function(){
 	}
 }
 
-// extract first <h1> from HTML
-  function getArticle () {
-	var article = document.getElementsByTagName("h1")
-	if (article.length == 0) {
-		return "No <h1> found. Paste Headline here.";
+// extract json-ld from HTML
+  function getJsonLd () {
+  	var returnValue = ''
+  	const jsonLdString = document.querySelectorAll('script[type="application/ld+json"]');
+  	if (jsonLdString.length > 0) {
+	    returnValue = JSON.parse(jsonLdString[0].text);
+    } else {
+  		returnValue = {};
+    }
+  	return returnValue;
+}
+
+function getJsonLdValue(jsonLd, field, subfield = null) {
+	if (field in jsonLd) {
+		const fieldValue = jsonLd[field];
+		if (subfield) {
+			return fieldValue[0][subfield];
+		} else {
+			return fieldValue
+		}
 	} else {
-		var areturn = article[0].innerText;
-		return areturn;
+		return '';
 	}
 }
+
+
+
+// extract author link from jsonLd
+	function getAuthorLink (jsonLd) {
+		const authorName = getJsonLdValue(jsonLd, "author", "name");
+		const authorUrl = getJsonLdValue(jsonLd, "author", "url");
+  	   if (authorName && authorUrl) {
+			var itemLink = document.createElement('a')
+			var linkText = document.createTextNode(authorName);// Create a text node
+			itemLink.appendChild(linkText);
+			itemLink.href = authorUrl;
+			itemLink.setAttribute('target', '_blank');
+			//TODO - fix issue where link is not clickable
+			return itemLink;
+		} else {
+			return ['n/a'];
+		}
+	}
+
+// extract first <h1> from HTML
+	function getArticle () {
+		var article = document.getElementsByTagName("h1")
+		if (article.length == 0) {
+			return "No <h1> found. Paste Headline here.";
+		} else {
+			var areturn = article[0].innerText;
+			return areturn;
+		}
+	}
 
 // search document.body for ABOUT US or similar in menu lists
   function aboutFinder () {
@@ -182,26 +237,35 @@ var controller = (function(){
 };
 
 // search document.body for posted date above or below body
-function dateFinder () {
-	var modifiedDate = new Date(document.lastModified);
-	var today = new Date();
-	//Check for dynamically created page
-	if (String(modifiedDate) !== String(today)) {
-		var splitDate = String(modifiedDate).split(' ');
-		var returnDate = splitDate[0]+' '+splitDate[1]+' '+splitDate[2]+' '+splitDate[3];
-		return returnDate;
-	}
-	//If modifiedDate doesn't work, search page for updated, posted, revised, modified + date
-	else {
-		var bodyTag = document.getElementsByTagName("body");
-		var bodyDates = bodyTag[0].innerText.match(/((((U|u)pdated)|((P|p)osted)|((R|r)evised)|((M|m)odified))( |: | on )(\d{1,2})(-|\/)(\d{1,2})(-|\/)(\d{4}))|(\d{1,2})(-|\/)(\d{1,2})(-|\/)(\d{4})/);
-		//Check that we found anything
-		if (bodyDates) {
-		return bodyDates.toString();
+function dateFinder (jsonLd) {
+	const dateModified = getJsonLdValue(jsonLd, "dateModified")
+	const datePublished = getJsonLdValue(jsonLd, "datePublished")
+	if (dateModified) {
+		return formatDate(dateModified);
+	} else if (datePublished) {
+		return formatDate(datePublished);
+	} else {
+		var modifiedDate = new Date(document.lastModified);
+		var today = new Date();
+		//Check for dynamically created page
+		if (String(modifiedDate) !== String(today)) {
+			var splitDate = String(modifiedDate).split(' ');
+			var returnDate = splitDate[0] + ' ' + splitDate[1] + ' ' + splitDate[2] + ' ' + splitDate[3];
+			return returnDate;
 		}
+		//If modifiedDate doesn't work, search page for updated, posted, revised, modified + date
 		else {
-		return 'No dates found.  Enter if you find one.';
-		};
+			var bodyTag = document.getElementsByTagName("body");
+			var bodyDates = bodyTag[0].innerText.match(/((((U|u)pdated)|((P|p)osted)|((R|r)evised)|((M|m)odified))( |: | on )(\d{1,2})(-|\/)(\d{1,2})(-|\/)(\d{4}))|(\d{1,2})(-|\/)(\d{1,2})(-|\/)(\d{4})/);
+			//Check that we found anything
+			if (bodyDates) {
+				return bodyDates.toString();
+			} else {
+				return 'No dates found.  Enter if you find one.';
+			}
+			;
+		}
+		;
 	};
 };
 
@@ -278,6 +342,9 @@ return {
 	dateFinder : dateFinder,
 	getTitle : getTitle,
 	getArticle : getArticle,
+	getAuthorLink: getAuthorLink,
+	getJsonLdValue: getJsonLdValue,
+	getJsonLd: getJsonLd,
 	aboutFinder : aboutFinder
 };
 
@@ -1073,4 +1140,10 @@ function replaceHtmlTags(value) {
 	}
 
 	return value;
+}
+
+//TODO - make a js file for this and other shared functions
+function formatDate (dateString) {
+	var dateArray = dateString.split("-");
+	return dateArray[1]+ "/" +dateArray[2].substr(0,2)+ "/" +dateArray[0];
 }
