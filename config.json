@@ -1,12 +1,14 @@
 {
 	"filled_form_page_1":[
 		["studentName","Student Name"									,"","f",0,"field_student_name",""],
+		["pageType","Page Type"											,"","f",0,"field_page_type",""],
 		["url","Page URL"												,"","f",0,"field_page_url",""],
 		["dn","Domain Name"												,"","f",0,"field_domain_name","fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"],
 		["tld","Top Level Domain ( TLD )"								,"","f",0,"field_top_level_domain","fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"],
 		["pageArticle","Headline ( First <H1> ) - Paste headline here!"	,"","f",0,"title",""],
 		["pageTitle","Page Title ( <title> ) - Could be headline?"		,"","f",0,"field_title",""],
 		["articleAuthor","Article Author"								,"","f",0,"field_article_author",""],
+		["articleAuthorLink","Author link"								,"","v",0,"field_article_author_link",""],
 		["modifiedDate","Dateline or Posted/Modified Date"				,"","f",0,"field_page_last_modified",""],
 		["headlinMatch","Headline Matches Content?"						,"","b",0,"field_headline_match",""],
 		["adContent","Advertising / Content Ratio ( Click one )"		,"","s51",0,"field_ad_content",""],
@@ -30,5 +32,5 @@
 	"typeAndOG":[
 		{"type":"page_check"},{"groupID":1}
 	],
-	"documentTitle": "My Fake News Assessment"
+	"documentTitle": "FNF - "
 }
