@@ -168,9 +168,13 @@ function getJsonLdValue(jsonLd, field, subfield = null) {
 	if (field in jsonLd) {
 		const fieldValue = jsonLd[field];
 		if (subfield) {
-			return fieldValue[0][subfield];
+			if (fieldValue.length) {
+				return fieldValue[0][subfield];
+			} else {
+				return fieldValue[subfield];
+			}
 		} else {
-			return fieldValue
+			return fieldValue;
 		}
 	} else {
 		return '';
