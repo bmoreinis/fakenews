@@ -9,12 +9,13 @@
 		["pageTitle","Page Title ( <title> ) - Could be headline?"		,"","f",0,"field_title",""],
 		["articleAuthor","Article Author"								,"","f",0,"field_article_author",""],
 		["articleAuthorLink","Author link"								,"","v",0,"field_article_author_link",""],
-		["modifiedDate","Dateline or Posted/Modified Date"				,"","f",0,"field_page_last_modified",""],
-		["headlinMatch","Headline Matches Content?"						,"","b",0,"field_headline_match",""],
-		["advertisingContent","Advertising / Content Ratio ( Click one )"		,"","s51",0,"field_ad_content",""],
-		["clickbaitRank","Clickbait Rank ( Click one )"					,"","s3",0,"field_clickbait_rank",""]
+		["modifiedDate","Dateline or Posted/Modified Date"				,"","f",0,"field_page_last_modified",""]
+
 	],
 	"filled_form_page_2":[
+		["headlinMatch","Headline Matches Content?"						,"","b",0,"field_headline_match",""],
+		["advertisingContent","Advertising / Content Ratio ( Click one )"		,"","s51",0,"field_ad_content",""],
+		["clickbaitRank","Clickbait Rank ( Click one )"					,"","s3",0,"field_clickbait_rank",""],
 		["allLinks","Page Links - remove non-sources"					,"","vl",0,"field_source_links",""],
 		["otherSources","Non-Linked Cited Sources"						,"","lt",0,"field_other_cited_sources",""],
 		["claimEvidence","Evidence for Claims"							,"","lt",0,"field_evidence_for_claims",""],
