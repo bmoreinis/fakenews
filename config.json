@@ -11,7 +11,7 @@
 		["articleAuthorLink","Author link"								,"","v",0,"field_article_author_link",""],
 		["modifiedDate","Dateline or Posted/Modified Date"				,"","f",0,"field_page_last_modified",""],
 		["headlinMatch","Headline Matches Content?"						,"","b",0,"field_headline_match",""],
-		["adContent","Advertising / Content Ratio ( Click one )"		,"","s51",0,"field_ad_content",""],
+		["advertisingContent","Advertising / Content Ratio ( Click one )"		,"","s51",0,"field_ad_content",""],
 		["clickbaitRank","Clickbait Rank ( Click one )"					,"","s3",0,"field_clickbait_rank",""]
 	],
 	"filled_form_page_2":[
