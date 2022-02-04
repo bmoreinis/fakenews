@@ -872,9 +872,23 @@ function makeForm(fields, fieldsP2, config) {
 	copyButton.addEventListener( 'click', function() {
 		var report = new FNF_Report( buildObject(fields, fieldsP2, config) );
 		var output = report.createReportText();
-		navigator.clipboard.writeText( output ).then( () => {
-			alert( 'Report copied. You may now paste it into your own document.' );
-		});
+		var message = 'Report copied. You may now paste it into your own document.';
+		if ( navigator.clipboard ) {
+			navigator.clipboard.writeText( output ).then( () => {
+				alert( message );
+			});
+		} else {
+			// Fallback for insecure pages.
+			var copyElement = document.createElement( 'textarea' );
+			copyElement.style.position = 'absolute';
+			copyElement.style.left = '-9999px';
+			formName.appendChild( copyElement );
+			copyElement.value = output;
+			copyElement.select();
+			document.execCommand('copy');
+			alert( message );
+		}
+
 	});
 
 	formName.appendChild( copyButton );
