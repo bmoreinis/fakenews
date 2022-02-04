@@ -998,7 +998,7 @@ function makeForm(fields, fieldsP2, config) {
 		/* ELI - Can we vary the values but use the same code for the slider? */
 			case "s31": // https://codepen.io/Buttonpresser/pen/qiuIx
 				var currentLikert = 0;
-				var values31 = ['1 = No Bias', '2 = Some Bias','3 = High Bias']
+				var values31 = ['1 = Low Bias', '2 = Some Bias','3 = High Bias']
 				var listNode = document.createElement("UL");
 					listNode.setAttribute("id", fieldsP2[i][0]);
 					listNode.setAttribute("class", "likert");
