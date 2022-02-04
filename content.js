@@ -1,30 +1,77 @@
 var fieldNameLookupObject = {};
 function sendToServer(obj) {
-	//build the document
-	var documentObject = {};
-	documentObject.title = '';
-	documentObject.body = {};
-	documentObject.body.content = [];
-	var studentName = '';
 
-	for(var i = 0; i < obj.fieldValue.length; i++){
-		fieldValueItem = obj.fieldValue[i];
-		documentObject = addDocumentItem(documentObject, fieldValueItem['field'], fieldValueItem['fieldName'], fieldValueItem['value']);
-		if (fieldValueItem['field'] === 'field_student_name') {
-			studentName = fieldValueItem['value'];
-		}
-	}
+	const report = new FNF_Report( obj );
 
 	//Check mode (download or post) and do it.
 	if (obj.mode == 'download') {
-		chrome.runtime.sendMessage({text:'download', downloadData: JSON.stringify(documentObject)}, null);
+		report.download();
+	} else {
+		report.createDriveFile();
 	}
-	else {
-		const htmlToPost = convertObjectToHtml(documentObject);
-		const documentTitleWithArticleTitle = googleDriveDocumentTitle + controller.getTitle();
-		var documentTitle = studentName ? documentTitleWithArticleTitle + ' by ' + studentName : documentTitleWithArticleTitle;
+}
+
+function FNF_Report( obj ) {
+	this.studentName = '';
+	this.documentObject = {};
+
+	if ( obj ) {
+		this.createDocumentObject( obj );
+	}
+}
+
+FNF_Report.prototype = {
+	createDocumentObject: function(obj) {
+		var documentObject = this.documentObject = {};
+		var fieldValueItem;
+
+		documentObject.title = '';
+		documentObject.body = {};
+		documentObject.body.content = [];
+
+		for(var i = 0; i < obj.fieldValue.length; i++){
+			fieldValueItem = obj.fieldValue[i];
+			documentObject = addDocumentItem(documentObject, fieldValueItem['field'], fieldValueItem['fieldName'], fieldValueItem['value']);
+			if (fieldValueItem['field'] === 'field_student_name') {
+				this.studentName = fieldValueItem['value'];
+			}
+		}
+	},
+
+	createReportHtml: function() {
+		return convertObjectToHtml(this.documentObject);
+	},
+
+	createReportText: function() {
+		const obj = this.documentObject;
+		var txt = '# ' + this.reportTitle() + "\n\n";
+
+		for (const [key, value] of Object.entries(obj.body.content)) {
+			txt += '## ' + value.header + "\n";
+			txt += value.text + "\n\n";
+		}
+
+		return txt;
+
+	},
+
+	reportTitle: function() {
+		var title = googleDriveDocumentTitle + controller.getTitle();
 		const today = new Date();
-		documentTitle += " (" + (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear() + ")";
+
+		if ( this.studentName ) {
+			title += ' by ' + this.studentName;
+		}
+
+		title += " (" + (today.getMonth() + 1) + "-" + today.getDate() + "-" + today.getFullYear() + ")";
+
+		return title;
+	},
+
+	createDriveFile: function() {
+		const htmlToPost = this.createReportHtml();
+		const documentTitle = this.reportTitle();
+
 		createDriveFile(htmlToPost, documentTitle )
 			.then(data => {
 				if (data.error) {
@@ -34,6 +81,35 @@ function sendToServer(obj) {
 					alert("Thank you for submitting your data. Please visit your Google Drive and view the document " + documentTitle + ".")
 				}
 			});
+
+	},
+
+	download: function() {
+	  const url = URL.createObjectURL( new Blob([this.createReportHtml()], {type: 'text/html'}) );
+	  //const url = URL.createObjectURL( new Blob([this.documentObject()], {type: 'application/json'}) );
+	  const filename = this.sanitizeFilename( this.reportTitle() ) + '.html';
+	  chrome.runtime.sendMessage( { text: 'download', url, filename } );
+	},
+
+	// Based on https://gist.github.com/barbietunnie/7bc6d48a424446c44ff4
+	sanitizeFilename: function( input, replacement ) {
+		if ( typeof replacement === 'undefined' ) {
+			replacement = '_';
+		}
+
+		const maxlength = 255;
+		const illegalRe = /[\/\?<>\\:\*\|":]/g;
+		const controlRe = /[\x00-\x1f\x80-\x9f]/g;
+		const reservedRe = /^\.+$/;
+		const windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+
+	  var sanitized = input
+	    .replace(illegalRe, replacement)
+	    .replace(controlRe, replacement)
+	    .replace(reservedRe, replacement)
+	    .replace(windowsReservedRe, replacement);
+
+		return sanitized.split("").splice(0, maxlength).join("");
 	}
 }
 
@@ -754,7 +830,8 @@ function makeForm(fields, fieldsP2, config) {
 		if (check == true) {
 			formName.style.display = 'hidden';
 			p2Form.style.display = 'block';
-			p2Form.appendChild(downloadElement);
+			//p2Form.appendChild(downloadElement);
+			p2Form.appendChild(copyButton)
 		} else {
 			alert ('Please fill out required fields');
 		};
@@ -782,9 +859,38 @@ function makeForm(fields, fieldsP2, config) {
 	downloadElement.setAttribute('id','FNdownload');
 	downloadElement.addEventListener('click', function() {
 		var mode = "download";
+		console.log( 'download click' );
 		sendToServer(buildObject(fields, fieldsP2, config, mode))
 	}, false)
-	formName.appendChild(downloadElement);
+	//formName.appendChild(downloadElement);
+
+
+	var copyButton = document.createElement( 'input' );
+	copyButton.type = 'button';
+	copyButton.value = 'Copy/Paste report';
+	copyButton.addEventListener( 'click', function() {
+		var report = new FNF_Report( buildObject(fields, fieldsP2, config) );
+		var output = report.createReportText();
+		var message = 'Report copied. You may now paste it into your own document.';
+		if ( navigator.clipboard ) {
+			navigator.clipboard.writeText( output ).then( () => {
+				alert( message );
+			});
+		} else {
+			// Fallback for insecure pages.
+			var copyElement = document.createElement( 'textarea' );
+			copyElement.style.position = 'absolute';
+			copyElement.style.left = '-9999px';
+			formName.appendChild( copyElement );
+			copyElement.value = output;
+			copyElement.select();
+			document.execCommand('copy');
+			alert( message );
+		}
+
+	});
+
+	formName.appendChild( copyButton );
 
 	var cancelElement = document.createElement("input"); //input element, cancel
 	cancelElement.setAttribute('type',"button");
@@ -1049,7 +1155,8 @@ function makeForm(fields, fieldsP2, config) {
 	pageBackElement.addEventListener("click", function() {
 		p2Form.style.display = 'none';
 		formName.style.display = 'block';
-		formName.appendChild(downloadElement);
+		//formName.appendChild(downloadElement);
+		formName.appendChild(copyButton)
 	}, false);
 	p2Form.appendChild(pageBackElement);
 	var submitAllElement = document.createElement("input"); //input element, Submit All button
