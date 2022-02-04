@@ -516,7 +516,6 @@ function getArrayValue(fieldData) {
 // create form on page one
 function makeForm(fields, fieldsP2, config) {
 	// Move Body Down
-	document.getElementsByTagName("BODY")[0].style.marginTop="420px";
 	// Create Form Object Page 1
 	var formDiv = document.createElement("div");
 	formDiv.setAttribute('id', "FakeNewsForm");
@@ -704,8 +703,8 @@ function makeForm(fields, fieldsP2, config) {
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values3[x]);
 						labelElement.appendChild(labelText);
-						listItem.appendChild(labelElement);
 						listItem.appendChild(inputElement);
+						listItem.appendChild(labelElement);
 						listNode.appendChild(listItem);
 					}
 				formName.appendChild(listNode);
@@ -725,8 +724,8 @@ function makeForm(fields, fieldsP2, config) {
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values5[x]);
 						labelElement.appendChild(labelText);
-						listItem.appendChild(labelElement);
 						listItem.appendChild(inputElement);
+						listItem.appendChild(labelElement);
 						listNode.appendChild(listItem);
 					}
 				formName.appendChild(listNode);
@@ -990,8 +989,8 @@ function makeForm(fields, fieldsP2, config) {
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values5[x]);
 						labelElement.appendChild(labelText);
-						listItem.appendChild(labelElement);
 						listItem.appendChild(inputElement);
+						listItem.appendChild(labelElement);
 						listNode.appendChild(listItem);
 					}
 				p2Form.appendChild(listNode);
@@ -1012,8 +1011,8 @@ function makeForm(fields, fieldsP2, config) {
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values31[x]);
 						labelElement.appendChild(labelText);
-						listItem.appendChild(labelElement);
 						listItem.appendChild(inputElement);
+						listItem.appendChild(labelElement);
 						listNode.appendChild(listItem);
 					}
 				p2Form.appendChild(listNode);
@@ -1033,8 +1032,8 @@ function makeForm(fields, fieldsP2, config) {
 						var labelElement = document.createElement("label");
 						var labelText = document.createTextNode(values52[x]);
 						labelElement.appendChild(labelText);
-						listItem.appendChild(labelElement);
 						listItem.appendChild(inputElement);
+						listItem.appendChild(labelElement);
 						listNode.appendChild(listItem);
 					}
 				p2Form.appendChild(listNode);

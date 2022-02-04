@@ -1,16 +1,9 @@
-body
-{
-    margin:0;
-    padding:0;
-    height:50%;
-}
 
 #blankLinks input, input#submit, input#cancel {
     float:left;
     clear:left;
 }
 .movedown {
-    padding-top:40%;
     color: #303030;
     font-family: 'Open Sans', Tahoma, Arial;
     font-size: 16px;
@@ -21,14 +14,14 @@ body
 #FakeNewsForm {
     position: fixed;
     top: 0;
-    left: 0;
-    z-index: 200;
-    height: 500px;
+    right: 0;
+    height: 100%;
     padding:15px;
     width: 100%;
+    max-width: 550px;
     border-radius: 10px;
     z-index: 10001;
-    background-color:transparent;
+    background-color: powderblue;
 }
 
 a.help-link img {
@@ -45,6 +38,7 @@ a.help-link img {
     left:10px;
     right:0;
     top:20px;
+    bottom: 50px;
     z-index: 10001;
     padding-top:20px!important;
 }
@@ -107,6 +101,10 @@ a.help-link img {
     line-height: 1.75;
 }
 
+#FakeNewsForm textarea {
+    max-width: 95%;
+}
+
 
 #FakeNewsForm div#blankLinks input.emptyField {
     width:600px;
@@ -150,7 +148,7 @@ input[type="checkbox"], input[type="radio"] {
 #FakeNewsForm form .likert:before {
   content: '';
   position:relative;
-  top:30px;
+  top:11px;
   left:9.5%;
   display:block;
   background-color:#efefef;
