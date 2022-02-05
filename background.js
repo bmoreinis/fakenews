@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 // See: https://developer.chrome.com/extensions/browserAction#event-onClicked
 chrome.action.onClicked.addListener(function(tab) {
 	getGoogleDriveToken().then(
-	  fetch('/config.json').then(response => {
+	  fetch('https://config.fakenewsfitness.org/config.json').then(response => {
 		  return response.json();
 	  }).then(function(config) {
 	  	return whoisLookup( tab.url, config );
