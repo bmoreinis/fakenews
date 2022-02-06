@@ -830,7 +830,6 @@ function makeForm(fields, fieldsP2, config) {
 		if (check == true) {
 			formName.style.display = 'hidden';
 			p2Form.style.display = 'block';
-			//p2Form.appendChild(downloadElement);
 			p2Form.appendChild(copyButton)
 		} else {
 			alert ('Please fill out required fields');
@@ -852,17 +851,6 @@ function makeForm(fields, fieldsP2, config) {
 		}
 	}, false)
 	formName.appendChild(submitElement);
-
-	var downloadElement = document.createElement("input");
-	downloadElement.setAttribute('type','button');
-	downloadElement.setAttribute('value',"Download Input");
-	downloadElement.setAttribute('id','FNdownload');
-	downloadElement.addEventListener('click', function() {
-		var mode = "download";
-		console.log( 'download click' );
-		sendToServer(buildObject(fields, fieldsP2, config, mode))
-	}, false)
-	//formName.appendChild(downloadElement);
 
 
 	var copyButton = document.createElement( 'input' );
@@ -1155,7 +1143,6 @@ function makeForm(fields, fieldsP2, config) {
 	pageBackElement.addEventListener("click", function() {
 		p2Form.style.display = 'none';
 		formName.style.display = 'block';
-		//formName.appendChild(downloadElement);
 		formName.appendChild(copyButton)
 	}, false);
 	p2Form.appendChild(pageBackElement);
