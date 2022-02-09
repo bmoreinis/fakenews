@@ -330,7 +330,7 @@
 		createLikertInput: function( data ) {
 			var options = data.options;
 			var nopt = options.length;
-			var list = _create( 'ul', data.id, 'likert likert-q' + nopt );
+			var list = _create( 'ul', data.id + '_container', 'likert likert-q' + nopt );
 
 			for ( var i=0; i<nopt; i++ ) {
 				var li = _create( 'li', '', '', list );
@@ -339,7 +339,7 @@
 					value.push( value[0] );
 				}
 				var item_id = data.id + '_' + value[0];
-				var input = _input( 'radio', item_id, value[0], data.id );
+				var input = _input( 'radio', data.id, value[0], item_id );
 				var label = _create( 'label' );
 				label.textContent = value[1];
 				label.setAttribute( 'for', item_id );
