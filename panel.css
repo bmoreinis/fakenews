@@ -1,0 +1,220 @@
+
+body {
+	font-family: Arial;
+	font-size: 14px;
+	background-color: #eee;
+	min-width: 360px;
+	overflow-x: hidden;
+	margin: 0;
+	padding: 0;
+
+	/*
+    background: rgb(255,120,151);
+    background: linear-gradient(90deg, rgba(255,120,151,1) 0%, rgba(255,255,157,1) 100%);
+	*/
+	background-color: #f5f5f5;
+}
+
+
+header {
+	margin: 10px;
+	text-align: center;
+}
+
+header h1, header h2 {
+	margin: 0 0 .2em 0;
+}
+
+#content {}
+
+#button-container {
+	display: flex;
+	margin: 15px;
+}
+
+#button-container button {
+	margin: 5px;
+}
+
+#tab-nav {
+	margin: 10px 10px 0;
+	display: flex;
+}
+
+#tab-nav a {
+	display: block;
+	border: solid #888 1px;
+	padding: 5px 10px;
+	text-decoration: none;
+	color: #000;
+	position: relative;
+	top: 1px;
+	margin-right: 5px;
+}
+
+#tab-sections > div {
+	display: none;
+	padding: 15px;
+	margin: 0 25px 10px 10px;
+	border: solid #888 1px;
+}
+
+#tab-nav a[data-tab-active] {
+	background-color: #fff;
+	border-bottom: 0;
+}
+
+#tab-sections .fnf-tab[data-tab-active] {
+	display: block;
+	background-color: #fff;
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+.form-group label.field-label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+	width: 100%;
+	box-sizing: border-box;
+
+	font-size: 1em;
+	border-radius: 3px;
+	border: solid 1px #888;
+	padding: 5px;
+	margin-bottom: 5px;
+}
+
+.form-group textarea {
+	min-height: 2em;
+	resize: vertical;
+}
+
+.form-group .checkbox-group input[type="checkbox"] {
+	margin-right: .5em;
+}
+
+.form-group .list-items {
+	padding-left: 1.5em;
+}
+
+.form-group .list-items li {
+	position: relative;
+	margin-right: 2em;
+	min-height: 2em;
+}
+
+.form-group .list-items button {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.form-group .add-list-items {
+	display: flex;
+}
+
+.form-group .add-list-items button {
+	flex: 0 0 auto;
+	font-size: 1em;
+	padding: 5px;
+	margin-left: 5px;
+	margin-bottom: 5px;
+}
+
+form .likert {
+	list-style:none;
+	width:100%;
+	margin:0;
+	padding:0;
+	display:block;
+	box-sizing: border-box;
+}
+
+form .likert:before {
+	content: '';
+	position:relative;
+	top:11px;
+	display:block;
+	background-color:#888;
+	height:4px;
+
+	/* See line position math below */
+	left:10%;
+	width:80%;
+}
+
+form .likert li {
+	display:inline-block;
+	width:20%;
+	text-align:center;
+	vertical-align: top;
+}
+
+form .likert li input[type=radio] {
+	display:block;
+	position:relative;
+	top:0;
+	left:50%;
+	margin-left:-6px;
+}
+
+form .likert li label {
+	width:100%;
+	font-size: .9em;
+}
+
+
+/* Math for likert line:
+	n = number of choices
+	line left offset = 1/2n
+	line width = 1 - 1/n
+	option width: 1/n
+
+	Flex layout could automate some aspects of this.
+*/
+
+/* Defines the scale line behind the options. */
+form .likert-q3:before {
+	left: 16.5%;
+	width: 66.6%;
+}
+
+/* Defines the width of each option area */
+form .likert-q3 li {
+	width: 33%;
+}
+
+.help-link {
+	display: inline-block;
+	max-width: 25px;
+	vertical-align: middle;
+	padding-left: .5em;
+}
+
+.help-link img {
+	width: 100%;
+	height: auto;
+}
+
+
+#whois {
+	list-style-type: none;
+}
+
+.link-input {
+	width: 100%;
+}
+
+.link-go-button {
+	display: block;
+}
+
+.fnf-tab-footer {
+	text-align: center;
+}

@@ -1,34 +1,64 @@
-chrome.runtime.onMessage.addListener(function (msg, sender, response) {
-  // First, validate the message's structure
-  if (msg.text == 'download') {
-	  console.log('received message');
-	  let doc = URL.createObjectURL( new Blob([msg.downloadData], {type: 'application/json'}) );
-	  let filename = 'FNdata.json';
-	  console.log(doc);
-	  chrome.downloads.download({ url: doc, filename: filename, conflictAction: 'overwrite', saveAs: true });
-  }
-});
+
+const configUrl = '/config-new.json';
+var config;
 
 // Now users updated function signature as of 25 Feb 2019
 // See: https://developer.chrome.com/extensions/browserAction#event-onClicked
 chrome.action.onClicked.addListener(function(tab) {
-	getGoogleDriveToken().then(
-	  fetch('/config.json').then(response => {
-		  return response.json();
-	  }).then(function(config) {
-	  	return whoisLookup( tab.url, config );
-	  }).then( data => {
-			var msg = {
-				text:'build_form_filled',
-				whois: formatWhois( data.whois ),
-				config: data.config,
-				googleDriveAPIToken: googleDriveAPIToken
-			};
-
-			chrome.tabs.sendMessage(tab.id, msg, null);
-		})
-	);
+  fetch( configUrl )
+  	.then( response => response.json() )
+  	.then( cfg => {
+  		config = cfg;
+			chrome.tabs.sendMessage( tab.id, {
+				text: 'add_frame',
+				src: chrome.runtime.getURL( '/panel.html' )
+			});
+	})
 });
+
+
+chrome.runtime.onMessage.addListener(function (msg, sender, response) {
+	var action = msg.text || '';
+
+	console.log( 'received bg messagex', action, msg );
+
+	switch (action) {
+
+		case 'create_doc':
+			const drive = new GoogleDrive();
+				drive.getToken( true )
+					.then( () => drive.createFile( msg.data, msg.filename ) )
+					.then( data => drive.getFileById( data.id ) )
+					.then( data => {
+
+						// Create new tab. Additional info sent to callback via response() below.
+						if ( data.webViewLink ) {
+							chrome.tabs.create({ url: data.webViewLink });
+						}
+						response( data );
+					});
+
+			return true; // Enables response callback when used asynchronously.
+			break;
+
+		case 'frame_loaded':
+			chrome.tabs.sendMessage( sender.tab.id, { text: 'gather_values' }, values => response( { config, values } ) );
+			return true;
+			break;
+
+		// Relay close_frame request from iFrame to content script.
+		case 'close_frame':
+			chrome.tabs.sendMessage( sender.tab.id, { text: 'close_frame' } );
+			return true;
+			break;
+
+		case 'whois':
+			whoisLookup( msg.domain ).then( data => response(data) );
+			return true;
+			break;
+  }
+});
+
 
 async function getGoogleDriveToken() {
 	chrome.identity.getAuthToken({interactive: true}, function(token) {
@@ -37,18 +67,17 @@ async function getGoogleDriveToken() {
 	})
 }
 
-function whoisLookup( tab_url, config ) {
-	var url = new URL(tab_url);
-	var esc_domain = encodeURIComponent( url.hostname );
-	var lookup_url = 'https://fnf.deltafactory.net/?q=' + esc_domain;
+function whoisLookup( hostname ) {
+	console.log( config );
+	var esc_domain = encodeURIComponent( hostname );
+	var lookup_url = config.whois_base_url + esc_domain;
 
-	return fetch( lookup_url ).then( response => {
-		return response.json();
-	}).then( response => {
-		return { whois: response, config };
-	}).catch( err => {
-		console.log("There was an error with the whois fetch: " + err);
-	});
+	return fetch( lookup_url )
+		.then( response => response.json() )
+		.then( data => formatWhois( data ) )
+		.catch( err => {
+			console.log("There was an error with the whois fetch: " + err);
+		});
 }
 
 function formatWhois( data ) {
@@ -78,4 +107,99 @@ function formatWhois( data ) {
 function formatDate (dateString) {
 	var dateArray = dateString.split("-");
 	return dateArray[1]+ "/" +dateArray[2]+ "/" +dateArray[0];
+}
+
+
+// Object/Constructor
+function GoogleDrive() {}
+
+GoogleDrive.prototype = {
+	// MIME boundary
+	boundary: '981273423198471923847',
+
+	getToken: async function( interactive ) {
+		return new Promise( ( resolve, reject ) => {
+			chrome.identity.getAuthToken( { interactive }, ( token, scopes ) => {
+				if ( token ) {
+					this.token = token;
+					resolve( { token, scopes } );
+				} else {
+					reject();
+				}
+			});
+		});
+	},
+
+	request: async function( method, url, body, headers ) {
+		const { token } = await this.getToken();
+		console.log( token );
+
+		if ( !token ) {
+			throw 'Missing token';
+			return false;
+		}
+
+		headers = headers || {};
+		Object.assign( headers, {
+			'Content-Type': 'multipart/related; boundary=' + this.boundary,
+			'Accept': 'text/html',
+			'Authorization': 'Bearer ' + token
+		});
+
+		const params = {
+			method,
+			headers,
+			mode: 'cors', // no-cors, *cors, same-origin
+			cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+			credentials: 'same-origin', // include, *same-origin, omit
+			redirect: 'follow',
+			referrerPolicy: 'no-referrer'
+		};
+
+		if ( body ) {
+			params.body = body;
+			headers['Content-Length'] = body.length;
+		}
+
+		return fetch( url, params );
+	},
+
+	createMultipart: function( sections ) {
+		let body = '--' + this.boundary + '\n';
+		sections.forEach( sec => {
+			body += sec.join("\n\n");
+			body += "\n--" + this.boundary + "\n";
+		});
+
+		body += '--';
+		return body;
+	},
+
+	createFile: async function( fileData, fileName ) {
+		const metaData = {'name': fileName};
+		const bodyparts = [
+			[ 'Content-Type: application/json', JSON.stringify(metaData) ],
+			[ 'Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document', fileData ],
+		];
+		const body = this.createMultipart( bodyparts );
+		console.log( bodyparts, body );
+		const url = "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
+		const response = await this.request( 'POST', url, body );
+		return response.json();
+	},
+
+	getFileById: async function( fileId, fields ) {
+		fields = fields || 'webViewLink';
+		console.log( 'Getting file info', fileId );
+
+		const url = "https://www.googleapis.com/drive/v3/files/" + fileId + '?fields=' + encodeURIComponent( fields );
+		const response = await this.request( 'GET', url );
+
+		console.log( 'getfile responding', response );
+		return response.json();
+	}
+}
+
+function FNF_Report() {
+
 }
