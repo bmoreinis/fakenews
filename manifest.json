@@ -11,7 +11,7 @@
   },
 
   "action": {
-   "default_icon": "icon.png"
+    "default_icon": "img/icon.png"
   },
 
   "background": {
@@ -21,25 +21,24 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["controller.js", "content.js"],
+      "js": ["content.js"],
       "css" : ["page.css"]
     }
   ],
-    "web_accessible_resources": [
-      {
-        "resources": [
-          "help.png",
-          "panel.html"
-        ],
-        "matches": [
-          "*://*/*"
-        ]
-      }],
+  "web_accessible_resources": [{
+    "resources": [
+      "img/help.png",
+      "panel.html"
+    ],
+    "matches": [
+      "*://*/*"
+    ]
+  }],
 
   "permissions": [
-     "activeTab",
-     "downloads",
-     "identity"
+    "activeTab",
+    "downloads",
+    "identity"
    ],
 
   "host_permissions": [

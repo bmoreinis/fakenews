@@ -1,6 +1,6 @@
 (function(){
 
-	const _helpimage = chrome.runtime.getURL( '/help.png' );
+	const _helpimage = chrome.runtime.getURL( '/img/help.png' );
 
 	function _create( type, id, cls, parent ) {
 		const el = document.createElement( type );
@@ -70,6 +70,14 @@
 		createForm: function() {
 			this.ui.form = _create( 'form', '', '', this.ui.panel );
 			this.ui.form.addEventListener( 'submit', e => e.preventDefault() );
+
+			// Disable auto-submission by pressing enter.
+			//https://stackoverflow.com/questions/895171/prevent-users-from-submitting-a-form-by-hitting-enter
+
+			var b = _create( 'button', 'doNothingButton', '', this.ui.form );
+			b.style.display = 'none';
+			b.type = 'submit';
+			b.setAttribute( 'aria-hidden', true );
 		},
 
 		createButtons: function() {
@@ -80,6 +88,8 @@
 			b = _create( 'button', 'saveReport', '', this.ui.buttons );
 			b.textContent = 'Save to Google Drive';
 			b.addEventListener( 'click', e => {
+				console.log( e );
+				debugger;
 				e.preventDefault();
 				const data = this.gatherFormValues();
 				const report = new FNF_Report( data );

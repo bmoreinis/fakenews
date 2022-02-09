@@ -1,0 +1,30 @@
+#FakeNewsContainer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 360px;
+    max-width: 100%;
+    border-radius: 10px;
+    z-index: 10001;
+    background-color: #eee;
+
+    transition: width .5s;
+}
+
+#FakeNewsFrame {
+    height: 100%;
+    width: 100%;
+
+}
+
+#FakeNewsContainer[data-fnf-closed="1"] {
+    width: 0px;
+}
+
+#FakeNewsFrameToggle {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    z-index: 10;
+}

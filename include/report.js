@@ -62,8 +62,16 @@ FNF_Report.prototype = {
 			var header = _create( 'h3', data.field.id, dom );
 			header.textContent = data.field.config.label;
 
-			var content = _create( 'p', '', dom );
-			content.textContent = data.value;
+			if ( Array.isArray( data.value ) ) {
+				var content = _create( 'ul', '', dom );
+				data.value.forEach( v => {
+					var item = _create( 'li', '', content );
+					item.textContent = v;					
+				});
+			} else {
+				var content = _create( 'p', '', dom );
+				content.textContent = data.value;
+			}
 
 		}
 
