@@ -20,7 +20,7 @@ chrome.action.onClicked.addListener(function(tab) {
 chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 	var action = msg.text || '';
 
-	console.log( 'received bg messagex', action, msg );
+	//console.log( 'received bg messagex', action, msg );
 
 	switch (action) {
 
@@ -63,12 +63,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 async function getGoogleDriveToken() {
 	chrome.identity.getAuthToken({interactive: true}, function(token) {
 		googleDriveAPIToken = token;
-		console.log('got the token', googleDriveAPIToken);
+		//console.log('got the token', googleDriveAPIToken);
 	})
 }
 
 function whoisLookup( hostname ) {
-	console.log( config );
+	//console.log( config );
 	var esc_domain = encodeURIComponent( hostname );
 	var lookup_url = config.whois_base_url + esc_domain;
 
@@ -132,7 +132,7 @@ GoogleDrive.prototype = {
 
 	request: async function( method, url, body, headers ) {
 		const { token } = await this.getToken();
-		console.log( token );
+		//console.log( token );
 
 		if ( !token ) {
 			throw 'Missing token';
@@ -182,7 +182,7 @@ GoogleDrive.prototype = {
 			[ 'Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document', fileData ],
 		];
 		const body = this.createMultipart( bodyparts );
-		console.log( bodyparts, body );
+		//console.log( bodyparts, body );
 		const url = "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
 		const response = await this.request( 'POST', url, body );
 		return response.json();
@@ -190,12 +190,12 @@ GoogleDrive.prototype = {
 
 	getFileById: async function( fileId, fields ) {
 		fields = fields || 'webViewLink';
-		console.log( 'Getting file info', fileId );
+		//console.log( 'Getting file info', fileId );
 
 		const url = "https://www.googleapis.com/drive/v3/files/" + fileId + '?fields=' + encodeURIComponent( fields );
 		const response = await this.request( 'GET', url );
 
-		console.log( 'getfile responding', response );
+		//console.log( 'getfile responding', response );
 		return response.json();
 	}
 }
