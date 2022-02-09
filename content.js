@@ -45,6 +45,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 				}
 			}
 			break;
+
+		case 'copypaste':
+
+
+			break;
 	}
 
 });
@@ -61,6 +66,22 @@ function _create( type, id, parent ) {
 
 	return el;
 }
+
+function createPopup( contents ) {
+	var container = _create( 'div', 'FakeNewsPopupOverlay' );
+
+	var wrap = _create( 'div', 'FakeNewsPopup', container );
+	var el = _create( 'div', '', wrap );
+	// Close button
+	// Copy button
+
+	// Contents
+
+	el.innerHTML = contents;
+	document.body.appendChild( container );
+}
+
+createPopup( 'text' );
 
 
 function gatherPageValues() {

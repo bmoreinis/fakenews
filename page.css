@@ -28,3 +28,24 @@
     right: 100%;
     z-index: 10;
 }
+
+#FakeNewsPopupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10002;
+}
+
+#FakeNewsPopup {
+    margin: 20px auto;
+    padding: 15px;
+    height: 90vh;
+    width: 600px;
+    max-width: 100%;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 10px 10px 10px rgba( 0,0,0,0.5);
+    border: solid 1px #ccc;
+}
