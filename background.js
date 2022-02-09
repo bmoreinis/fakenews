@@ -56,6 +56,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 			whoisLookup( msg.domain ).then( data => response(data) );
 			return true;
 			break;
+
+		case 'copypaste':
+			chrome.tabs.sendMessage( sender.tab.id, msg );
+			break;
   }
 });
 

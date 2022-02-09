@@ -1,6 +1,9 @@
 (function(){
 // Encapsulated in a function to avoid namimg conflicts.
 
+var fnContainer;
+var fnPopup;
+
 // Listen for message from background.js to create form and populate values.
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	const action = msg.text || '';
@@ -23,7 +26,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 				container.setAttribute( d, container.getAttribute( d )  ? '' : 1 );
 			});
 
+			fnContainer = container;
 			document.body.appendChild( container );
+
 			break;
 
 		case 'gather_values':
@@ -47,8 +52,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 			break;
 
 		case 'copypaste':
-
-
+			createPopup( msg.data );
 			break;
 	}
 
@@ -68,21 +72,62 @@ function _create( type, id, parent ) {
 }
 
 function createPopup( contents ) {
-	var container = _create( 'div', 'FakeNewsPopupOverlay' );
 
-	var wrap = _create( 'div', 'FakeNewsPopup', container );
-	var el = _create( 'div', '', wrap );
-	// Close button
-	// Copy button
+	if ( !fnContainer ) {
+		console.warn( 'Cannot add popup before container is created.' );
+		return;
+	}
 
-	// Contents
+	// Create and reuse elements.
+	if ( ! ( fnPopup && fnPopup.popup ) ) {
 
-	el.innerHTML = contents;
-	document.body.appendChild( container );
+		var popup = _create( 'div', 'FakeNewsPopup' );
+		// Close button
+		var close = _create( 'button', 'FakeNewsPopupCloseButton', popup );
+		close.innerHTML = '&times;';
+		close.addEventListener( 'click', e => {
+			e.preventDefault();
+			popup.parentNode.removeChild( popup );
+		});
+
+		var header = _create( 'div', 'FakeNewsPopupHeader', popup );
+
+		// Copy button
+		var copy = _create( 'button', 'FakeNewsPopupCopyButton', header );
+		copy.textContent = 'Copy report to clipboard';
+
+		// Contents
+		var content = _create( 'div', 'FakeNewsPopupContent', popup );
+
+		copy.addEventListener( 'click', e => {
+
+			if ( navigator.clipboard ) {
+				// Clipboard API on secure pages
+				const type = 'text/html';
+				const blob = new Blob( [content.innerHTML], { type });
+				const data = [ new ClipboardItem({ [type]: blob }) ];
+				navigator.clipboard.write( data ).then(
+					e => alert( 'Success' ),
+					e => alert( 'Failure' )
+				);
+
+			} else {
+				// OG Copy command API
+				var sel = window.getSelection();
+				range = document.createRange();
+				range.selectNodeContents( content );
+				sel.removeAllRanges();
+				sel.addRange( range );
+				document.execCommand( 'copy' );
+			}
+		});
+
+		fnPopup = { popup, content };
+	}
+
+	fnPopup.content.innerHTML = contents;
+	fnContainer.appendChild( fnPopup.popup );
 }
-
-createPopup( 'text' );
-
 
 function gatherPageValues() {
 	const jsonLd = controller.getJsonLd();

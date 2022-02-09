@@ -101,7 +101,8 @@
 			b.addEventListener( 'click', e => {
 				e.preventDefault();
 				const data = this.gatherFormValues();
-				console.log( data );
+				const report = new FNF_Report( data );
+				report.sendToCopyPopup();
 			});
 
 			b = _create( 'button', 'cancelButton', '', this.ui.buttons );

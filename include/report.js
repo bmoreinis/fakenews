@@ -53,10 +53,15 @@ FNF_Report.prototype = {
 		}
 	},
 
-	objectToHTML: function( dataObject ) {
+	objectToHTML: function( dataObject, title ) {
 		var htmlString = '<html><body>';
 
 		var dom = _create( 'div' );
+
+		if ( title ) {
+			const titleEl = _create( 'h1', '', dom );
+			titleEl.textContent = title;
+		}
 
 		for (const [key, data] of Object.entries( dataObject )) {
 			var header = _create( 'h3', data.field.id, dom );
@@ -80,8 +85,9 @@ FNF_Report.prototype = {
 		return htmlString;
 	},
 
-	createReportHtml: function() {
-		return this.objectToHTML(this.documentObject);
+	createReportHtml: function( withTitle ) {
+		var title = withTitle ? this.reportTitle() : '';
+		return this.objectToHTML(this.documentObject, title );
 	},
 
 	createReportText: function() {
@@ -126,6 +132,16 @@ FNF_Report.prototype = {
 				alert(errorMessage);
 			}
 		});
+	},
+
+	sendToCopyPopup: function() {
+		const html = this.createReportHtml( true );
+		const msg = {
+			text: 'copypaste',
+			data: html
+		};
+
+		chrome.runtime.sendMessage( msg );
 	},
 
 	// @todo: Not used, does not work.
