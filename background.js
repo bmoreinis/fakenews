@@ -63,14 +63,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
   }
 });
 
-
-async function getGoogleDriveToken() {
-	chrome.identity.getAuthToken({interactive: true}, function(token) {
-		googleDriveAPIToken = token;
-		//console.log('got the token', googleDriveAPIToken);
-	})
-}
-
 function whoisLookup( hostname ) {
 	//console.log( config );
 	var esc_domain = encodeURIComponent( hostname );

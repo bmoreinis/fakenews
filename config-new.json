@@ -17,7 +17,14 @@
 		},
 		{
 			"id": "tab2",
-			"label": "Section 2"
+			"label": "Section 2",
+			"footer_actions": [
+				{
+					"type": "changetab",
+					"label": "Previous",
+					"args": [ "tab1" ]
+				}
+			]
 		}
 	],
 

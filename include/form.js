@@ -88,8 +88,6 @@
 			b = _create( 'button', 'saveReport', '', this.ui.buttons );
 			b.textContent = 'Save to Google Drive';
 			b.addEventListener( 'click', e => {
-				console.log( e );
-				debugger;
 				e.preventDefault();
 				const data = this.gatherFormValues();
 				const report = new FNF_Report( data );
