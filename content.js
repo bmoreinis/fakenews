@@ -118,7 +118,16 @@ function createPopup( contents ) {
 				range.selectNodeContents( content );
 				sel.removeAllRanges();
 				sel.addRange( range );
+
+				// HTML support, from https://stackoverflow.com/questions/23934656/javascript-copy-rich-text-contents-to-clipboard
+				function copyListener(e) {
+					e.clipboardData.setData( 'text/html', content.innerHTML );
+					e.preventDefault();
+				}
+
+				document.addEventListener( 'copy', copyListener );
 				document.execCommand( 'copy' );
+				document.removeEventListener( 'copy', copyListener );
 			}
 		});
 
