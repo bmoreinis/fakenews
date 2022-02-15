@@ -3,6 +3,8 @@
 
 	"whois_base_url": "https://fnf.deltafactory.net/?q=",
 
+	"disable_google_drive": true,
+
 	"tabs": [
 		{
 			"id": "tab1",
@@ -23,6 +25,16 @@
 					"type": "changetab",
 					"label": "Previous",
 					"args": [ "tab1" ]
+				},
+
+				{
+					"type": "save_google",
+					"label": "Save to Google Drive"
+				},
+
+				{
+					"type": "save_copypaste",
+					"label": "Copy/Paste Report"
 				}
 			]
 		}
@@ -63,7 +75,7 @@
 		{
 			"tabid": "tab1",
 			"id": "tld",
-			"label": "Top Level Domain ( TLD )",
+			"label": "Top Level Domain (TLD)",
 			"type": "text",
 			"contextual_help": {
 				"url": "https://fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"
@@ -73,14 +85,14 @@
 		{
 			"tabid": "tab1",
 			"id": "pageArticle",
-			"label": "Headline ( First <H1> ) - Paste headline here!",
+			"label": "Headline (First <H1>) - Paste headline here!",
 			"type": "text"
 		},
 
 		{
 			"tabid": "tab1",
 			"id": "pageTitle",
-			"label": "Page Title ( <title> ) - Could be headline?",
+			"label": "Page Title (<title>) - Could be headline?",
 			"type": "text"
 		},
 
@@ -118,11 +130,11 @@
 			"label": "Advertising / Content Ratio ( Click one )",
 			"type": "likert",
 			"options": [
-				["1 = No Ads"],
+				["No Ads"],
 				["1-2 Ads"],
-				["3 = Some Ads"],
-				["4 = Many Ads"],
-				["5 = Too Many Ads"]
+				["Some Ads"],
+				["Many Ads"],
+				["Too Many Ads"]
 			]
 		},
 
@@ -132,9 +144,9 @@
 			"label": "Clickbait Rank ( Click one )",
 			"type": "likert",
 			"options": [
-				["1 = Not Clickbait"],
-				["2 = Some Bait Markers"],
-				["3 = Definitely Clickbait"]
+				["Not Clickbait"],
+				["Some Bait Markers"],
+				["Definitely Clickbait"]
 			]
 		},
 
@@ -142,7 +154,7 @@
 			"tabid": "tab2",
 			"id": "allLinks",
 			"label": "Page Links - remove non-sources",
-			"type": "list"
+			"type": "linklist"
 		},
 
 		{
@@ -189,9 +201,9 @@
 			"label": "Bias Level ( Click one )",
 			"type": "likert",
 			"options": [
-				["1 = Low Bias"],
-				["2 = Some Bias"],
-				["3 = High Bias"]
+				["Low Bias"],
+				["Some Bias"],
+				["High Bias"]
 			]
 		},
 
@@ -201,11 +213,11 @@
 			"label": "Your Bias Level ( Click one )",
 			"type": "likert",
 			"options": [
-				["1 = Very Anti"],
-				["2 = Some Anti"],
-				["3 = Neutral / Open"],
-				["4 = Some Pro"],
-				["5 = Very Pro"]
+				["Very Anti"],
+				["Some Anti"],
+				["Neutral / Open"],
+				["Some Pro"],
+				["Very Pro"]
 			]
 		},
 
@@ -215,11 +227,11 @@
 			"label": "Initial Trust Rank ( Click one )",
 			"type": "likert",
 			"options": [
-				["1 = Full Mistrust"],
-				["2 = Some Mistrust"],
-				["3 = Cannot Tell"],
-				["4 = Some Trust"],
-				["5 = Full Trust"]
+				["Full Mistrust"],
+				["Some Mistrust"],
+				["Cannot Tell"],
+				["Some Trust"],
+				["Full Trust"]
 			]
 		},
 
