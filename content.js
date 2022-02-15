@@ -43,11 +43,12 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
 		case 'gather_values':
 			const values = gatherPageValues();
+			sendResponse( values );
+			break;
+
+		case 'whois':
 			// @todo: Separate WHOIS response from page values to speed form load time.
-			chrome.runtime.sendMessage({ text: 'whois', domain: document.location.hostname }, whois => {
-				values.whois = whois;
-				sendResponse( values );
-			});
+			chrome.runtime.sendMessage({ text: 'whois', domain: document.location.hostname }, whois => sendResponse( whois ) );
 			return true;
 			break;
 
