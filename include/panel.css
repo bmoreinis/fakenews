@@ -1,18 +1,17 @@
 
+:root {
+	--fnf-dark-red: #b93a3d;
+}
+
 body {
 	font-family: Arial;
 	font-size: 14px;
-	background-color: #eee;
+	background-color: #f5f5f5;
 	min-width: 360px;
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
 
-	/*
-    background: rgb(255,120,151);
-    background: linear-gradient(90deg, rgba(255,120,151,1) 0%, rgba(255,255,157,1) 100%);
-	*/
-	background-color: #f5f5f5;
 }
 
 
@@ -50,18 +49,19 @@ header h1, header h2 {
 	position: relative;
 	top: 1px;
 	margin-right: 5px;
+	border-bottom: 0;
 }
 
 #tab-sections > div {
 	display: none;
 	padding: 15px;
 	margin: 0 25px 10px 10px;
-	border: solid #888 1px;
+	border: solid var(--fnf-dark-red) 1px;
 }
 
 #tab-nav a[data-tab-active] {
 	background-color: #fff;
-	border-bottom: 0;
+	border-color: var(--fnf-dark-red);
 }
 
 #tab-sections .fnf-tab[data-tab-active] {
@@ -105,7 +105,7 @@ header h1, header h2 {
 
 .form-group .list-items li {
 	position: relative;
-	margin-right: 2em;
+	padding-right: 2em;
 	min-height: 2em;
 }
 
@@ -125,6 +125,14 @@ header h1, header h2 {
 	padding: 5px;
 	margin-left: 5px;
 	margin-bottom: 5px;
+}
+
+.form-group .link-list-items .list-value {
+    display: inline-block;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 form .likert {
@@ -216,5 +224,7 @@ form .likert-q3 li {
 }
 
 .fnf-tab-footer {
-	text-align: center;
+	display: flex;
+	justify-content: space-around;
+	gap: 10px;
 }

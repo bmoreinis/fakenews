@@ -14,20 +14,30 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
 		// User has clicked on the FNF icon. Add the frame to the page.
 		case 'add_frame':
-			var container = _create( 'div', 'FakeNewsContainer' );
-			var iframe = _create( 'iframe', 'FakeNewsFrame', container );
-			iframe.src = msg.src;
-			iframe.frameBorder = '0';
 
-			var button = _create( 'button', 'FakeNewsFrameToggle', container );
-			button.textContent = 'Toggle';
-			button.addEventListener( 'click', function(){
-				var d = 'data-fnf-closed';
-				container.setAttribute( d, container.getAttribute( d )  ? '' : 1 );
-			});
+			if ( !fnContainer ) {
+				var container = _create( 'div', 'FakeNewsContainer' );
+				var iframe = _create( 'iframe', 'FakeNewsFrame', container );
+				iframe.src = msg.src;
+				iframe.frameBorder = '0';
 
-			fnContainer = container;
-			document.body.appendChild( container );
+				var button = _create( 'button', 'FakeNewsFrameToggle', container );
+				//button.textContent = 'Toggle';
+				var img = _create( 'img', 'FakeNewsFrameToggleImage', button );
+				img.src = chrome.runtime.getURL( '/img/tab.png' );
+				img.alt = 'Toggle';
+
+				button.addEventListener( 'click', function(){
+					var d = 'data-fnf-closed';
+					container.setAttribute( d, container.getAttribute( d )  ? '' : 1 );
+				});
+
+				fnContainer = container;
+			}
+
+			if ( ! fnContainer.parentNode ) {
+				document.body.appendChild( fnContainer );
+			}
 
 			break;
 
@@ -170,7 +180,7 @@ function getURL() {
 }
 
 function domainFinder() {
-	return window.location.host.split('.').slice( -2 ).join('.');
+	return window.location.host;
 }
 
 // extract tld from url of active tab
@@ -190,13 +200,15 @@ function getTitle () {
 
 // extract json-ld from HTML
 function getJsonLd () {
-	var returnValue = ''
+	var returnValue = {};
 	const jsonLdString = document.querySelectorAll('script[type="application/ld+json"]');
 	if (jsonLdString.length > 0) {
-    returnValue = JSON.parse(jsonLdString[0].text);
-} else {
-		returnValue = {};
-}
+		try {
+		    returnValue = JSON.parse(jsonLdString[0].text);
+		} catch (err) {
+			console.warn( 'FNF could not parse JSON LD as JSON.', err );
+		}
+	}
 	return returnValue;
 }
 
@@ -323,7 +335,16 @@ function linkFinder () {
 			}
 		}
 	}
-	return linkList;
+
+	// Filter down to unique list
+	const uniqueList = [];
+	linkList.forEach( v => {
+		if ( -1 === uniqueList.indexOf( v ) ) {
+			uniqueList.push( v );
+		}
+	});
+
+	return uniqueList;
 };
 
 function checkSocialPostLink(link) {

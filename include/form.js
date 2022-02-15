@@ -42,14 +42,11 @@
 		ui: {},
 		tabs: {},
 		fields: {},
+		config: {},
 
 		render: function( config, values ) {
-			/*
-			if ( !this.container ) {
-				console.error( 'Could not create form without valid container' );
-				return false;
-			}
-			*/
+
+			this.config = config;
 
 			if ( values ) {
 				this.values = values;
@@ -85,23 +82,15 @@
 
 			var b;
 
-			b = _create( 'button', 'saveReport', '', this.ui.buttons );
-			b.textContent = 'Save to Google Drive';
-			b.addEventListener( 'click', e => {
-				e.preventDefault();
-				const data = this.gatherFormValues();
-				const report = new FNF_Report( data );
-				report.createDriveFile();
-			});
+			if ( ! this.config.disable_google_drive ) {
+				b = _create( 'button', 'saveReport', '', this.ui.buttons );
+				b.textContent = 'Save to Google Drive';
+				this.bindGoogleDrive( b );
+			}
 
 			b = _create( 'button', 'copyReport', '', this.ui.buttons );
 			b.textContent = 'Copy/Paste';
-			b.addEventListener( 'click', e => {
-				e.preventDefault();
-				const data = this.gatherFormValues();
-				const report = new FNF_Report( data );
-				report.sendToCopyPopup();
-			});
+			this.bindCopyPaste( b );
 
 			b = _create( 'button', 'cancelButton', '', this.ui.buttons );
 			b.textContent = 'Exit';
@@ -110,6 +99,26 @@
 				chrome.runtime.sendMessage( { text: 'close_frame' } );
 			});
 
+		},
+
+		bindGoogleDrive: function( button ) {
+			button.addEventListener( 'click', e => {
+				e.preventDefault();
+				const data = this.gatherFormValues();
+				const report = new FNF_Report( data );
+				report.createDriveFile();
+			});
+
+		},
+
+
+		bindCopyPaste: function( button ) {
+			button.addEventListener( 'click', e => {
+				e.preventDefault();
+				const data = this.gatherFormValues();
+				const report = new FNF_Report( data );
+				report.sendToCopyPopup();
+			});
 		},
 
 		createTabs: function( tabs ) {
@@ -164,6 +173,22 @@
 						});
 						break;
 
+					case 'save_google':
+						// Global drive setting overrides footer action.
+						if ( this.config.disable_google_drive ) {
+							break;
+						}
+
+						var b = _create( 'button', '', '', ui.footer );
+						b.textContent = data.label;
+						this.bindGoogleDrive( b );
+						break;
+
+					case 'save_copypaste':
+						var b = _create( 'button', '', '', ui.footer );
+						b.textContent = data.label;
+						this.bindCopyPaste( b );
+						break;
 				}
 			});
 
@@ -217,6 +242,7 @@
 			if ( data.contextual_help ) {
 				var hlp = data.contextual_help;
 				var helplink = _create( 'a', '', 'help-link', label );
+				helplink.target = '_blank';
 				if ( hlp.url ) {
 					helplink.href = hlp.url;
 				}
@@ -305,6 +331,62 @@
 			return item;
 		},
 
+		createLinkListInput: function( data ) {
+			const el = _create( 'div', data.id, 'list-input-container link-list-input-container' );
+			const list = _create( 'ul', '', 'list-items link-list-items', el );
+			const addblock = _create( 'div', '', 'add-list-items add-link-list-items', el );
+
+			if ( !data.noAdd ) {
+				const input = _input( 'text', 'add_' + data.id, '' );
+				input.placeholder = 'https://';
+				input.addEventListener( 'keyup', e => {
+					if ( e.code === 'Enter' ) {
+						addItem.call( this, e);
+					}
+				});
+				addblock.appendChild( input );
+				const addbutton = _create( 'button', '', '', addblock );
+				addbutton.textContent = 'Add';
+				addbutton.addEventListener( 'click', addItem.bind(this) );
+
+				function addItem(e) {
+					e.preventDefault();
+					var value = input.value;
+					if ( value !== '' ) {
+						this.addLinkListItem( list, value, data );
+						input.value = '';
+					}
+
+				}
+			}
+
+			if ( data.value ) {
+				var val = Array.isArray( data.value ) ? data.value : [ data.value ];
+				val.forEach( v => this.addLinkListItem( list, v, data ) );
+			}
+
+			return el;
+		},
+
+		addLinkListItem: function( list, value, field ) {
+			var item = _create( 'li', '', '', list );
+			var span = _create( 'a', '', 'list-value tooltip-title', item );
+			span.textContent = value;
+			span.href = value;
+			span.target = '_blank';
+			span.title = value;
+			if ( !field.noRemove ) {
+				var del = _create( 'button', '', '', item );
+				del.innerHTML = '&times;';
+				del.addEventListener( 'click', function(e) {
+					e.preventDefault();
+					list.removeChild( item );
+				});
+			}
+			list.appendChild( item );
+			return item;
+		},
+
 		createBooleanInput: function( data ) {
 			data.options = [ [ 'Yes' ] ];
 			return this.createCheckboxInput( data );
@@ -379,6 +461,7 @@
 			var el;
 			if ( data.value ) {
 				el = _create( 'a', data.id, 'link-field' );
+				el.target = '_blank';
 				el.href = data.value;
 				el.textContent = data.value;
 			} else {
@@ -396,6 +479,7 @@
 			checkbox: 'createCheckboxInput',
 			likert: 'createLikertInput',
 			list: 'createListInput',
+			linklist: 'createLinkListInput',
 			link: 'createLinkInput'
 		},
 
@@ -455,6 +539,7 @@
 					break;
 
 				case 'list':
+				case 'linklist':
 					var items = field.input.querySelectorAll( 'li .list-value' );
 					value = [];
 					items.forEach( el => value.push( el.textContent ) );

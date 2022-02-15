@@ -1,19 +1,29 @@
 
 const configUrl = '/config-new.json';
-var config;
+var config = null;
+
+function getConfig() {
+	if ( !config ) {
+	  return fetch( configUrl )
+	  	.then( response => response.json() )
+	  	.then( cfg => {
+	  		// Store in global
+	  		config = cfg;
+	  		return config;
+	  	});
+
+	 } else {
+	 	return new Promise( resolve => resolve( config ) );
+	 }
+}
 
 // Now users updated function signature as of 25 Feb 2019
 // See: https://developer.chrome.com/extensions/browserAction#event-onClicked
 chrome.action.onClicked.addListener(function(tab) {
-  fetch( configUrl )
-  	.then( response => response.json() )
-  	.then( cfg => {
-  		config = cfg;
-			chrome.tabs.sendMessage( tab.id, {
-				text: 'add_frame',
-				src: chrome.runtime.getURL( '/panel.html' )
-			});
-	})
+		chrome.tabs.sendMessage( tab.id, {
+			text: 'add_frame',
+			src: chrome.runtime.getURL( '/panel.html' )
+		});
 });
 
 
@@ -42,7 +52,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 			break;
 
 		case 'frame_loaded':
-			chrome.tabs.sendMessage( sender.tab.id, { text: 'gather_values' }, values => response( { config, values } ) );
+			getConfig().then( config => {
+					chrome.tabs.sendMessage( sender.tab.id, { text: 'gather_values' }, values => response( { config, values } ) );
+			});
 			return true;
 			break;
 
@@ -53,7 +65,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 			break;
 
 		case 'whois':
-			whoisLookup( msg.domain ).then( data => response(data) );
+			getConfig().then( () => {
+				whoisLookup( msg.domain ).then( data => response(data) );
+			});
 			return true;
 			break;
 
