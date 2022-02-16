@@ -8,7 +8,7 @@
 		["pageArticle","Headline ( First <H1> ) - Paste headline here!"	,"","f",0,"title",""],
 		["pageTitle","Page Title ( <title> ) - Could be headline?"		,"","f",0,"field_title",""],
 		["articleAuthor","Article Author"								,"","f",0,"field_article_author",""],
-		["articleAuthorLink","Author link"								,"","v",0,"field_article_author_link",""],
+		["articleAuthorLink","Author link"								,"","f",0,"field_article_author_link",""],
 		["modifiedDate","Dateline or Posted/Modified Date"				,"","f",0,"field_page_last_modified",""]
 
 	],

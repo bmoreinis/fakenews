@@ -1,0 +1,266 @@
+{
+	"documentTitle": "FNF - ",
+
+	"whois_base_url": "https://fnf.deltafactory.net/?q=",
+
+	"disable_google_drive": true,
+
+	"tabs": [
+		{
+			"id": "tab1",
+			"label": "Section 1",
+			"footer_actions": [
+				{
+					"type": "changetab",
+					"label": "Next",
+					"args": [ "tab2" ]
+				}
+			]
+		},
+		{
+			"id": "tab2",
+			"label": "Section 2",
+			"footer_actions": [
+				{
+					"type": "changetab",
+					"label": "Previous",
+					"args": [ "tab1" ]
+				},
+
+				{
+					"type": "save_google",
+					"label": "Save to Google Drive"
+				},
+
+				{
+					"type": "save_copypaste",
+					"label": "Copy/Paste Report"
+				}
+			]
+		}
+	],
+
+	"fields": [
+		{
+			"tabid": "tab1",
+			"id": "studentName",
+			"label": "Student Name",
+			"type": "text"
+		},
+
+		{
+			"tabid": "tab1",
+			"id": "pageType",
+			"label": "Page Type",
+			"type": "text"
+		},
+
+		{
+			"tabid": "tab1",
+			"id": "url",
+			"label": "Page URL",
+			"type": "text"
+		},
+
+		{
+			"tabid": "tab1",
+			"id": "dn",
+			"label": "Domain Name",
+			"type": "text",
+			"contextual_help": {
+				"url": "https://fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"
+			}
+		},
+
+		{
+			"tabid": "tab1",
+			"id": "tld",
+			"label": "Top Level Domain (TLD)",
+			"type": "text",
+			"contextual_help": {
+				"url": "https://fakenewsfitness.org/web-media-literacy/check-url-domain-name-and-subdomain"
+			}
+		},
+
+		{
+			"tabid": "tab1",
+			"id": "pageArticle",
+			"label": "Headline (First <H1>) - Paste headline here!",
+			"type": "text"
+		},
+
+		{
+			"tabid": "tab1",
+			"id": "pageTitle",
+			"label": "Page Title (<title>) - Could be headline?",
+			"type": "text"
+		},
+
+		{
+			"tabid": "tab1",
+			"id": "articleAuthor",
+			"label": "Article Author",
+			"type": "text"
+		},
+
+		{
+			"tabid": "tab1",
+			"id": "articleAuthorLink",
+			"label": "Author Link",
+			"type": "link"
+		},
+
+		{
+			"tabid": "tab1",
+			"id": "modifiedDate",
+			"label": "Dateline or Posted/Modified Date",
+			"type": "text"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "headlineMatch",
+			"label": "Headline Matches Content?",
+			"type": "boolean"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "advertisingContent",
+			"label": "Advertising / Content Ratio ( Click one )",
+			"type": "likert",
+			"options": [
+				["No Ads"],
+				["1-2 Ads"],
+				["Some Ads"],
+				["Many Ads"],
+				["Too Many Ads"]
+			]
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "clickbaitRank",
+			"label": "Clickbait Rank ( Click one )",
+			"type": "likert",
+			"options": [
+				["Not Clickbait"],
+				["Some Bait Markers"],
+				["Definitely Clickbait"]
+			]
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "allLinks",
+			"label": "Page Links - remove non-sources",
+			"type": "linklist"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "otherSources",
+			"label": "Non-Linked Cited Sources",
+			"type": "list"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "claimEvidence",
+			"label": "Evidence for Claims",
+			"type": "list"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "aboutLinks",
+			"label": "About Us Link",
+			"type": "text"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "aboutSummary",
+			"label": "About Us Summary",
+			"type": "textarea"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "whois",
+			"label": "WHOIS Lookup",
+			"type": "list",
+			"noRemove": true,
+			"noAdd": true
+		},
+
+
+		{
+			"tabid": "tab2",
+			"id": "biasLevel",
+			"label": "Bias Level ( Click one )",
+			"type": "likert",
+			"options": [
+				["Low Bias"],
+				["Some Bias"],
+				["High Bias"]
+			]
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "yourBias",
+			"label": "Your Bias Level ( Click one )",
+			"type": "likert",
+			"options": [
+				["Very Anti"],
+				["Some Anti"],
+				["Neutral / Open"],
+				["Some Pro"],
+				["Very Pro"]
+			]
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "trustRank",
+			"label": "Initial Trust Rank ( Click one )",
+			"type": "likert",
+			"options": [
+				["Full Mistrust"],
+				["Some Mistrust"],
+				["Cannot Tell"],
+				["Some Trust"],
+				["Full Trust"]
+			]
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "trustMarkers",
+			"label": "Page Trust Markers",
+			"type": "textarea"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "mistrustMarkers",
+			"label": "Page Mistrust Markers & Red Flags",
+			"type": "textarea"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "assessment",
+			"label": "Assessment Notes: Why this rank?",
+			"type": "textarea"
+		},
+
+		{
+			"tabid": "tab2",
+			"id": "questions",
+			"label": "Questions (for Commenters)",
+			"type": "textarea"
+		}
+	]
+}

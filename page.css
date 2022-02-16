@@ -1,0 +1,99 @@
+#FakeNewsContainer {
+    /* Prevent styling contamination from parent stylesheet. */
+    all: initial;
+}
+
+#FakeNewsContainer {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 360px;
+    max-width: 100%;
+    z-index: 10001;
+    background-color: #eee;
+    border-left: solid #b93a3d 2px;
+
+    transition: width .5s;
+}
+
+#FakeNewsFrame {
+    height: 100%;
+    width: 100%;
+
+}
+
+#FakeNewsContainer[data-fnf-closed="1"] {
+    width: 0px;
+}
+
+#FakeNewsFrameToggle {
+    position: absolute;
+    top: 5px;
+    right: 100%;
+    z-index: 10;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: none;
+}
+
+img#FakeNewsFrameToggleButton {
+    display: block;
+}
+
+#FakeNewsPopup {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    box-sizing: border-box;
+    padding: 15px;
+    width: 600px;
+    max-width: 100%;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 10px 10px 10px rgba( 0,0,0,0.5);
+    border: solid 1px #ccc;
+
+    transition: opacity .5s, right .5s;
+}
+
+/*
+#FakeNewsPopup[data-fnf-closed="1"] {
+    opacity: 0;
+    left: 0;
+}
+*/
+
+#FakeNewsPopupContent {
+    border: solid black 1px;
+    overflow: auto;
+    margin-top: 15px;
+    padding: 5px;
+    font-size: .7em;
+    max-height: 90vh;
+}
+
+#FakeNewsPopupCloseButton {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    font-size: 20px;
+    line-height: 20px;
+    width: 24px;
+    height: 24px;
+    border: solid #888 1px;
+    background-color: #eee;
+    border-radius: 12px;
+    text-align: center;
+    padding: 0;
+}
+
+
+#FakeNewsPopupCloseButton:hover,
+#FakeNewsPopupCloseButton:focus,
+#FakeNewsPopupCloseButton:active {
+    background-color: #888;
+}
