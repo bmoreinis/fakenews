@@ -550,6 +550,41 @@
 			}
 
 			return value;
+		},
+
+		// @todo: Partially implemented - values aren't populated for all types yet.
+		setFieldValue: function( id, value ) {
+			var field = this.fields[id] || false;
+
+			if ( !field ) {
+				console.warn( 'Field ID not found:', id );
+				return;
+			}
+
+			var cfg = field.config;
+
+			switch ( cfg.type ) {
+				case 'text':
+				case 'textarea':
+					field.input.value = value;
+					break;
+
+				// Array of entries
+				case 'list':
+				case 'linklist':
+					var list = field.input.querySelector( '.list-items' );
+					value = Array.isArray( value ) ? value : [ value ];
+					value.forEach( v => this.addListItem( list, v, field.config ) );
+					break;
+
+				default:
+					console.warn( 'Unhandled field setter for ', field.id, field.config.type, field.config );
+
+
+			}
+
+			field.value = value;
+
 		}
 	};
 

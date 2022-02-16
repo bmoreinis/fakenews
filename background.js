@@ -1,5 +1,7 @@
 
-const configUrl = '/config-new.json';
+//const configUrl = 'https://config.fakenewsfitness.org/config.json';
+const configUrl = '/config.json';
+
 var config = null;
 
 function getConfig() {
@@ -65,6 +67,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 			break;
 
 		case 'whois':
+			// Config needed for WHOIS API
 			getConfig().then( () => {
 				whoisLookup( msg.domain ).then( data => response(data) );
 			});

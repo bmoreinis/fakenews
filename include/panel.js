@@ -6,5 +6,11 @@ chrome.runtime.sendMessage( { text: 'frame_loaded' }, response => {
 	formdata = response;
 	var builder = new FNF_Form( document.getElementById( 'content' ) );
 	builder.render( formdata.config, formdata.values );
+
+	// Send separate message to gather WHOIS data after form rendered:
+	chrome.runtime.sendMessage( { text: 'whois', domain: formdata.values.dn }, response => {
+		builder.setFieldValue( 'whois', response );
+	});
+
 });
 
