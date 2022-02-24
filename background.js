@@ -73,10 +73,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 			});
 			return true;
 			break;
-
-		case 'copypaste':
-			chrome.tabs.sendMessage( sender.tab.id, msg );
-			break;
   }
 });
 

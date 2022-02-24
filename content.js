@@ -20,6 +20,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 				var iframe = _create( 'iframe', 'FakeNewsFrame', container );
 				iframe.src = msg.src;
 				iframe.frameBorder = '0';
+				iframe.setAttribute( 'allow', 'clipboard-write' );
 
 				var button = _create( 'button', 'FakeNewsFrameToggle', container );
 				//button.textContent = 'Toggle';
@@ -62,9 +63,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 			}
 			break;
 
-		case 'copypaste':
-			createPopup( msg.data );
-			break;
 	}
 
 });
@@ -80,73 +78,6 @@ function _create( type, id, parent ) {
 	}
 
 	return el;
-}
-
-function createPopup( contents ) {
-
-	if ( !fnContainer ) {
-		console.warn( 'Cannot add popup before container is created.' );
-		return;
-	}
-
-	// Create and reuse elements.
-	if ( ! ( fnPopup && fnPopup.popup ) ) {
-
-		var popup = _create( 'div', 'FakeNewsPopup' );
-		// Close button
-		var close = _create( 'button', 'FakeNewsPopupCloseButton', popup );
-		close.innerHTML = '&times;';
-		close.addEventListener( 'click', e => {
-			e.preventDefault();
-			popup.parentNode.removeChild( popup );
-		});
-
-		var header = _create( 'div', 'FakeNewsPopupHeader', popup );
-
-		// Copy button
-		var copy = _create( 'button', 'FakeNewsPopupCopyButton', header );
-		copy.textContent = 'Copy report to clipboard';
-
-		// Contents
-		var content = _create( 'div', 'FakeNewsPopupContent', popup );
-
-		copy.addEventListener( 'click', e => {
-
-			if ( navigator.clipboard ) {
-				// Clipboard API on secure pages
-				const type = 'text/html';
-				const blob = new Blob( [content.innerHTML], { type });
-				const data = [ new ClipboardItem({ [type]: blob }) ];
-				navigator.clipboard.write( data ).then(
-					e => alert( 'Success' ),
-					e => alert( 'Failure' )
-				);
-
-			} else {
-				// OG Copy command API
-				var sel = window.getSelection();
-				range = document.createRange();
-				range.selectNodeContents( content );
-				sel.removeAllRanges();
-				sel.addRange( range );
-
-				// HTML support, from https://stackoverflow.com/questions/23934656/javascript-copy-rich-text-contents-to-clipboard
-				function copyListener(e) {
-					e.clipboardData.setData( 'text/html', content.innerHTML );
-					e.preventDefault();
-				}
-
-				document.addEventListener( 'copy', copyListener );
-				document.execCommand( 'copy' );
-				document.removeEventListener( 'copy', copyListener );
-			}
-		});
-
-		fnPopup = { popup, content };
-	}
-
-	fnPopup.content.innerHTML = contents;
-	fnContainer.appendChild( fnPopup.popup );
 }
 
 function gatherPageValues() {

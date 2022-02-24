@@ -117,7 +117,10 @@
 				e.preventDefault();
 				const data = this.gatherFormValues();
 				const report = new FNF_Report( data );
-				report.sendToCopyPopup();
+				var el = report.createCopyPopup();
+				if ( ! el.parentNode ) {
+					this.ui.panel.appendChild( el );
+				}
 			});
 		},
 
