@@ -12,6 +12,7 @@ body {
 	margin: 0;
 	padding: 0;
 
+	user-select: none;
 }
 
 header {
@@ -36,7 +37,7 @@ header h1, header h2 {
 }
 
 #tab-nav {
-	margin: 10px 10px 0;
+	margin: 10px 10px 0 15px;
 	display: flex;
 }
 
@@ -227,4 +228,132 @@ form .likert-q3 li {
 	display: flex;
 	justify-content: space-around;
 	gap: 10px;
+}
+
+
+#FakeNewsPopup {
+    position: absolute;
+    top: 40px;
+    left: 10px;
+    right: 10px;
+    box-sizing: border-box;
+    padding: 15px;
+    max-width: 100%;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 10px 10px 10px rgba( 0,0,0,0.5);
+    border: solid 1px #ccc;
+
+    transition: opacity .5s, right .5s;
+}
+
+/*
+#FakeNewsPopup[data-fnf-closed="1"] {
+    opacity: 0;
+    left: 0;
+}
+*/
+
+#FakeNewsPopupContent {
+    border: solid black 1px;
+    overflow: auto;
+    margin-top: 15px;
+    padding: 5px;
+    font-size: .7em;
+    max-height: 80vh;
+    user-select: text;
+}
+
+#FakeNewsPopupContent h1 {
+	font-size: 14px;
+}
+
+#FakeNewsPopupCloseButton {
+    position: absolute;
+    right: -5px;
+    top: -5px;
+    font-size: 20px;
+    line-height: 20px;
+    width: 24px;
+    height: 24px;
+    border: solid #888 1px;
+    background-color: #eee;
+    border-radius: 12px;
+    text-align: center;
+    padding: 0;
+}
+
+
+#FakeNewsPopupCloseButton:hover,
+#FakeNewsPopupCloseButton:focus,
+#FakeNewsPopupCloseButton:active {
+    background-color: #888;
+}
+
+.tooltip {
+	position: absolute;
+	border: solid 1px #888;
+	border-radius: 15px;
+	background-color: #fff;
+	box-shadow: 0px 5px 5px #666;
+
+	padding: 10px;
+	max-width: 80%;
+	box-sizing: border-box;
+
+	visibility: hidden;
+}
+
+.tooltip[data-animate="1"] {
+	animation-name: tooltip;
+	animation-duration: 5s;
+	
+}
+
+.tooltip:before {
+	content: '';
+	position: absolute;
+	display: block;
+	width: 0;
+	height: 0;
+	left: calc( 50% - 10px);
+	top: -10px;
+
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+
+	border-bottom: 10px solid #888;
+
+}
+
+.arrow-down {
+	width: 0; 
+	height: 0; 
+}
+
+
+@keyframes tooltip {
+	from {
+		visibility: hidden;
+		opacity: 0%;
+		transform: translate(0, 10px);
+	}
+
+	10% {
+		visibility: visible;
+		opacity: 100%;
+		transform: translate(0, 0px);
+	}
+
+	80% {
+		visibility: visible;
+		opacity: 100%;
+		transform: translate(0, 0px);
+	}
+
+	to {
+		visibility: hidden;
+		opacity: 0%;
+		transform: translate(0, 10px);
+	}
 }

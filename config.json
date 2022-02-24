@@ -3,7 +3,7 @@
 
 	"whois_base_url": "https://fnf.deltafactory.net/?q=",
 
-	"disable_google_drive": true,
+	"disable_google_drive": false,
 
 	"tabs": [
 		{
