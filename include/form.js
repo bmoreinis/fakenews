@@ -238,9 +238,13 @@
 			}
 
 			var el = _create( 'div', '', 'form-group', tabui.content );
-			var label = _create( 'label', '', 'field-label', el );
+			var label = _create( 'label', data.id + '_label', 'field-label', el );
 			el.setAttribute( 'for', data.id );
 			label.textContent = data.label;
+
+
+			el.setAttribute( 'role', 'group' );
+			el.setAttribute( 'aria-labelledby', data.id + '_label' );
 
 			if ( data.contextual_help ) {
 				var hlp = data.contextual_help;
