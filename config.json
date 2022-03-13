@@ -1,7 +1,7 @@
 {
 	"documentTitle": "FNF - ",
 
-	"whois_base_url": "https://fnf.deltafactory.net/?q=",
+	"whois_base_url": "https://whois.fakenewsfitness.org/?q=",
 
 	"disable_google_drive": false,
 
@@ -26,15 +26,21 @@
 					"label": "Previous",
 					"args": [ "tab1" ]
 				},
-
 				{
-					"type": "save_google",
-					"label": "Save to Google Drive"
-				},
-
+					"type": "changetab",
+					"label": "Next",
+					"args": [ "actions" ]
+				}
+			]
+		},
+		{
+			"id": "actions",
+			"label": "Actions",
+			"footer_actions": [
 				{
-					"type": "save_copypaste",
-					"label": "Copy/Paste Report"
+					"type": "changetab",
+					"label": "Previous",
+					"args": [ "tab2" ]
 				}
 			]
 		}
@@ -260,6 +266,31 @@
 			"id": "questions",
 			"label": "Questions (for Commenters)",
 			"type": "textarea"
+		},
+
+
+		{
+			"tabid": "actions",
+			"id": "action_instructions",
+			"type": "html",
+			"content": "Instructions <strong>here</strong>"
+		},
+
+		{
+			"tabid": "actions",
+			"id": "action_save_google",
+			"type": "actionbutton",
+			"buttonlabel": "Save to Google Drive",
+			"action": "save_google"
+		},
+
+		{
+			"tabid": "actions",
+			"id": "action_copypaste",
+			"type": "actionbutton",
+			"buttonlabel": "Copy/Paste Report",
+			"action": "save_copypaste"
 		}
+
 	]
 }

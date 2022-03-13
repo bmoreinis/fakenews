@@ -180,21 +180,37 @@
 						// Global drive setting overrides footer action.
 						if ( this.config.disable_google_drive ) {
 							break;
+
 						}
 
-						var b = _create( 'button', '', '', ui.footer );
-						b.textContent = data.label;
-						this.bindGoogleDrive( b );
-						break;
-
+						/* falls through */
 					case 'save_copypaste':
+
 						var b = _create( 'button', '', '', ui.footer );
 						b.textContent = data.label;
-						this.bindCopyPaste( b );
+						this.bindClickAction( data.type, b );
 						break;
 				}
 			});
 
+		},
+
+		bindClickAction: function( action, el ) {
+			switch( action ) {
+				case 'save_google':
+					if ( this.config.disable_google_drive ) {
+						break;
+					}
+
+					this.bindGoogleDrive( el );
+					break;
+
+				case 'save_copypaste':
+					this.bindCopyPaste( el );
+					break;
+			}
+
+			return el;
 		},
 
 		setActiveTab: function( tabid ) {
@@ -238,17 +254,23 @@
 			}
 
 			var el = _create( 'div', '', 'form-group', tabui.content );
-			var label = _create( 'label', data.id + '_label', 'field-label', el );
 			el.setAttribute( 'for', data.id );
-			label.textContent = data.label;
+
+			// Label is optional now, for HTML type mainly.
+			var label = false;
+
+			if ( data.label ) {
+				label = _create( 'label', data.id + '_label', 'field-label', el );
+				label.textContent = data.label;
 
 
-			el.setAttribute( 'role', 'group' );
-			el.setAttribute( 'aria-labelledby', data.id + '_label' );
+				el.setAttribute( 'role', 'group' );
+				el.setAttribute( 'aria-labelledby', data.id + '_label' );
+			}
 
 			if ( data.contextual_help ) {
 				var hlp = data.contextual_help;
-				var helplink = _create( 'a', '', 'help-link', label );
+				var helplink = _create( 'a', '', 'help-link', label || el );
 				helplink.target = '_blank';
 				if ( hlp.url ) {
 					helplink.href = hlp.url;
@@ -479,6 +501,25 @@
 			return el;
 		},
 
+		createHtmlRegion: function( data ) {
+			var el = _create( 'div' );
+			if ( data.content ) {
+				el.innerHTML = data.content;
+			}
+
+			return el;
+		},
+
+		createActionButton: function( data ) {
+			var el = _create( 'button' );
+			if ( data.buttonlabel ) {
+				el.innerHTML = data.buttonlabel;
+			}
+
+			this.bindClickAction( data.action, el );
+			return el;
+		},
+
 		inputBuilders: {
 			text: 'createTextInput',
 			textarea: 'createTextareaInput',
@@ -487,19 +528,32 @@
 			likert: 'createLikertInput',
 			list: 'createListInput',
 			linklist: 'createLinkListInput',
-			link: 'createLinkInput'
+			link: 'createLinkInput',
+			html: 'createHtmlRegion',
+			actionbutton: 'createActionButton'
 		},
 
 		gatherFormValues: function() {
 			const f = this.fields;
 			const keys = Object.keys( f );
 			const data = {};
+			const ignoreTypes = [ 'html', 'actionbutton' ];
 
 			keys.forEach( k => {
-				data[k] = {
-					field: f[k],
-					value: this.getFieldValue( f[k], k )
-				};
+
+				// Buttons and HTML areas are for onscreen instruction, not gathering value.
+				if ( ignoreTypes.indexOf( f[k].config.type ) !== -1 ) {
+					return;
+				}
+
+				let value = this.getFieldValue( f[k], k );
+
+				if ( value !== null ) {
+					data[k] = {
+						field: f[k],
+						value
+					};
+				}
 			});
 
 			return data;
