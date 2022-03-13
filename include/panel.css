@@ -11,7 +11,7 @@ body {
 	overflow-x: hidden;
 	margin: 0;
 	padding: 0;
-
+	background: #fff url("diamondplate.png") repeat;
 	user-select: none;
 }
 
@@ -36,6 +36,8 @@ header h1, header h2 {
 	margin: 5px;
 }
 
+
+
 #tab-nav {
 	margin: 10px 10px 0 15px;
 	display: flex;
@@ -51,6 +53,12 @@ header h1, header h2 {
 	top: 1px;
 	margin-right: 5px;
 	border-bottom: 0;
+	background-color:#fcfcfc;
+	border-bottom: 1px solid #B93A3D;
+}
+
+#tab-nav a:hover {
+	background-color:#EFEFEF;
 }
 
 #tab-sections > div {
@@ -63,6 +71,7 @@ header h1, header h2 {
 #tab-nav a[data-tab-active] {
 	background-color: #fff;
 	border-color: var(--fnf-dark-red);
+	border-bottom: none;
 }
 
 #tab-sections .fnf-tab[data-tab-active] {
