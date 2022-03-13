@@ -1,4 +1,3 @@
-
 //const configUrl = 'https://config.fakenewsfitness.org/config.json';
 const configUrl = '/config.json';
 

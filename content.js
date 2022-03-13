@@ -21,12 +21,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 				iframe.src = msg.src;
 				iframe.frameBorder = '0';
 				iframe.setAttribute( 'allow', 'clipboard-write' );
+				iframe.title = 'Fake News Fitness Evaluation Form';
 
 				var button = _create( 'button', 'FakeNewsFrameToggle', container );
-				//button.textContent = 'Toggle';
+				button.setAttribute( 'aria-label', 'Toggle Fake News Fitness panel' );
+
 				var img = _create( 'img', 'FakeNewsFrameToggleImage', button );
 				img.src = chrome.runtime.getURL( '/img/tab.png' );
-				img.alt = 'Toggle';
+				//img.alt = 'Toggle';
 
 				button.addEventListener( 'click', function(){
 					var d = 'data-fnf-closed';
