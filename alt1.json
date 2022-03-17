@@ -1,0 +1,29 @@
+{
+	"documentTitle": "FNF - ",
+
+	"whois_base_url": "https://whois.fakenewsfitness.org/?q=",
+
+	"disable_google_drive": false,
+
+	"tabs": [
+		{
+			"id": "actions",
+			"label": "Actions"
+		}
+	],
+
+	"fields": [
+		{
+			"tabid": "actions",
+			"id": "action_selectconfig",
+			"label": "Select Configuration",
+			"type": "configselector",
+			"options": [
+				{
+					"label": "Alt 1",
+					"url": "/alt1.json"
+				}
+			]
+		}
+	]
+}

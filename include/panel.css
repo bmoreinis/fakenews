@@ -366,3 +366,8 @@ form .likert-q3 li {
 		transform: translate(0, 10px);
 	}
 }
+
+
+.config-selector {
+	margin-right: 10px;
+}

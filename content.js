@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	switch( action ) {
 
 		// User has clicked on the FNF icon. Add the frame to the page.
-		case 'add_frame':
+		case 'open_frame':
 
 			if ( !fnContainer ) {
 				var container = _create( 'div', 'FakeNewsContainer' );
@@ -58,11 +58,19 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 		case 'close_frame':
 			var el = document.getElementById( 'FakeNewsContainer' );
 			if ( el ) {
-				var msg = 'This will close the panel and lose any changes.\n\nAre you sure?';
-				if ( confirm( msg ) ) {
+				if ( msg.noprompt ) {
 					el.parentNode.removeChild( el );
+					sendResponse( true );
+				} else {
+					var message = 'This will close the panel and lose any changes.\n\nAre you sure?';
+					if ( confirm( message ) ) {
+						el.parentNode.removeChild( el );
+						sendResponse( true );
+					}
 				}
 			}
+
+			sendResponse( false );
 			break;
 
 	}
