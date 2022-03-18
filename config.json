@@ -195,7 +195,7 @@
 			"tabid": "tab2",
 			"id": "whois",
 			"label": "WHOIS Lookup",
-			"type": "whois",
+			"type": "list",
 			"noRemove": true,
 			"noAdd": true
 		},
@@ -290,19 +290,7 @@
 			"type": "actionbutton",
 			"buttonlabel": "Copy/Paste Report",
 			"action": "save_copypaste"
-		},
-
-		{
-			"tabid": "actions",
-			"id": "action_selectconfig",
-			"label": "Select Configuration",
-			"type": "configselector",
-			"options": [
-				{
-					"label": "Alt 1",
-					"url": "/alt1.json"
-				}
-			]
 		}
+
 	]
 }
