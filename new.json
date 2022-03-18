@@ -95,12 +95,6 @@
 			"type": "text"
 		},
 
-		{
-			"tabid": "tab1",
-			"id": "pageTitle",
-			"label": "Page Title (<title>) - Could be headline?",
-			"type": "text"
-		},
 
 		{
 			"tabid": "tab1",
@@ -159,21 +153,15 @@
 		{
 			"tabid": "tab2",
 			"id": "allLinks",
-			"label": "Page Links - remove non-sources",
+			"label": "All Content Links",
 			"type": "linklist"
 		},
 
-		{
-			"tabid": "tab2",
-			"id": "otherSources",
-			"label": "Non-Linked Cited Sources",
-			"type": "list"
-		},
 
 		{
 			"tabid": "tab2",
 			"id": "claimEvidence",
-			"label": "Evidence for Claims",
+			"label": "Claim Evidence Link(s)",
 			"type": "list"
 		},
 
@@ -203,7 +191,7 @@
 		{
 			"tabid": "tab2",
 			"id": "biasLevel",
-			"label": "Bias Level ( Click one )",
+			"label": "Site Bias Level",
 			"type": "likert",
 			"options": [
 				["Low Bias"],
@@ -215,7 +203,7 @@
 		{
 			"tabid": "tab2",
 			"id": "yourBias",
-			"label": "Your Bias Level ( Click one )",
+			"label": "Your Bias Towards Site",
 			"type": "likert",
 			"options": [
 				["Very Anti"],
@@ -223,20 +211,6 @@
 				["Neutral / Open"],
 				["Some Pro"],
 				["Very Pro"]
-			]
-		},
-
-		{
-			"tabid": "tab2",
-			"id": "trustRank",
-			"label": "Initial Trust Rank ( Click one )",
-			"type": "likert",
-			"options": [
-				["Full Mistrust"],
-				["Some Mistrust"],
-				["Cannot Tell"],
-				["Some Trust"],
-				["Full Trust"]
 			]
 		},
 
@@ -250,21 +224,37 @@
 		{
 			"tabid": "tab2",
 			"id": "mistrustMarkers",
-			"label": "Page Mistrust Markers & Red Flags",
+			"label": "Page Mistrust Markers",
 			"type": "textarea"
 		},
 
 		{
 			"tabid": "tab2",
+			"id": "trustRank",
+			"label": "Rank Article Credibility",
+			"type": "likert",
+			"options": [
+				["Full Mistrust"],
+				["Some Mistrust"],
+				["Cannot Tell"],
+				["Some Trust"],
+				["Full Trust"]
+			]
+		},
+
+		
+
+		{
+			"tabid": "tab2",
 			"id": "assessment",
-			"label": "Assessment Notes: Why this rank?",
+			"label": "Why this Rank?",
 			"type": "textarea"
 		},
 
 		{
 			"tabid": "tab2",
 			"id": "questions",
-			"label": "Questions (for Commenters)",
+			"label": "Any Questions for Later?",
 			"type": "textarea"
 		},
 
@@ -301,7 +291,13 @@
 				{
 					"label": "New",
 					"url": "/new.json"
+				},
+
+				{
+					"label": "Original",
+					"url": "/config.json"
 				}
+
 			]
 		}
 	]
