@@ -572,14 +572,8 @@
 			const f = this.fields;
 			const keys = Object.keys( f );
 			const data = {};
-			//const ignoreTypes = [ 'html', 'actionbutton', 'configselector'];
 
 			keys.forEach( k => {
-
-				// Buttons and HTML areas are for onscreen instruction, not gathering value.
-				if ( ignoreTypes.indexOf( f[k].config.type ) !== -1 ) {
-					return;
-				}
 
 				let value = this.getFieldValue( f[k], k );
 
