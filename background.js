@@ -1,11 +1,11 @@
 //const configUrl = 'https://config.fakenewsfitness.org/config.json';
-const configUrl = '/config.json';
-
+const defaultConfigUrl = '/config.json';
 var config = null;
 
 function getConfig() {
 	if ( !config ) {
-	  return fetch( configUrl )
+	  return getConfigUrl()
+	  	.then( configUrl => fetch( configUrl ) )
 	  	.then( response => response.json() )
 	  	.then( cfg => {
 	  		// Store in global
@@ -18,50 +18,78 @@ function getConfig() {
 	 }
 }
 
+function getConfigUrl() {
+	return chrome.storage.sync.get( ['configurl'] )
+		.then( items => {
+			return items.configurl || defaultConfigUrl;
+		});
+}
+
+function setConfigUrl( url ) {
+	resetConfig();
+	return chrome.storage.sync.set( { configurl: url } );
+}
+
+function resetConfig() {
+	config = null;
+}
+
 // Now users updated function signature as of 25 Feb 2019
 // See: https://developer.chrome.com/extensions/browserAction#event-onClicked
 chrome.action.onClicked.addListener(function(tab) {
-		chrome.tabs.sendMessage( tab.id, {
-			text: 'add_frame',
-			src: chrome.runtime.getURL( '/panel.html' )
-		});
+	openFrame( tab.id );
 });
 
+function openFrame( tabid ) {
+	chrome.tabs.sendMessage( tabid, {
+		text: 'open_frame',
+		src: chrome.runtime.getURL( '/panel.html' )
+	});
+}
 
 chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 	var action = msg.text || '';
-
-	//console.log( 'received bg messagex', action, msg );
 
 	switch (action) {
 
 		case 'create_doc':
 			const drive = new GoogleDrive();
-				drive.getToken( true )
-					.then( () => drive.createFile( msg.data, msg.filename ) )
-					.then( data => drive.getFileById( data.id ) )
-					.then( data => {
-
-						// Create new tab. Additional info sent to callback via response() below.
-						if ( data.webViewLink ) {
-							chrome.tabs.create({ url: data.webViewLink });
-						}
-						response( data );
-					});
+			drive.getToken( true )
+				.then( () => drive.createFile( msg.data, msg.filename ) )
+				.then( data => drive.getFileById( data.id ) )
+				.then( data => {
+					// Create new tab. Additional info sent to callback via response() below.
+					if ( data.webViewLink ) {
+						chrome.tabs.create({ url: data.webViewLink });
+					}
+					response( data );
+				});
 
 			return true; // Enables response callback when used asynchronously.
 			break;
 
+		case 'set_config':
+			setConfigUrl( msg.url ).then( () => response( msg.url ) );
+			return true;
+			break;
+		case 'open_frame':
+			openFrame( sender.tab.id );
+			break;
+
 		case 'frame_loaded':
 			getConfig().then( config => {
-					chrome.tabs.sendMessage( sender.tab.id, { text: 'gather_values' }, values => response( { config, values } ) );
+				chrome.tabs.sendMessage( sender.tab.id, { text: 'gather_values' }, values => response( { config, values } ) );
 			});
 			return true;
 			break;
 
 		// Relay close_frame request from iFrame to content script.
 		case 'close_frame':
-			chrome.tabs.sendMessage( sender.tab.id, { text: 'close_frame' } );
+			chrome.tabs.sendMessage( sender.tab.id, msg, closed => {
+				if ( msg.reopen ) {
+					openFrame( sender.tab.id );
+				}
+			} );
 			return true;
 			break;
 
@@ -76,7 +104,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, response) {
 });
 
 function whoisLookup( hostname ) {
-	//console.log( config );
 	var esc_domain = encodeURIComponent( hostname );
 	var lookup_url = config.whois_base_url + esc_domain;
 
@@ -140,7 +167,6 @@ GoogleDrive.prototype = {
 
 	request: async function( method, url, body, headers ) {
 		const { token } = await this.getToken();
-		//console.log( token );
 
 		if ( !token ) {
 			throw 'Missing token';
@@ -190,7 +216,6 @@ GoogleDrive.prototype = {
 			[ 'Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document', fileData ],
 		];
 		const body = this.createMultipart( bodyparts );
-		//console.log( bodyparts, body );
 		const url = "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
 		const response = await this.request( 'POST', url, body );
 		return response.json();
@@ -198,16 +223,10 @@ GoogleDrive.prototype = {
 
 	getFileById: async function( fileId, fields ) {
 		fields = fields || 'webViewLink';
-		//console.log( 'Getting file info', fileId );
 
 		const url = "https://www.googleapis.com/drive/v3/files/" + fileId + '?fields=' + encodeURIComponent( fields );
 		const response = await this.request( 'GET', url );
 
-		//console.log( 'getfile responding', response );
 		return response.json();
 	}
-}
-
-function FNF_Report() {
-
 }
