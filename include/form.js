@@ -520,6 +520,39 @@
 			return el;
 		},
 
+		createConfigSelector: function( data ) {
+			var el = _create( 'div' );
+			var sel = _create( 'select', '', 'config-selector', el );
+			var button = _create( 'button', '', '', el );
+			button.textContent = 'Save/Reload';
+			button.addEventListener( 'click', e => {
+				chrome.runtime.sendMessage( { text: 'set_config', url: sel.value }, () => {
+					chrome.runtime.sendMessage( { text: 'close_frame', noprompt: 1, reopen: 1 } );
+				});
+			});
+
+			var optDefault = _create( 'option' );
+			optDefault.value = '';
+			optDefault.text = 'Default';
+			sel.options.add( optDefault );
+
+			if ( data.options.length ) {
+				for( var i=0,n=data.options.length; i<n; i++ ) {
+					var item = data.options[i];
+					if ( ! item.url ) {
+						continue;
+					}
+
+					var opt = _create( 'option' );
+					opt.value = item.url;
+					opt.text = item.label || item.url;
+					sel.options.add( opt );
+				}
+			}
+
+			return el;
+		},
+
 		inputBuilders: {
 			text: 'createTextInput',
 			textarea: 'createTextareaInput',
@@ -527,10 +560,12 @@
 			checkbox: 'createCheckboxInput',
 			likert: 'createLikertInput',
 			list: 'createListInput',
+			whois: 'createListInput',
 			linklist: 'createLinkListInput',
 			link: 'createLinkInput',
 			html: 'createHtmlRegion',
-			actionbutton: 'createActionButton'
+			actionbutton: 'createActionButton',
+			configselector: 'createConfigSelector'
 		},
 
 		gatherFormValues: function() {
@@ -594,10 +629,16 @@
 					break;
 
 				case 'list':
+				case 'whois':
 				case 'linklist':
 					var items = field.input.querySelectorAll( 'li .list-value' );
 					value = [];
 					items.forEach( el => value.push( el.textContent ) );
+					break;
+
+				case 'html':
+				case 'actionbutton':
+				case 'configselector':
 					break;
 
 				default:
@@ -626,6 +667,7 @@
 
 				// Array of entries
 				case 'list':
+				case 'whois':
 				case 'linklist':
 					var list = field.input.querySelector( '.list-items' );
 					value = Array.isArray( value ) ? value : [ value ];
