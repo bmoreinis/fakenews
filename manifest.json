@@ -3,7 +3,7 @@
 
   "name": "FakeNewsFitness Plugin",
   "description": "This extension will analyze a page for truth value",
-  "version": "3.3.0",
+  "version": "3.2.3",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx0IC6RtP2vrNIe2DjqIlCUkPh06wcc4JYEVMYE6KLd+u6j6E3pFShdn2GZtROrOMK5xoWtjzTAb3abU1naSnGKD0fWhcOBwYNbRdatNAhJPvkOyRoFt5QyHDQVhjQpPEgwPgKYJ0cBPV1RCWKpx/YVds+sSd/GyQ3ft5BYwXf++D4RK7NPJlkZgjoT6MKbTLVjpLpmoFhTPzGILTPacOt99e6yJu4wp/Pn9cFoQ3qdcmvQAXaBV2okpmlGblF4CbX6B6z1d9AcCkdOijR0/r9atzNUFAKVnKSHBGQZ9CHnWj5SmXBQTSx1bb8+IJCFin3DHlqmOLnv3O80zSK2Br3QIDAQAB",
   "oauth2": {
     "client_id": "177922651464-t5kp828e4u8g8bobn1q6v8dc4vfolh5t.apps.googleusercontent.com",
@@ -39,8 +39,7 @@
   "permissions": [
     "activeTab",
     "downloads",
-    "identity",
-    "storage"
+    "identity"
    ],
 
   "host_permissions": [
