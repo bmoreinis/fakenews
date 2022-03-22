@@ -47,12 +47,6 @@
 	],
 
 	"fields": [
-		{
-			"tabid": "tab1",
-			"id": "studentName",
-			"label": "Student Name",
-			"type": "text"
-		},
 
 		{
 			"tabid": "tab1",
@@ -91,7 +85,7 @@
 		{
 			"tabid": "tab1",
 			"id": "pageArticle",
-			"label": "Headline (First <H1>) - Paste headline here!",
+			"label": "Headline (First <H1>)",
 			"type": "text"
 		},
 
@@ -113,21 +107,26 @@
 		{
 			"tabid": "tab1",
 			"id": "modifiedDate",
-			"label": "Dateline or Posted/Modified Date",
+			"label": "Dateline or Posted Date",
 			"type": "text"
 		},
 
 		{
 			"tabid": "tab2",
-			"id": "headlineMatch",
-			"label": "Headline Matches Content?",
-			"type": "boolean"
+			"id": "clickbaitRank",
+			"label": "Clickbait Content",
+			"type": "likert",
+			"options": [
+				["Not Clickbait"],
+				["Some Clickbait Markers"],
+				["Definitely Clickbait"]
+			]
 		},
 
 		{
 			"tabid": "tab2",
 			"id": "advertisingContent",
-			"label": "Advertising / Content Ratio ( Click one )",
+			"label": "Ads/Content Ratio",
 			"type": "likert",
 			"options": [
 				["No Ads"],
@@ -140,85 +139,14 @@
 
 		{
 			"tabid": "tab2",
-			"id": "clickbaitRank",
-			"label": "Clickbait Rank ( Click one )",
-			"type": "likert",
-			"options": [
-				["Not Clickbait"],
-				["Some Bait Markers"],
-				["Definitely Clickbait"]
-			]
-		},
-
-		{
-			"tabid": "tab2",
-			"id": "allLinks",
-			"label": "All Content Links",
-			"type": "linklist"
-		},
-
-
-		{
-			"tabid": "tab2",
-			"id": "claimEvidence",
-			"label": "Claim Evidence Link(s)",
-			"type": "list"
-		},
-
-		{
-			"tabid": "tab2",
-			"id": "aboutLinks",
-			"label": "About Us Link",
-			"type": "text"
-		},
-
-		{
-			"tabid": "tab2",
-			"id": "aboutSummary",
-			"label": "About Us Summary",
-			"type": "textarea"
-		},
-
-		{
-			"tabid": "tab2",
-			"id": "whois",
-			"label": "WHOIS Lookup",
-			"type": "whois",
-			"noRemove": true,
-			"noAdd": true
-		},
-
-		{
-			"tabid": "tab2",
 			"id": "biasLevel",
-			"label": "Site Bias Level",
+			"label": "Article Bias Level",
 			"type": "likert",
 			"options": [
 				["Low Bias"],
 				["Some Bias"],
 				["High Bias"]
 			]
-		},
-
-		{
-			"tabid": "tab2",
-			"id": "yourBias",
-			"label": "Your Bias Towards Site",
-			"type": "likert",
-			"options": [
-				["Very Anti"],
-				["Some Anti"],
-				["Neutral / Open"],
-				["Some Pro"],
-				["Very Pro"]
-			]
-		},
-
-		{
-			"tabid": "tab2",
-			"id": "trustMarkers",
-			"label": "Page Trust Markers",
-			"type": "textarea"
 		},
 
 		{
@@ -230,8 +158,15 @@
 
 		{
 			"tabid": "tab2",
+			"id": "trustMarkers",
+			"label": "Page Trust Markers",
+			"type": "textarea"
+		},
+
+		{
+			"tabid": "tab2",
 			"id": "trustRank",
-			"label": "Rank Article Credibility",
+			"label": "Rank Overall Trust",
 			"type": "likert",
 			"options": [
 				["Full Mistrust"],
@@ -242,7 +177,6 @@
 			]
 		},
 
-		
 
 		{
 			"tabid": "tab2",
@@ -250,20 +184,12 @@
 			"label": "Why this Rank?",
 			"type": "textarea"
 		},
-
-		{
-			"tabid": "tab2",
-			"id": "questions",
-			"label": "Any Questions for Later?",
-			"type": "textarea"
-		},
-
-
+		
 		{
 			"tabid": "actions",
 			"id": "action_instructions",
 			"type": "html",
-			"content": "Instructions <strong>here</strong>"
+			"content": "Lesson I <strong>Instructions</strong>"
 		},
 
 		{
@@ -289,15 +215,13 @@
 			"type": "configselector",
 			"options": [
 				{
-					"label": "New",
+					"label": "Surface",
 					"url": "/new.json"
 				},
-
 				{
-					"label": "Original",
+					"label": "Detailed",
 					"url": "/config.json"
 				}
-
 			]
 		}
 	]
