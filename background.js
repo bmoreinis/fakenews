@@ -2,10 +2,21 @@ const defaultConfigUrl = 'https://config.fakenewsfitness.org/config.json';
 var config = null;
 
 function getConfig() {
+	var url;
 	if ( !config ) {
 	  return getConfigUrl()
-	  	.then( configUrl => fetch( configUrl ) )
+	  	.then( configUrl => {
+	  		url = configUrl;
+	  		console.log( 'Attempting config fetch', url );
+	  		return fetch( configUrl );
+	  	})
 	  	.then( response => response.json() )
+		.catch( err => {
+	  		if ( url != defaultConfigUrl ) {
+	  			return setConfigUrl( defaultConfigUrl )
+	  				.then( () => getConfig() );
+	  		}
+	  	})
 	  	.then( cfg => {
 	  		// Store in global
 	  		config = cfg;
