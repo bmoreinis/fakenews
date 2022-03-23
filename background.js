@@ -1,5 +1,4 @@
-//const configUrl = 'https://config.fakenewsfitness.org/config.json';
-const defaultConfigUrl = '/config.json';
+const defaultConfigUrl = 'https://config.fakenewsfitness.org/config.json';
 var config = null;
 
 function getConfig() {
