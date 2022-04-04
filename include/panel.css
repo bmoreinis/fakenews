@@ -46,7 +46,7 @@ header h1, header h2 {
 #tab-nav a {
 	display: block;
 	border: solid #888 1px;
-	padding: 5px 10px;
+	padding: 5px;
 	text-decoration: none;
 	color: #000;
 	position: relative;
