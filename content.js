@@ -42,6 +42,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 				document.body.appendChild( fnContainer );
 			}
 
+			warnBeforeUnload( true );
 			break;
 
 		case 'gather_values':
@@ -71,6 +72,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 			}
 
 			sendResponse( false );
+			warnBeforeUnload( false );
 			break;
 
 	}
@@ -321,6 +323,23 @@ function checkSelfReferralLink(link) {
 function backlinkCounter () {
 	//insert fxn here
 }
+
+// BeforeUnload Listener
+function unloadWarning( e ) {
+	var msg = 'If you leave this page you will empty the Fake News form!';
+	e.preventDefault();
+	return e.returnValue = msg;
+}
+
+function warnBeforeUnload( warn ) {
+	if ( warn ) {
+		window.addEventListener( 'beforeunload', unloadWarning, { capture: true } );
+	} else {
+		window.removeEventListener( 'beforeunload', unloadWarning, { capture: true } );
+	}
+}
+
+
 
 //return public methods MBM1
 const controller = {
